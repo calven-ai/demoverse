@@ -1,0 +1,84 @@
+# =============================================================================
+# slack-personas.yaml — synthetic Slack identities
+#
+# WHAT THIS FILE CONTROLS
+#   Who posts in the demo Slack workspace. ONE controller app posts every
+#   message under a per-message username + avatar (chat:write.customize), so
+#   this roster can be any size. Two groups:
+#     internal_personas — standing employee voices for #general / #competitive
+#                         / #win-loss (they have no CRM link)
+#     rep_personas      — the deal-owning reps from sales-team.yaml, who also
+#                         post in Slack (same person owns the deal in the CRM
+#                         and discusses it in Slack)
+#   Buyer-side contacts are referenced by name in threads but never post —
+#   internal chatter is employees only.
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   1. Copy to config/slack-personas.yaml. Rename the internal roster to
+#      fictional employees of YOUR fictional company (5–6 voices covering
+#      exec, marketing, sales-adjacent and ops roles works well).
+#   2. rep_personas: `display` MUST equal the rep `name` in sales-team.yaml
+#      exactly, and `handle` MUST equal the engine's derived handle for that
+#      name: lowercase, every run of non a-z characters collapsed to "."
+#      (e.g. "Avery Stone" -> avery.stone). If they don't match, the persona
+#      won't bind to the rep.
+#   3. `voice` is a one-line voice card rendered into Slack prompts so the
+#      personas don't all sound alike — and so they don't fall into fixed
+#      reflexes (the VP congratulating every win, the CSM volunteering
+#      onboarding on every thread). Edit freely; it changes only future prose.
+#
+# AVATARS
+#   avatar_style: initials | emoji | image. `initials` (the default here)
+#   needs no `avatar` field at all — Slack renders an initials block, no
+#   external assets involved. If you switch to `image`, set each persona's
+#   `avatar` to an http(s) URL of a clearly-synthetic illustrated avatar
+#   (never a real person's photo); a :shortcode: value renders as an emoji
+#   icon instead. Names + icons are baked in at first post — set them before
+#   the backfill.
+# =============================================================================
+
+avatar_style: initials          # initials | emoji | image
+
+# Standing internal voices beyond the deal-owning reps.
+internal_personas:
+  - handle: taylor.ceo
+    display: Taylor Brennan     # TODO: fictional CEO
+    role: CEO
+    voice: "posts rarely and briefly — one short sentence, usually a question about revenue impact or repeatability; never cheerleads"
+  - handle: dana.marketing
+    display: Dana Okafor        # TODO: fictional marketing lead
+    role: Head of Marketing
+    voice: "direct, asks for specifics, comfortable disagreeing with a rep's read of a deal"
+  - handle: chris.sales
+    display: Chris Mercer       # TODO: fictional VP Sales
+    role: VP Sales
+    voice: "blunt and pipeline-focused — asks what's repeatable, what stalled, who else fits the pattern; congratulates rarely and briefly"
+  - handle: priya.se
+    display: Priya Raman        # TODO: fictional sales engineer
+    role: Sales Engineer
+    voice: "technical and precise, hedges claims, cites what she actually saw in POCs; asks integration/security questions"
+  - handle: marco.csm
+    display: Marco Silva        # TODO: fictional CSM
+    role: Customer Success Manager
+    voice: "pragmatic, thinks about the customer's first 90 days; raises onboarding or churn risk only when the thread genuinely touches it"
+  - handle: omar.revops
+    display: Omar Haddad        # TODO: fictional RevOps
+    role: Revenue Operations
+    voice: "nitpicks data hygiene, quotes concrete numbers and stage history, reminds people to log things in the CRM"
+
+# The deal-owning reps (pulled from sales-team.yaml `ics` automatically; listed
+# here to pin voice + avatar). `display` must equal the sales-team.yaml `name`;
+# `handle` must be that name lowercased with non a-z runs collapsed to ".".
+rep_personas:
+  - handle: avery.stone
+    display: Avery Stone
+    voice: "structured deal narrator — writes 2–4 sentence updates with the why behind the outcome; occasionally self-critical about what he missed"
+  - handle: casey.nguyen
+    display: Casey Nguyen
+    voice: "steady and factual — logs what happened and the next step, rarely editorializes"
+  - handle: riley.foster
+    display: Riley Foster
+    voice: "the new hire — asks more questions than she answers, tags teammates for help, over-shares learnings"
+  - handle: sam.whitfield
+    display: Sam Whitfield
+    voice: "quick and informal — short lines, dry humor, leads with the number or the blocker; hates writing long updates"

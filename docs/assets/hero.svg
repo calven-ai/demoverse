@@ -1,0 +1,348 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" shape-rendering="crispEdges" role="img" aria-label="An 8-bit pixel-art office on a white background: a green LED wall sign reads DEMOVERSE HQ — AGENTS AT WORK above two agents sitting at desks typing on green-on-black CRT terminals; on a loop, one picks up the phone for a call, they turn to chat with each other in a speech-bubble exchange, then the other takes a call and both go back to typing.">
+  <defs>
+    <pattern id="stripes" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#ffffff"/>
+      <rect width="8" height="3" fill="#f4f3ee"/>
+    </pattern>
+
+    <!-- CRT terminal, 92x90, base sits at y=90 -->
+    <g id="crt">
+      <rect x="30" y="78" width="24" height="8" fill="#111"/>
+      <rect x="20" y="86" width="52" height="4" fill="#111"/>
+      <rect x="0" y="0" width="92" height="78" fill="#111"/>
+      <rect x="4" y="4" width="84" height="70" fill="#f2efe6"/>
+      <rect x="12" y="12" width="68" height="50" fill="#111"/>
+      <rect x="16" y="16" width="60" height="42" fill="#161616"/>
+      <rect x="20" y="20" width="36" height="4" fill="#22c55e"/>
+      <rect x="20" y="28" width="24" height="4" fill="#15803d">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;.5;.75" dur="4s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="48" y="28" width="16" height="4" fill="#15803d" opacity="0">
+        <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;.5;.75" dur="4s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="20" y="36" width="44" height="4" fill="#15803d"/>
+      <rect x="20" y="44" width="16" height="4" fill="#22c55e"/>
+      <rect x="40" y="44" width="6" height="4" fill="#22c55e">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".8s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="72" y="66" width="6" height="4" fill="#22c55e"/>
+    </g>
+
+    <!-- keyboard, 64x12 -->
+    <g id="kbd">
+      <rect width="64" height="12" fill="#111"/>
+      <rect x="2" y="2" width="60" height="8" fill="#f2efe6"/>
+      <rect x="6" y="4" width="52" height="2" fill="#c9c6bb"/>
+      <rect x="6" y="7" width="52" height="2" fill="#c9c6bb"/>
+    </g>
+
+    <!-- agent poses: local 56x84, torso/arm rects unfilled so <use fill> sets shirt -->
+    <g id="a-type">
+      <rect x="8" y="0" width="40" height="12" fill="#111"/>
+      <rect x="8" y="12" width="6" height="8" fill="#111"/>
+      <rect x="42" y="12" width="6" height="8" fill="#111"/>
+      <rect x="14" y="12" width="28" height="22" fill="#eec39a"/>
+      <rect x="19" y="20" width="5" height="5" fill="#222"/>
+      <rect x="32" y="20" width="5" height="5" fill="#222"/>
+      <rect x="24" y="34" width="8" height="4" fill="#eec39a"/>
+      <rect x="4" y="38" width="48" height="46"/>
+      <rect x="-2" y="42" width="8" height="18"/>
+      <rect x="50" y="42" width="8" height="18"/>
+      <g>
+        <rect x="-2" y="56" width="10" height="8" fill="#eec39a"/>
+        <rect x="48" y="58" width="10" height="8" fill="#eec39a"/>
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".4s" repeatCount="indefinite"/>
+      </g>
+      <g opacity="0">
+        <rect x="-2" y="58" width="10" height="8" fill="#eec39a"/>
+        <rect x="48" y="56" width="10" height="8" fill="#eec39a"/>
+        <animate attributeName="opacity" calcMode="discrete" values="0;1" keyTimes="0;.5" dur=".4s" repeatCount="indefinite"/>
+      </g>
+    </g>
+
+    <g id="a-phone">
+      <rect x="8" y="0" width="40" height="12" fill="#111"/>
+      <rect x="8" y="12" width="6" height="8" fill="#111"/>
+      <rect x="14" y="12" width="28" height="22" fill="#eec39a"/>
+      <rect x="19" y="20" width="5" height="5" fill="#222"/>
+      <rect x="32" y="20" width="5" height="5" fill="#222"/>
+      <rect x="25" y="29" width="6" height="3" fill="#7a4a2b">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".5s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="24" y="34" width="8" height="4" fill="#eec39a"/>
+      <rect x="4" y="38" width="48" height="46"/>
+      <rect x="-2" y="42" width="8" height="18"/>
+      <rect x="-2" y="56" width="10" height="8" fill="#eec39a"/>
+      <rect x="46" y="38" width="10" height="10"/>
+      <rect x="50" y="32" width="8" height="8"/>
+      <rect x="48" y="26" width="8" height="8" fill="#eec39a"/>
+      <rect x="48" y="4" width="8" height="24" fill="#111"/>
+      <rect x="46" y="2" width="12" height="6" fill="#111"/>
+    </g>
+
+    <g id="a-talk">
+      <rect x="8" y="0" width="40" height="12" fill="#111"/>
+      <rect x="8" y="12" width="10" height="14" fill="#111"/>
+      <rect x="18" y="12" width="24" height="22" fill="#eec39a"/>
+      <rect x="42" y="20" width="4" height="6" fill="#eec39a"/>
+      <rect x="33" y="18" width="5" height="5" fill="#222"/>
+      <rect x="35" y="28" width="6" height="3" fill="#7a4a2b">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".35s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="24" y="34" width="8" height="4" fill="#eec39a"/>
+      <rect x="4" y="38" width="48" height="46"/>
+      <rect x="-2" y="42" width="8" height="18"/>
+      <rect x="50" y="42" width="8" height="18"/>
+      <rect x="-2" y="56" width="10" height="8" fill="#eec39a"/>
+      <rect x="48" y="56" width="10" height="8" fill="#eec39a"/>
+    </g>
+
+    <!-- handset resting on the phone base -->
+    <g id="handset-rest">
+      <rect x="0" y="0" width="8" height="8" fill="#111"/>
+      <rect x="22" y="0" width="8" height="8" fill="#111"/>
+      <rect x="6" y="2" width="18" height="4" fill="#111"/>
+    </g>
+
+    <!-- incoming-call blips -->
+    <g id="ring">
+      <rect x="0" y="4" width="5" height="5" fill="#22c55e">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="9" y="0" width="4" height="4" fill="#22c55e">
+        <animate attributeName="opacity" calcMode="discrete" values="0;1" keyTimes="0;.5" dur=".3s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <!-- speech bubble with typing dots, 88x59 incl. tail -->
+    <g id="bubble">
+      <rect x="0" y="0" width="88" height="44" fill="#111"/>
+      <rect x="3" y="3" width="82" height="38" fill="#fff"/>
+      <rect x="36" y="44" width="16" height="5" fill="#111"/>
+      <rect x="40" y="44" width="8" height="5" fill="#fff"/>
+      <rect x="40" y="49" width="10" height="5" fill="#111"/>
+      <rect x="43" y="49" width="4" height="5" fill="#fff"/>
+      <rect x="18" y="18" width="8" height="8" fill="#333" opacity="0">
+        <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;.1;.9" dur="1.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="40" y="18" width="8" height="8" fill="#333" opacity="0">
+        <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;.35;.9" dur="1.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="62" y="18" width="8" height="8" fill="#333" opacity="0">
+        <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;.6;.9" dur="1.2s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <!-- 5x5 pixel font (2-unit pixels, 10x10 glyphs); rects unfilled so <g fill> colors them -->
+    <g id="g-A"><rect x="2" width="6" height="2"/><rect y="2" width="2" height="8"/><rect x="8" y="2" width="2" height="8"/><rect x="2" y="4" width="6" height="2"/></g>
+    <g id="g-D"><rect width="8" height="2"/><rect y="2" width="2" height="6"/><rect x="8" y="2" width="2" height="6"/><rect y="8" width="8" height="2"/></g>
+    <g id="g-E"><rect width="10" height="2"/><rect y="2" width="2" height="6"/><rect y="4" width="8" height="2"/><rect y="8" width="10" height="2"/></g>
+    <g id="g-G"><rect x="2" width="8" height="2"/><rect y="2" width="2" height="6"/><rect x="6" y="4" width="4" height="2"/><rect x="8" y="4" width="2" height="4"/><rect x="2" y="8" width="6" height="2"/></g>
+    <g id="g-H"><rect width="2" height="10"/><rect x="8" width="2" height="10"/><rect x="2" y="4" width="6" height="2"/></g>
+    <g id="g-K"><rect width="2" height="10"/><rect x="8" width="2" height="2"/><rect x="6" y="2" width="2" height="2"/><rect x="2" y="4" width="4" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/></g>
+    <g id="g-M"><rect width="2" height="10"/><rect x="8" width="2" height="10"/><rect x="2" y="2" width="2" height="2"/><rect x="6" y="2" width="2" height="2"/><rect x="4" y="4" width="2" height="2"/></g>
+    <g id="g-N"><rect width="2" height="10"/><rect x="8" width="2" height="10"/><rect x="2" y="2" width="2" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="6" y="6" width="2" height="2"/></g>
+    <g id="g-O"><rect x="2" width="6" height="2"/><rect y="2" width="2" height="6"/><rect x="8" y="2" width="2" height="6"/><rect x="2" y="8" width="6" height="2"/></g>
+    <g id="g-Q"><rect x="2" width="6" height="2"/><rect y="2" width="2" height="6"/><rect x="8" y="2" width="2" height="4"/><rect x="6" y="6" width="2" height="2"/><rect x="2" y="8" width="4" height="2"/><rect x="8" y="8" width="2" height="2"/></g>
+    <g id="g-R"><rect width="8" height="2"/><rect width="2" height="10"/><rect x="8" y="2" width="2" height="2"/><rect y="4" width="8" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/></g>
+    <g id="g-S"><rect x="2" width="8" height="2"/><rect y="2" width="2" height="2"/><rect x="2" y="4" width="6" height="2"/><rect x="8" y="6" width="2" height="2"/><rect y="8" width="8" height="2"/></g>
+    <g id="g-T"><rect width="10" height="2"/><rect x="4" y="2" width="2" height="8"/></g>
+    <g id="g-V"><rect width="2" height="6"/><rect x="8" width="2" height="6"/><rect x="2" y="6" width="2" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="4" y="8" width="2" height="2"/></g>
+    <g id="g-W"><rect width="2" height="8"/><rect x="8" width="2" height="8"/><rect x="4" y="4" width="2" height="4"/><rect x="2" y="8" width="2" height="2"/><rect x="6" y="8" width="2" height="2"/></g>
+    <g id="g-dash"><rect y="4" width="10" height="2"/></g>
+
+    <!-- behind-the-agent layer: chair, seat, legs -->
+    <g id="station-back">
+      <rect x="232" y="136" width="64" height="66" fill="#111"/>
+      <rect x="236" y="140" width="56" height="58" fill="#262626"/>
+      <rect x="238" y="206" width="52" height="10" fill="#111"/>
+      <rect x="260" y="216" width="8" height="66" fill="#111"/>
+      <rect x="248" y="212" width="10" height="62" fill="#2b2b2b"/>
+      <rect x="270" y="212" width="10" height="62" fill="#2b2b2b"/>
+      <rect x="242" y="274" width="18" height="8" fill="#111"/>
+      <rect x="268" y="274" width="18" height="8" fill="#111"/>
+    </g>
+
+    <!-- in-front-of-the-agent layer: desk, monitor, keyboard, phone base -->
+    <g id="station-front">
+      <rect x="70" y="196" width="260" height="16" fill="#111"/>
+      <rect x="72" y="198" width="256" height="12" fill="#e7cfa4"/>
+      <rect x="72" y="206" width="256" height="4" fill="#c9a86f"/>
+      <rect x="80" y="212" width="14" height="70" fill="#111"/>
+      <rect x="83" y="214" width="8" height="66" fill="#d9bd8d"/>
+      <rect x="306" y="212" width="14" height="70" fill="#111"/>
+      <rect x="309" y="214" width="8" height="66" fill="#d9bd8d"/>
+      <use href="#crt" x="104" y="108"/>
+      <use href="#kbd" x="232" y="186"/>
+      <rect x="297" y="180" width="32" height="18" fill="#111"/>
+      <rect x="300" y="183" width="26" height="12" fill="#3f3f3f"/>
+      <rect x="303" y="186" width="4" height="3" fill="#6b6b6b"/>
+      <rect x="309" y="186" width="4" height="3" fill="#6b6b6b"/>
+      <rect x="315" y="186" width="4" height="3" fill="#6b6b6b"/>
+    </g>
+  </defs>
+
+  <!-- backdrop -->
+  <rect width="880" height="320" fill="#ffffff"/>
+  <rect width="880" height="282" fill="url(#stripes)"/>
+  <rect y="282" width="880" height="4" fill="#111"/>
+
+  <!-- wall sign above the clock and calendar: DEMOVERSE HQ — AGENTS AT WORK -->
+  <g transform="translate(254,10)">
+    <rect width="372" height="26" fill="#111"/>
+    <rect x="4" y="4" width="364" height="18" fill="#161616"/>
+    <g fill="#22c55e" transform="translate(8,8)">
+      <use href="#g-D"/>
+      <use href="#g-E" x="12"/>
+      <use href="#g-M" x="24"/>
+      <use href="#g-O" x="36"/>
+      <use href="#g-V" x="48"/>
+      <use href="#g-E" x="60"/>
+      <use href="#g-R" x="72"/>
+      <use href="#g-S" x="84"/>
+      <use href="#g-E" x="96"/>
+      <use href="#g-H" x="120"/>
+      <use href="#g-Q" x="132"/>
+      <use href="#g-dash" x="156"/>
+      <use href="#g-A" x="180"/>
+      <use href="#g-G" x="192"/>
+      <use href="#g-E" x="204"/>
+      <use href="#g-N" x="216"/>
+      <use href="#g-T" x="228"/>
+      <use href="#g-S" x="240"/>
+      <use href="#g-A" x="264"/>
+      <use href="#g-T" x="276"/>
+      <use href="#g-W" x="300"/>
+      <use href="#g-O" x="312"/>
+      <use href="#g-R" x="324"/>
+      <use href="#g-K" x="336"/>
+      <rect x="350" width="6" height="10">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur="1s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- wall: clock, calendar, whiteboard -->
+  <g transform="translate(124,34)">
+    <rect width="52" height="52" fill="#111"/>
+    <rect x="4" y="4" width="44" height="44" fill="#fff"/>
+    <rect x="24" y="6" width="4" height="4" fill="#111"/>
+    <rect x="42" y="24" width="4" height="4" fill="#111"/>
+    <rect x="24" y="42" width="4" height="4" fill="#111"/>
+    <rect x="6" y="24" width="4" height="4" fill="#111"/>
+    <rect x="24" y="18" width="4" height="8" fill="#111" transform="rotate(300 26 26)"/>
+    <rect x="24" y="14" width="4" height="12" fill="#111">
+      <animateTransform attributeName="transform" type="rotate" calcMode="discrete" values="0 26 26;90 26 26;180 26 26;270 26 26" keyTimes="0;.25;.5;.75" dur="16s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  <g transform="translate(414,48)">
+    <rect width="52" height="56" fill="#111"/>
+    <rect x="4" y="4" width="44" height="48" fill="#fff"/>
+    <rect x="4" y="4" width="44" height="10" fill="#111"/>
+    <rect x="10" y="20" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="19" y="20" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="28" y="20" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="37" y="20" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="10" y="29" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="19" y="29" width="4" height="4" fill="#22c55e"/>
+    <rect x="28" y="29" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="37" y="29" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="10" y="38" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="19" y="38" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="28" y="38" width="4" height="4" fill="#c9c6bb"/>
+    <rect x="37" y="38" width="4" height="4" fill="#c9c6bb"/>
+  </g>
+  <g transform="translate(672,32)">
+    <rect width="112" height="72" fill="#111"/>
+    <rect x="4" y="4" width="104" height="64" fill="#fff"/>
+    <rect x="16" y="44" width="10" height="16" fill="#15803d"/>
+    <rect x="32" y="36" width="10" height="24" fill="#22c55e"/>
+    <rect x="48" y="28" width="10" height="32" fill="#15803d"/>
+    <rect x="64" y="20" width="10" height="40" fill="#22c55e"/>
+    <rect x="82" y="30" width="6" height="6" fill="#111"/>
+    <rect x="88" y="24" width="6" height="6" fill="#111"/>
+    <rect x="94" y="18" width="6" height="6" fill="#111"/>
+    <rect x="94" y="12" width="6" height="6" fill="#111"/>
+    <rect x="88" y="12" width="6" height="6" fill="#111"/>
+  </g>
+
+  <!-- plant and filing cabinet -->
+  <g transform="translate(14,208)">
+    <rect x="8" y="8" width="16" height="16" fill="#2f9e44"/>
+    <rect x="28" y="4" width="18" height="18" fill="#37b24d"/>
+    <rect x="18" y="18" width="22" height="16" fill="#1e7a33"/>
+    <rect x="2" y="20" width="14" height="12" fill="#1e7a33"/>
+    <rect x="40" y="22" width="12" height="10" fill="#2f9e44"/>
+    <rect x="10" y="42" width="36" height="6" fill="#111"/>
+    <rect x="12" y="48" width="32" height="26" fill="#111"/>
+    <rect x="16" y="48" width="24" height="22" fill="#8a5a2b"/>
+    <rect x="16" y="48" width="24" height="6" fill="#a06a35"/>
+  </g>
+  <g transform="translate(818,170)">
+    <rect width="56" height="112" fill="#111"/>
+    <rect x="4" y="4" width="48" height="104" fill="#d9d7cf"/>
+    <rect x="4" y="54" width="48" height="4" fill="#111"/>
+    <rect x="20" y="24" width="16" height="6" fill="#111"/>
+    <rect x="20" y="78" width="16" height="6" fill="#111"/>
+  </g>
+
+  <!-- LEFT workstation: agent A (green shirt) -->
+  <use href="#station-back"/>
+  <g>
+    <use href="#a-type" x="236" y="120" fill="#3f7d5a"/>
+    <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.3125;0.6875" dur="16s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#a-phone" x="236" y="120" fill="#3f7d5a"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.3125;0.5" dur="16s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#a-talk" x="236" y="120" fill="#3f7d5a"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.6875" dur="16s" repeatCount="indefinite"/>
+  </g>
+  <use href="#station-front"/>
+  <g>
+    <use href="#handset-rest" x="298" y="172"/>
+    <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.3125;0.5" dur="16s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#ring" x="300" y="148"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.28125;0.3125" dur="16s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- RIGHT workstation, mirrored: agent B (blue shirt) -->
+  <g transform="translate(880,0) scale(-1,1)">
+    <use href="#station-back"/>
+    <g>
+      <use href="#a-type" x="236" y="120" fill="#556b8a"/>
+      <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.5;0.875" dur="16s" repeatCount="indefinite"/>
+    </g>
+    <g opacity="0">
+      <use href="#a-phone" x="236" y="120" fill="#556b8a"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.6875;0.875" dur="16s" repeatCount="indefinite"/>
+    </g>
+    <g opacity="0">
+      <use href="#a-talk" x="236" y="120" fill="#556b8a"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.6875" dur="16s" repeatCount="indefinite"/>
+    </g>
+    <use href="#station-front"/>
+    <g>
+      <use href="#handset-rest" x="298" y="172"/>
+      <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.6875;0.875" dur="16s" repeatCount="indefinite"/>
+    </g>
+    <g opacity="0">
+      <use href="#ring" x="300" y="148"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.65625;0.6875" dur="16s" repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <!-- speech bubbles: A speaks first, B replies -->
+  <g opacity="0">
+    <use href="#bubble" x="220" y="54"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.59375" dur="16s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#bubble" x="572" y="54"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.59375;0.6875" dur="16s" repeatCount="indefinite"/>
+  </g>
+</svg>

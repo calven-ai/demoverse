@@ -1,0 +1,62 @@
+{
+  "display_information": {
+    "name": "Demo-World Controller",
+    "description": "Posts synthetic internal chatter as a roster of demo personas (chat:write.customize). Dedicated demo workspace only.",
+    "background_color": "#4a154b"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "demo-world",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "chat:write.customize",
+        "chat:write.public",
+        "channels:read",
+        "channels:join",
+        "channels:manage",
+        "channels:history",
+        "groups:read",
+        "groups:write",
+        "groups:history",
+        "im:read",
+        "im:write",
+        "im:history",
+        "mpim:read",
+        "mpim:write",
+        "mpim:history",
+        "reactions:read",
+        "reactions:write",
+        "files:read",
+        "files:write",
+        "remote_files:read",
+        "remote_files:write",
+        "users:read",
+        "users:read.email",
+        "users.profile:read",
+        "usergroups:read",
+        "usergroups:write",
+        "pins:read",
+        "pins:write",
+        "bookmarks:read",
+        "bookmarks:write",
+        "emoji:read",
+        "team:read",
+        "links:read",
+        "links:write",
+        "metadata.message:read",
+        "canvases:read",
+        "canvases:write"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

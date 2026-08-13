@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-label="One deal accumulating history across six weekly runs: Discovery in weeks 1–2 with a discovery call and intro email, Evaluation in weeks 3–4 with a demo call, Slack thread and AE note, Proposal in week 5 with a proposal email, Closed-Won in week 6 with a win-loss interview and a #win-loss post.">
+  <defs>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: #f5f7fa; text-anchor: middle; }
+      .stage { font-size: 12.5px; font-weight: 600; }
+      .chip  { font-size: 10.5px; }
+      .capT  { font-size: 11.5px; }
+      .capI  { font-size: 11.5px; font-style: italic; opacity: .9; }
+      .wk    { fill: #8b98a5; font-size: 10px; font-weight: 600; letter-spacing: .08em; }
+      .note  { fill: #8b98a5; font-size: 9.5px; font-style: italic; }
+      .grid  { stroke: #8b98a5; stroke-width: 1; stroke-dasharray: 3 4; opacity: .35; }
+      .tie   { stroke: #8b98a5; stroke-width: 1; opacity: .55; }
+    </style>
+  </defs>
+
+  <!-- week grid -->
+  <line x1="40"  y1="44" x2="40"  y2="230" class="grid"/>
+  <line x1="185" y1="44" x2="185" y2="230" class="grid"/>
+  <line x1="330" y1="44" x2="330" y2="230" class="grid"/>
+  <line x1="475" y1="44" x2="475" y2="230" class="grid"/>
+  <line x1="620" y1="44" x2="620" y2="230" class="grid"/>
+  <line x1="765" y1="44" x2="765" y2="230" class="grid"/>
+  <line x1="910" y1="44" x2="910" y2="230" class="grid"/>
+
+  <text x="112.5" y="30" class="wk">WEEK 1</text>
+  <text x="257.5" y="30" class="wk">WEEK 2</text>
+  <text x="402.5" y="30" class="wk">WEEK 3</text>
+  <text x="547.5" y="30" class="wk">WEEK 4</text>
+  <text x="692.5" y="30" class="wk">WEEK 5</text>
+  <text x="837.5" y="30" class="wk">WEEK 6</text>
+
+  <!-- stage lane -->
+  <rect x="50"  y="58" width="270" height="34" rx="17" fill="#3b82f6"/>
+  <text x="185" y="80" class="stage">Discovery</text>
+  <rect x="340" y="58" width="270" height="34" rx="17" fill="#6366f1"/>
+  <text x="475" y="80" class="stage">Evaluation</text>
+  <rect x="630" y="58" width="125" height="34" rx="17" fill="#8b5cf6"/>
+  <text x="692.5" y="80" class="stage">Proposal</text>
+  <rect x="775" y="58" width="125" height="34" rx="17" fill="#16a34a"/>
+  <text x="837.5" y="80" class="stage">Closed-Won</text>
+
+  <!-- touch points, on the week they were earned -->
+  <line x1="112.5" y1="92" x2="112.5" y2="118" class="tie"/>
+  <rect x="62.5" y="118" width="100" height="26" rx="13" fill="#475569"/>
+  <text x="112.5" y="135" class="chip">discovery call</text>
+  <rect x="69.5" y="152" width="86" height="26" rx="13" fill="#475569"/>
+  <text x="112.5" y="169" class="chip">intro email</text>
+
+  <line x1="402.5" y1="92" x2="402.5" y2="118" class="tie"/>
+  <rect x="364.5" y="118" width="76" height="26" rx="13" fill="#475569"/>
+  <text x="402.5" y="135" class="chip">demo call</text>
+  <rect x="347.5" y="152" width="110" height="26" rx="13" fill="#475569"/>
+  <text x="402.5" y="169" class="chip">Slack deal thread</text>
+
+  <line x1="547.5" y1="92" x2="547.5" y2="118" class="tie"/>
+  <rect x="514.5" y="118" width="66" height="26" rx="13" fill="#475569"/>
+  <text x="547.5" y="135" class="chip">AE note</text>
+
+  <line x1="692.5" y1="92" x2="692.5" y2="118" class="tie"/>
+  <rect x="642.5" y="118" width="100" height="26" rx="13" fill="#475569"/>
+  <text x="692.5" y="135" class="chip">proposal email</text>
+
+  <line x1="837.5" y1="92" x2="837.5" y2="118" class="tie"/>
+  <rect x="778.5" y="118" width="118" height="26" rx="13" fill="#475569"/>
+  <text x="837.5" y="135" class="chip">win-loss interview</text>
+  <rect x="788.5" y="152" width="98" height="26" rx="13" fill="#475569"/>
+  <text x="837.5" y="169" class="chip">#win-loss post</text>
+  <text x="837.5" y="198" class="note">only ~1 close in 3</text>
+  <text x="837.5" y="210" class="note">gets a debrief</text>
+
+  <!-- caption -->
+  <rect x="180" y="256" width="600" height="52" rx="10" fill="#475569"/>
+  <text x="480" y="278" class="capT">Each weekly run generates only the touch points each deal earned that week —</text>
+  <text x="480" y="296" class="capI">history accumulates across runs, like a real deal.</text>
+</svg>

@@ -1,0 +1,155 @@
+# =============================================================================
+# prose.yaml — the story banks
+#
+# WHAT THIS FILE CONTROLS
+#   Seeded variety axes, per-artifact structural shapes, per-stage call focus,
+#   the anti-repetition blocklist, and the sampled vocab. This file is what
+#   makes generated prose sound like a real sales world instead of a template;
+#   the engine only draws from it deterministically (one stable draw per deal
+#   / artifact).
+#
+#   This template ships COMPLETE generic-B2B defaults — it works as-is. Make
+#   it yours over time by appending entries in your product's vocabulary.
+#
+# ORDER MATTERS
+#   Draws are seeded picks over these arrays, so reordering or inserting
+#   entries changes which texture existing deals get on a re-plant. APPEND new
+#   entries at the END; never reorder or delete mid-list once a world exists.
+#
+# LEAK-SAFETY
+#   All axis text must never imply a deal's eventual outcome, because the same
+#   block appears on open-stage AND close artifacts. "The champion is
+#   skeptical" is safe; "the deal is doomed" is a leak. Objections exist on
+#   won and lost deals alike.
+# =============================================================================
+
+# Why THIS buyer is looking — the deal's backstory, one per deal.
+narrative_angles:
+  - A newly-hired team lead is building the function from scratch and wants tooling before headcount.
+  - The work was outsourced to an agency; the team is pulling it in-house and needs to replace the agency's deliverables.
+  - An exec asked for rigor after a quarter that went sideways with no clear explanation.
+  - "A tool-consolidation / budget-cut initiative: several point tools are on the chopping block and this purchase must replace more than one."
+  - A neighboring team keeps complaining that the current outputs are stale; this team is under pressure to fix it this quarter.
+  - A major product launch is forcing the company to rethink how this function runs, and the old process can't keep up.
+  - The team is prepping for a board review and realized their current picture is anecdotal.
+  - A string of post-mortems exposed blind spots nobody owns; this purchase is the fix.
+  - Two teams are being merged after an acquisition and their knowledge lives in two incompatible piles.
+  - An ops-led data-hygiene push surfaced how little structured process exists; ops is an unusually active stakeholder.
+  - The founder/CEO personally fields these questions from the board and wants to stop being the bottleneck.
+  - A key competitor of the buyer just made a loud move; leadership wants a systematic answer instead of panicked Slack threads.
+
+# How the buying group communicates, one per deal.
+buyer_tones:
+  - skeptical and numbers-first — wants proof, quantifies everything, allergic to marketing language
+  - enthusiastic early adopter — excited by new tooling, moves fast, occasionally overpromises internally
+  - terse and distracted — short answers, reschedules, hard to pin down, but engaged when it matters
+  - process-heavy — procurement-minded, wants security reviews and references early, follows a formal evaluation rubric
+  - warm but budget-constrained — likes the product and the people, keeps steering to price and phasing
+  - technically probing — asks how things work under the hood, tests claims, distrusts demos
+  - delegation-happy executive — sets direction in one call then routes everything through a lieutenant
+
+# Friction the rep must handle. Leak-safe: an objection exists on won AND lost deals.
+objection_themes:
+  - we could build a lightweight version of this internally
+  - the output won't match how we work and someone will have to redo it anyway
+  - we already pay for overlapping tools and finance will push back on another line item
+  - the team is too small to feed and maintain another system
+  - data security / where our data ends up and who can see it
+  - we tried a tool like this before and nobody opened it after month two
+  - the wider team won't change their habits no matter what we buy
+  - the champion believes, but their boss thinks this is a nice-to-have
+
+# Urgency texture, one per deal.
+timeline_pressures:
+  - a hard budget-cycle deadline makes this quarter decisive
+  - an upcoming external event gives the evaluation real urgency
+  - no particular urgency — the buyer is deliberate and won't be rushed
+  - an internal reorg could freeze spending, so the champion is pushing pace
+  - a new exec starts soon and the champion wants this decided before priorities reshuffle
+
+# Per-artifact structural variants — one draw per ARTIFACT (not per deal), so
+# the same deal's two AE notes or two calls don't share a template either.
+artifact_shapes:
+  call_transcript:
+    - One attendee joins a few minutes late; the call restarts briefly.
+    - Open with 1–2 lines of small talk, then the BUYER drives the agenda.
+    - The rep drives a crisp agenda; the buyer keeps pulling it sideways.
+    - An attendee has to drop early, so the rep front-loads what matters to them.
+    - A short screen-share hiccup interrupts the demo/flow at one point.
+    - The buyer opens with a pointed question before any pleasantries.
+  ae_note:
+    - one run-on sentence, no bullets, the way a rep types between meetings
+    - 2 bullets, logistics only (what happened, next step) — no insight at all
+    - shorthand with abbreviations (nxt stp, EB, POC, w/) and no full sentences
+    - next-steps only — a dated to-do line or two, nothing about the call itself
+    - 4–6 bullets, unusually thorough for this rep — a rare detailed entry
+  survey:
+    - "terse respondent: one-word or one-line answers, skips every optional question"
+    - writes short paragraphs in the free-text fields; ratings get a clause of justification
+    - answers in bullet fragments, inconsistent capitalization, clearly rushed
+    - "dutiful respondent: answers everything asked, neutral corporate tone"
+  interview:
+    - chatty — over-shares, wanders into war stories, the interviewer has to steer back
+    - guarded — short answers until one question unlocks a candid stretch
+    - rushed — 15 minutes between meetings, blunt and compressed
+    - venting — has opinions about the whole evaluation process and shares them
+  email_exchange:
+    - the buyer goes quiet for a stretch, then re-engages with an apology and a concrete ask
+    - one buyer message is clearly typed on a phone — short, typo'd, no signature
+    - the champion forwards a colleague's internal question into the thread
+    - a scheduling misfire (wrong timezone or double-booking) costs the thread a few days
+    - the buyer answers only half the rep's questions; the rep has to re-ask one
+  slack_deal_thread:
+    - someone asks a blunt follow-up question the poster has to answer
+    - one reply mildly disagrees with the poster's read of the deal
+    - a reply is just an emoji-style one-liner; another asks something specific
+    - someone tags a discipline question (pricing, integration, timeline) onto the thread
+
+# What a call at each pipeline stage digs into (drives transcript prompts).
+# Keys should cover world.yaml pipeline.stages; `default` is the fallback.
+stage_focus:
+  Discovery: |-
+    A ~30–45 min first discovery call. Brief rapport, then the rep runs structured discovery/qualification
+    (BANT/MEDDPICC: budget, authority, need, timeline, decision process, metrics, champion). The rep asks far
+    more than they tell — current tooling and process, team size and who does what, where the time goes,
+    what's painful, what triggered the look. Position the product only at a high level and tease the one or
+    two capabilities that map to the pain heard. No pricing deep-dive, and keep it small — no IT/security.
+  Evaluation: |-
+    A ~45–60 min working session that includes a real DEMO. The rep walks the specific modules/features that
+    map to the pain uncovered in discovery, shows how they work, and ties each back to the buyer's stated
+    problem. The rep probes the tech stack named on the deal (integrations) and who else will use it; the
+    buyer and a technical evaluator push on how it actually works.
+  Proposal: |-
+    A ~30–45 min call on packaging, pricing, and the business case. The rep frames the value and ROI for the
+    economic buyer, and confirms the buying process and timeline.
+  Negotiation: |-
+    A ~45–60 min late-stage call: objection handling, competitor head-to-head (raised by the buyer), the
+    security review (IT joins — SSO/SAML, SOC 2, data handling), procurement/redlines, and final timeline.
+  default: |-
+    A realistic sales call: the rep discovers needs, demos where relevant, and addresses the competitor(s) and any pricing/product reaction.
+
+# Anti-repetition blocklist. Starts with generic LLM-isms; as your world grows,
+# run the repetition linter and PROMOTE recurring phrases here — appending at
+# the end (order matters above does not apply here, but appending keeps diffs
+# clean). Banned phrases may never appear in generated prose.
+banned_phrases:
+  - game changer
+  - game-changer
+  - needle mover
+  - single pane of glass
+  - at the end of the day
+  - the missing piece
+
+vocab:
+  # Product-feedback option list sampled onto closed deals (CRM picklist).
+  # Generic B2B SaaS set — TODO: adjust to the feedback themes your product
+  # would actually receive.
+  product_feedback:
+    - Integrations
+    - Security
+    - Analytics
+    - AI / Automation
+    - API
+    - Reporting
+    - Onboarding
+    - Support

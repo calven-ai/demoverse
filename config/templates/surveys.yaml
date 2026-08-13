@@ -1,0 +1,219 @@
+# =============================================================================
+# surveys.yaml — the win-loss questionnaires
+#
+# WHAT THIS FILE CONTROLS
+#   TWO outcome-keyed question sets:
+#     win  -> "Win analysis"  (asked after a CLOSED-WON deal)
+#     loss -> "Loss analysis" (asked after a CLOSED-LOST deal)
+#   Each set drives BOTH win-loss artifact modes for that outcome:
+#     survey    -> respondent TYPES  -> structured answers + short free-text
+#     interview -> respondent SPEAKS -> same questions, long conversational
+#                                       transcript
+#     (none     -> no artifact; the signal comes from CRM fields + Slack only
+#                  — and most closed deals ARE `none`, see world.yaml
+#                  winloss.mode_mix)
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   These are standard win/loss questions and WORK AS-IS — most users only
+#   tweak wording. Substitutions happen at generation time:
+#     `{company}`            -> world.yaml company.name
+#     vendor references      -> the competitor(s) recorded on the deal
+#     `options_from_config: product_modules` -> world.yaml product_modules
+#
+# QUESTION `type` (the 7 supported types):
+#   open_text        free text
+#   single_select    pick one of `options` (or of options_from a prior answer)
+#   multi_select     pick any of `options` (+ allow_other to add your own)
+#   vendor_select    name the vendors evaluated (uses the deal's competitors)
+#   comparison_table one row per `rows_from` vendor, with `columns`
+#   rating_scale     a `scale.min`–`scale.max` rating (+ allow_comment)
+#   yes_no           yes / no
+# `required` defaults to true; optional questions set `required: false`.
+# =============================================================================
+
+# --- Closed-won: "Win analysis" ---------------------------------------------
+win:
+  meta:
+    title: Win analysis
+    intro: >-
+      Questions we ask a buyer after a CLOSED-WON deal to understand why they
+      chose {company}. Same questions whether typed (survey) or spoken
+      (phone interview).
+  groups:
+    - id: competition
+      title: Competition
+      questions:
+        - id: vendors_evaluated
+          type: vendor_select
+          prompt: Besides {company}, which vendors did you evaluate?
+        - id: vendor_comparison
+          type: comparison_table
+          prompt: How did {company} compare to each vendor you evaluated?
+          rows_from: vendors_evaluated
+          columns:
+            - What did this vendor do better than {company}?
+            - What did this vendor do worse than {company}?
+
+    - id: product
+      title: Product
+      questions:
+        - id: product_modules
+          type: multi_select
+          prompt: Which of {company}'s product modules impressed you most and do you plan to use?
+          options_from_config: product_modules
+          allow_other: true
+        - id: features_liked
+          type: open_text
+          prompt: Which {company} features did you like the most?
+        - id: features_missing
+          type: open_text
+          prompt: Which {company} features were missing or did you like the least?
+          required: false
+
+    - id: sales
+      title: Sales Team
+      questions:
+        - id: sales_experience
+          type: rating_scale
+          prompt: How would you rate your experience with {company}'s sales team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: technical_expertise
+          type: rating_scale
+          prompt: How would you rate the technical expertise demonstrated by {company}'s team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: industry_expertise
+          type: rating_scale
+          prompt: How would you rate the industry expertise demonstrated by {company}'s team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: sales_process_overall
+          type: rating_scale
+          prompt: Overall, how would you rate your experience with {company}'s sales process?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+
+    - id: pricing
+      title: Pricing & Legal
+      questions:
+        - id: pricing_comparison
+          type: single_select
+          prompt: How did {company}'s pricing compare to the second-best vendor you evaluated?
+          options:
+            - "{company} was less expensive"
+            - Priced similarly
+            - "{company} was more expensive"
+        - id: licensing_feedback
+          type: open_text
+          prompt: What feedback do you have about {company}'s licensing model?
+          required: false
+        - id: contract_negotiation
+          type: rating_scale
+          prompt: How smooth was the contract negotiation process?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+
+    - id: closing
+      title: Closing
+      questions:
+        - id: chose_reason
+          type: open_text
+          prompt: In short, why did you pick {company}?
+
+# --- Closed-lost: "Loss analysis" -------------------------------------------
+loss:
+  meta:
+    title: Loss analysis
+    intro: >-
+      Questions we ask a buyer after a CLOSED-LOST deal to understand why they
+      did not choose {company}. Same questions whether typed (survey) or
+      spoken (phone interview).
+  groups:
+    - id: competition
+      title: Competition
+      questions:
+        - id: vendors_evaluated
+          type: vendor_select
+          prompt: Besides {company}, which vendors were you evaluating?
+        - id: vendor_chosen
+          type: single_select
+          prompt: Which of those vendors did you ultimately choose?
+          options_from: vendors_evaluated
+        - id: vendor_comparison
+          type: comparison_table
+          prompt: How did {company} compare to each of those vendors?
+          rows_from: vendors_evaluated
+          columns:
+            - What did this vendor do better than {company}?
+            - What did this vendor do worse than {company}?
+
+    - id: product
+      title: Product
+      questions:
+        - id: product_modules
+          type: multi_select
+          prompt: Which of {company}'s product modules did you evaluate or were interested in?
+          options_from_config: product_modules
+          allow_other: true
+        - id: features_liked
+          type: open_text
+          prompt: Which {company} features did you like the most?
+          required: false
+        - id: features_lacked
+          type: open_text
+          prompt: What features did {company} lack compared to the vendor you selected?
+          required: false
+
+    - id: sales
+      title: Sales Team
+      questions:
+        - id: sales_experience
+          type: rating_scale
+          prompt: How would you rate your experience with {company}'s sales team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: technical_expertise
+          type: rating_scale
+          prompt: How would you rate the technical expertise demonstrated by {company}'s team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: industry_expertise
+          type: rating_scale
+          prompt: How would you rate the industry expertise demonstrated by {company}'s team?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+        - id: sales_process_overall
+          type: rating_scale
+          prompt: Overall, how would you rate your experience with {company}'s sales process?
+          scale: { min: 1, max: 4 }
+          allow_comment: true
+
+    - id: pricing
+      title: Pricing & Legal
+      questions:
+        - id: pricing_comparison
+          type: single_select
+          prompt: How did {company}'s pricing compare to the vendor you selected?
+          options:
+            - "{company} was less expensive"
+            - Priced similarly
+            - "{company} was more expensive"
+        - id: licensing_feedback
+          type: open_text
+          prompt: What feedback do you have about {company}'s licensing model?
+          required: false
+
+    - id: closing
+      title: Closing
+      questions:
+        - id: not_chose_reason
+          type: open_text
+          prompt: In short, what were the main reasons you did not select {company}?
+
+# Interview mode layers these conversational behaviors on top of the questions.
+interview_style:
+  follow_ups: true
+  tangents: true
+  verbatim_color: true
+  approx_duration_min: [12, 25]

@@ -1,0 +1,95 @@
+# =============================================================================
+# personas.yaml — the buying committee
+#
+# WHAT THIS FILE CONTROLS
+#   The buyer-side roles that populate each deal's buying group (the
+#   opportunity-contact records) with roles + titles, and who is actually IN
+#   THE ROOM on a call at each pipeline stage. Multi-threading depth, persona
+#   analytics, and transcript attendee lists all derive from here.
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   This template is a generic B2B buying committee that WORKS AS-IS. To make
+#   it yours, swap the labels/titles for the roles in YOUR buyer's org (the
+#   TODO comments mark the likely edits) — keep the `role` values themselves
+#   stable, since world.yaml (optional cohort block) and the engine reference
+#   them.
+#
+# FIELD NOTES
+#   • `presence` — probability a contact in this role appears on a given deal.
+#     The champion is always present (1.0) and is the primary contact; others
+#     are sampled, and larger deals pull in more of them (multi-threading).
+#   • `seniority` — one of: C-suite / VP / Director / Manager / IC.
+#   • `attendees_by_stage` — the buying group ACCUMULATES over a deal's life,
+#     but a single call only has a subset present, and early calls are small:
+#     a first discovery call is 1–2 people, never IT/Security; executives and
+#     technical gatekeepers appear late. The transcript builder intersects
+#     this allowlist with the deal's recorded contacts (the primary contact is
+#     always kept). A stage omitted here → primary contact only.
+# =============================================================================
+
+# The role that always anchors a deal (the primary contact).
+champion_role: Champion
+
+personas:
+  # Primary buyer + evaluation owner. TODO: retitle for your buyer's function
+  # (shown here as a generic Operations leader).
+  - role: Champion
+    label: Functional Leader
+    seniority: VP
+    presence: 1.0
+    titles:
+      - VP of Operations
+      - Head of Operations
+      - Director of Operations
+      - Senior Director of Operations
+
+  # Signs off on budget; appears mostly on larger deals and late stages.
+  - role: Economic Buyer
+    label: Executive Sponsor
+    seniority: C-suite
+    presence: 0.40
+    titles:
+      - COO
+      - CFO
+      - Chief of Staff
+
+  # Daily users — the team whose adoption makes or breaks the deal.
+  # TODO: retitle for whoever actually uses your product day to day.
+  - role: User
+    label: Team Member
+    seniority: Manager
+    presence: 0.45
+    titles:
+      - Operations Manager
+      - Senior Operations Manager
+      - Operations Analyst
+
+  # Technical evaluator / gatekeeper on integration- and security-heavy deals.
+  - role: Technical Buyer
+    label: IT / Systems
+    seniority: Director
+    presence: 0.25
+    titles:
+      - Director of IT
+      - IT Systems Manager
+      - Head of Business Systems
+
+  # Champion-adjacent voice with opinions but no veto — an internal expert or
+  # a neighboring team lead. TODO: retitle for your world.
+  - role: Influencer
+    label: Adjacent Stakeholder
+    seniority: Manager
+    presence: 0.25
+    titles:
+      - Program Manager
+      - Business Process Lead
+      - Strategy & Planning Manager
+
+# Who is IN THE ROOM at each pipeline stage (keys = world.yaml pipeline.stages,
+# open stages only). Defaults encode the realistic arc: small early calls, the
+# committee widening as the deal advances, executives and IT arriving late.
+attendees_by_stage:
+  Discovery:   [Champion, User]
+  Evaluation:  [Champion, User, Technical Buyer]
+  Proposal:    [Champion, Economic Buyer, User]
+  Negotiation: [Champion, Economic Buyer, Technical Buyer, Influencer, User]

@@ -1,0 +1,1277 @@
+{
+  "totals": {
+    "accounts": 44,
+    "contacts": 98,
+    "opportunities": 44,
+    "artifacts": 528
+  },
+  "opportunities": [
+    {
+      "id": "opp-001",
+      "account": "North Co",
+      "industry": "Software & SaaS",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 14400,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-08-04",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-002",
+      "account": "Summit Partners",
+      "industry": "Software & SaaS",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-08-18",
+      "winLossReason": "Incumbent",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-003",
+      "account": "Silver Partners",
+      "industry": "Professional Services",
+      "size": "Enterprise",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 12000,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-08-04",
+      "winLossReason": "No decision",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-004",
+      "account": "Polaris Co",
+      "industry": "Professional Services",
+      "size": "Mid-market",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 28800,
+      "competitors": [
+        "Competitor C",
+        "Competitor A"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-09-01",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-005",
+      "account": "Cedar Partners",
+      "industry": "Healthcare",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 12000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-08-11",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-006",
+      "account": "Harbor Partners",
+      "industry": "Financial Services",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-09-15",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-007",
+      "account": "Pioneer Partners",
+      "industry": "Financial Services",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor C",
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-09-01",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "interview",
+        "slack_deal_thread",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-008",
+      "account": "Pioneer Co",
+      "industry": "Manufacturing",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-09-01",
+      "winLossReason": "Incumbent",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-009",
+      "account": "Meridian Partners",
+      "industry": "Software & SaaS",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 12000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-09-22",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "interview",
+        "slack_deal_thread",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-010",
+      "account": "Iron Partners",
+      "industry": "Healthcare",
+      "size": "SMB",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-08-25",
+      "winLossReason": "Incumbent",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-011",
+      "account": "North Group",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 14400,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-08-25",
+      "winLossReason": "No decision",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-012",
+      "account": "Lumen Co",
+      "industry": "Software & SaaS",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-09-15",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "interview",
+        "slack_deal_thread",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-013",
+      "account": "Anchor Group",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 24000,
+      "competitors": [
+        "Competitor A",
+        "Competitor C"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-10-06",
+      "winLossReason": "Brand/trust",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-014",
+      "account": "Granite Co",
+      "industry": "Software & SaaS",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-09-22",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-015",
+      "account": "Keystone Group",
+      "industry": "Manufacturing",
+      "size": "Mid-market",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-10-06",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-016",
+      "account": "Helix Partners",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-10-13",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "interview",
+        "slack_deal_thread",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-017",
+      "account": "Atlas Co",
+      "industry": "Financial Services",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 28800,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-10",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-018",
+      "account": "Iron Co",
+      "industry": "Retail & E-commerce",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-10-27",
+      "winLossReason": "Incumbent",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-019",
+      "account": "Summit Partners",
+      "industry": "Retail & E-commerce",
+      "size": "Enterprise",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor A",
+        "Competitor B"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-10-27",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-020",
+      "account": "Orchard Co",
+      "industry": "Software & SaaS",
+      "size": "SMB",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 14400,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-11-10",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-021",
+      "account": "Orchard Group",
+      "industry": "Manufacturing",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 24000,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-10",
+      "winLossReason": "No decision",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-022",
+      "account": "Harbor Co",
+      "industry": "Professional Services",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 12000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-24",
+      "winLossReason": "Integrations",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-023",
+      "account": "Granite Co",
+      "industry": "Financial Services",
+      "size": "SMB",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 14400,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-11-03",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-024",
+      "account": "Lumen Group",
+      "industry": "Healthcare",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 14400,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-03",
+      "winLossReason": "Integrations",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-025",
+      "account": "Bright Co",
+      "industry": "Professional Services",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-17",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-026",
+      "account": "Polaris Group",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-11-24",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-027",
+      "account": "Granite Group",
+      "industry": "Retail & E-commerce",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 14400,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-12-08",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-028",
+      "account": "North Group",
+      "industry": "Software & SaaS",
+      "size": "Enterprise",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 24000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-12-15",
+      "winLossReason": "Missing feature",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-029",
+      "account": "Pioneer Co",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 12000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-11-10",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-030",
+      "account": "Vertex Partners",
+      "industry": "Financial Services",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-12-08",
+      "winLossReason": "Integrations",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-031",
+      "account": "Orchard Co",
+      "industry": "Financial Services",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 14400,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2025-12-01",
+      "winLossReason": "Missing feature",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-032",
+      "account": "Keystone Group",
+      "industry": "Software & SaaS",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-12-15",
+      "winLossReason": "Missing feature",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-033",
+      "account": "Ridge Co",
+      "industry": "Financial Services",
+      "size": "Mid-market",
+      "region": "EMEA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2025-12-22",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-034",
+      "account": "Quill Co",
+      "industry": "Healthcare",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2026-01-12",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-035",
+      "account": "Meridian Co",
+      "industry": "Professional Services",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 24000,
+      "competitors": [
+        "Competitor A",
+        "Competitor B"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": "2026-01-12",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-036",
+      "account": "Bright Group",
+      "industry": "Financial Services",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "won",
+      "amount": 28800,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2026-01-12",
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-037",
+      "account": "Polaris Partners",
+      "industry": "Healthcare",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 14400,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": "2025-12-29",
+      "winLossReason": "Integrations",
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-038",
+      "account": "Atlas Co",
+      "industry": "Healthcare",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Negotiation",
+      "status": "open",
+      "amount": 12000,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case One",
+      "closeDate": null,
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-039",
+      "account": "Beacon Co",
+      "industry": "Healthcare",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 12000,
+      "competitors": [
+        "Competitor B"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2026-01-12",
+      "winLossReason": "Missing feature",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "winloss_post"
+      ]
+    },
+    {
+      "id": "opp-040",
+      "account": "Pioneer Group",
+      "industry": "Manufacturing",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2026-01-19",
+      "winLossReason": "Brand/trust",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "interview",
+        "slack_deal_thread",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-041",
+      "account": "Anchor Partners",
+      "industry": "Healthcare",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Closed",
+      "status": "lost",
+      "amount": 28800,
+      "competitors": [
+        "Competitor A",
+        "Competitor C"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": "2026-01-12",
+      "winLossReason": "Price",
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread",
+        "slack_deal_thread",
+        "survey"
+      ]
+    },
+    {
+      "id": "opp-042",
+      "account": "Vantage Co",
+      "industry": "Software & SaaS",
+      "size": "Enterprise",
+      "region": "NA",
+      "stage": "Negotiation",
+      "status": "open",
+      "amount": 24000,
+      "competitors": [
+        "Competitor C",
+        "Competitor A"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": null,
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-043",
+      "account": "Vertex Co",
+      "industry": "Healthcare",
+      "size": "Mid-market",
+      "region": "NA",
+      "stage": "Proposal",
+      "status": "open",
+      "amount": 28800,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case Three",
+      "closeDate": null,
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
+        "email_exchange",
+        "slack_deal_thread"
+      ]
+    },
+    {
+      "id": "opp-044",
+      "account": "Crest Partners",
+      "industry": "Financial Services",
+      "size": "SMB",
+      "region": "NA",
+      "stage": "Discovery",
+      "status": "open",
+      "amount": 24000,
+      "competitors": [
+        "Competitor C"
+      ],
+      "useCase": "Use Case Two",
+      "closeDate": null,
+      "winLossReason": null,
+      "artifacts": [
+        "ae_note",
+        "call_transcript",
+        "email_exchange",
+        "slack_deal_thread"
+      ]
+    }
+  ]
+}

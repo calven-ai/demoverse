@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Credentials — never commit
+.env
+.env.local
+*.pem
+service-account*.json
+gcp-key*.json
+
+# Generation request scratch (filled by the agent in-session, not persisted)
+state/requests/
+
+# Machine-generated run reports and import logs
+runs/
+
+# OS / editor
+.DS_Store
+*.log
+.idea/
+.vscode/

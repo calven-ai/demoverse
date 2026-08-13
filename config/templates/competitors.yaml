@@ -1,0 +1,66 @@
+# =============================================================================
+# competitors.yaml — the fictional competitor roster
+#
+# WHAT THIS FILE CONTROLS
+#   The vendors your fictional company loses (and wins) against. Every
+#   opportunity samples one or more of these; the recorded competitor drives
+#   per-deal win probability (`strength`), skews the deal's use case
+#   (use-cases.yaml `competitor_weights`), and colors all of that deal's prose
+#   (transcripts, surveys, Slack #competitive questions).
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   1. Copy to config/competitors.yaml. Rename Competitor A/B/C to invented
+#      vendor names that fit your market (2–5 competitors is the sweet spot);
+#      keep domains under `.example` or invent clearly-fictional ones.
+#   2. Write `positioning` as YOUR side's honest read: where they beat you,
+#      where you beat them. Prose generators lean on this heavily — a
+#      one-dimensional "they're worse" produces cartoonish transcripts.
+#   3. Give each competitor a distinct texture: different category, different
+#      strength, different typical_loss_reasons. Identical competitors make
+#      the per-competitor analytics story flat.
+#
+# FIELD NOTES
+#   • `strength` — how tough this competitor is on a contested deal, 0..1
+#     (higher = you lose to them more often). Keep the roster in the
+#     ~0.4–0.6 band: below ~0.3 they never win convincingly, above ~0.7 they
+#     dominate the ledger. Spread the values so a leaderboard emerges.
+#   • `typical_loss_reasons` — values MUST come from world.yaml
+#     winloss.loss_reasons keys. When you lose to this competitor, these
+#     reasons are favored (the "we lose to X on price" pattern worth
+#     discovering downstream).
+#   • `cohort` (optional) — tag tying a competitor to a special buying motion
+#     (see the commented-out market_intelligence block in world.yaml). Omit
+#     unless you're using that advanced feature.
+#
+# LEAK-SAFETY: fictional vendors only — never real companies. Realistic-
+# sounding invented names ("Northbeam Analytics") read better in prose than
+# obvious placeholders once you rename these.
+# =============================================================================
+
+competitors:
+  - name: Competitor A          # TODO: invent a vendor name for your market
+    domain: competitor-a.example
+    category: TODO — their market category (e.g. "Legacy incumbent suite")
+    positioning: >-
+      TODO: Your honest competitive read — what they're known for, where they
+      win against you, where you win against them. Two sentences.
+    strength: 0.6               # the tough incumbent — you lose to them most
+    typical_loss_reasons: [Incumbent, Brand/trust]
+
+  - name: Competitor B          # TODO
+    domain: competitor-b.example
+    category: TODO — e.g. "Modern point solution"
+    positioning: >-
+      TODO: Where they beat you (e.g. depth in one feature, price), where you
+      beat them (e.g. breadth, integration).
+    strength: 0.5
+    typical_loss_reasons: [Missing feature, Price]
+
+  - name: Competitor C          # TODO
+    domain: competitor-c.example
+    category: TODO — e.g. "Adjacent enterprise platform"
+    positioning: >-
+      TODO: An adjacent-rather-than-head-on player works well here — they show
+      up in larger evaluations as a "do we need both?" question.
+    strength: 0.45
+    typical_loss_reasons: [Integrations, No decision]

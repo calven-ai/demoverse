@@ -1,0 +1,66 @@
+# =============================================================================
+# connectors.yaml — per-destination wiring
+#
+# WHAT THIS FILE CONTROLS
+#   Which external systems the engine reconciles into, and the
+#   destination-side naming it writes (CRM stage names, Drive folder tree,
+#   Slack channels). Credentials stay in `.env` (see .env.example); a
+#   connector runs only when it is BOTH enabled here AND its credentials are
+#   present, so flipping `enabled: false` is the clean way to park a
+#   destination without touching secrets.
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   Everything ships DISABLED so a fresh world generates locally with zero
+#   external side effects. Flip each `enabled: true` only once:
+#     • the destination is a DEDICATED, ISOLATED demo org/workspace (never a
+#       production system), and
+#     • its credentials are in `.env`.
+#   You can run the whole engine with everything disabled — artifacts are
+#   still generated and filed locally.
+# =============================================================================
+
+salesforce:
+  # Flip to true once a dedicated Developer Edition / sandbox org is wired up
+  # in .env. Pushes Accounts, Contacts, Opportunities, OpportunityContactRoles
+  # and timeline activities.
+  enabled: false
+  # Engine pipeline stage → Salesforce Opportunity StageName picklist value
+  # (keys = world.yaml pipeline.stages, open stages only). Closed deals map to
+  # "Closed Won"/"Closed Lost" from the deal status. The defaults below target
+  # the standard out-of-the-box Salesforce picklist — adjust only if your org
+  # customized it.
+  stage_map:
+    Discovery: Qualification
+    Evaluation: Needs Analysis
+    Proposal: Proposal/Price Quote
+    Negotiation: Negotiation/Review
+
+# Structure-only CRM alternative (companies, contacts, deals, associations —
+# no activity timeline). Flip on only against a dedicated test portal.
+hubspot:
+  enabled: false
+
+drive:
+  # Flip to true once a dedicated shared Drive folder + service credentials
+  # are wired up in .env. Files are filed
+  # <folder>/<Account Name>/<date> — <title>.md.
+  enabled: false
+  # Artifact kind → top-level folder inside the shared demo folder.
+  folders:
+    call_transcript: Call Transcripts
+    survey: Win-Loss
+    interview: Win-Loss
+    internal_collateral: Internal Collateral
+    ae_note: AE Notes
+
+slack:
+  # Flip to true once a dedicated demo workspace + bot token are wired up in
+  # .env. The channels must already exist in the workspace (public); the bot
+  # joins them on demand.
+  enabled: false
+  # Artifact kind → channel.
+  channels:
+    slack_deal_thread: "#deals"
+    winloss_post: "#win-loss"
+    competitive_q: "#competitive"
+  fallback_channel: "#general"

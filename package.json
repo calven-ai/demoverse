@@ -1,0 +1,74 @@
+{
+  "name": "demoverse",
+  "version": "0.1.0",
+  "description": "Grow a fictional company's entire sales history \u2014 CRM, calls, email, Slack \u2014 that moves every week. Synthetic demo-data engine for building, testing and demoing B2B products.",
+  "keywords": [
+    "synthetic-data",
+    "demo-data",
+    "sales",
+    "crm",
+    "salesforce",
+    "hubspot",
+    "slack",
+    "b2b",
+    "ai-agents",
+    "claude-code",
+    "agents-md",
+    "test-data"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calven-ai/demoverse.git"
+  },
+  "homepage": "https://github.com/calven-ai/demoverse#readme",
+  "bugs": {
+    "url": "https://github.com/calven-ai/demoverse/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "init": "tsx scripts/init.ts",
+    "apply": "tsx scripts/apply.ts",
+    "pipeline": "tsx scripts/apply.ts --weeks=1",
+    "assign-use-cases": "tsx scripts/assign-use-cases.ts",
+    "backfill:created-at": "tsx scripts/backfill-created-at.ts",
+    "cohort": "tsx scripts/cohort-status.ts",
+    "cohort:select": "tsx scripts/cohort-select.ts",
+    "cohort:prune-slack": "tsx scripts/cohort-prune-slack.ts",
+    "cohort:prune-winloss": "tsx scripts/cohort-prune-winloss.ts",
+    "hubspot:setup": "tsx scripts/hubspot-setup.ts",
+    "hubspot:import": "tsx scripts/hubspot-import.ts",
+    "hubspot:verify": "tsx scripts/hubspot-verify.ts",
+    "hubspot:purge": "tsx scripts/hubspot-purge.ts",
+    "drive:audit": "tsx scripts/drive-audit.ts",
+    "sf:setup": "tsx scripts/sf-setup.ts",
+    "sf:purge": "tsx scripts/sf-purge.ts",
+    "sf:stage-fields": "tsx scripts/sf-ensure-stage-fields.ts",
+    "preflight": "tsx scripts/insights-preflight.ts",
+    "lint": "tsx scripts/lint.ts",
+    "lint:code": "eslint .",
+    "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
+    "test": "node --test --import tsx tests/*.test.ts"
+  },
+  "dependencies": {
+    "@slack/web-api": "^7.8.0",
+    "googleapis": "^173.0.0",
+    "yaml": "^2.6.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.10.2",
+    "eslint": "^10.8.1",
+    "prettier": "^3.9.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.67.0"
+  }
+}

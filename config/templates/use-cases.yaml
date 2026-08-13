@@ -1,0 +1,87 @@
+# =============================================================================
+# use-cases.yaml — domain use cases (what the buyer walked in asking for)
+#
+# Every opportunity carries exactly ONE primary use case. It does two jobs:
+#
+#   1. It names the deal. Opportunity name = "<Account> - <Use Case>", because
+#      a CRM where the deal is named after the account and nothing else tells
+#      you nothing about what the deal is.
+#   2. It is the DOMINANT theme of that deal's prose. Transcripts, emails and
+#      AE notes lead with it. Other capabilities may come up in passing —
+#      buyers rarely want exactly one thing — but they stay secondary.
+#
+# HOW TO FILL IT IN (the /setup wizard walks you through this)
+#   1. Copy to config/use-cases.yaml. Define 3–6 use cases, deliberately
+#      COARSER than your feature list: a buyer says "we need to get on top of
+#      our reporting", not "we need Feature A2". Each use case maps to the
+#      feature(s)/agent(s) the AE demos for it.
+#   2. `domain` MUST reuse a world.yaml company.product_modules string
+#      VERBATIM — the win-loss surveys' product_module question and this field
+#      speak the same vocabulary.
+#   3. `agents` should name entries from product.yaml — that is what tells the
+#      transcript builder what to demo on this deal.
+#   4. `keywords` are lowercase phrases that identify the use case in prose;
+#      the linter uses them to check each artifact actually leads with its
+#      deal's use case. Include your buyers' natural vocabulary and synonyms.
+#
+# THE TWO KNOBS, deliberately separated — they answer different questions:
+#
+#   `target_share`       how common the use case is OVERALL. Shares are
+#                        relative and get normalized, so they read as
+#                        percentages of the pipeline.
+#   `competitor_weights` how much a given competitor SKEWS toward this use
+#                        case. Only the RATIOS matter: each use case's weights
+#                        are mean-normalized before use, so a use case that
+#                        likes every competitor equally gets no extra volume.
+#
+# Keeping these separate is what stops the two effects fighting: the marginal
+# distribution tracks target_share while the conditional distribution given a
+# competitor still skews hard — which is the discoverable pattern
+# ("Competitor A turns up mostly in Use-Case-One deals"), not a lopsided
+# pipeline. A competitor absent from a map scores `default_weight`. None of
+# this touches win rate, ICP tier or loss reason.
+# =============================================================================
+
+default_weight: 1.0
+
+use_cases:
+  - name: Use Case One          # TODO: e.g. "Reporting & Analytics"
+    domain: Module A            # MUST match a world.yaml product_module verbatim
+    target_share: 0.40          # ~40% of pipeline walks in asking for this
+    agents: [Feature A1, Feature A2]   # product.yaml names the AE demos here
+    # Lowercase phrases that identify this use case in prose (matching + lint).
+    keywords: [TODO keyword one, TODO keyword two, TODO synonym]
+    # What the buyer actually says in discovery — the AE hears this, not the
+    # use-case label. Prose generators lead with it.
+    buyer_pain: >-
+      TODO: The complaint that starts this kind of deal, in the buyer's own
+      words. Two sentences max.
+    lead_with: >-
+      TODO: The pitch/demo angle the AE opens with for this use case.
+    # Which competitors show up disproportionately on these deals. Ratios only
+    # (mean-normalized). Competitor names must match competitors.yaml.
+    competitor_weights: { Competitor A: 3.0, Competitor B: 1.0, Competitor C: 0.5 }
+
+  - name: Use Case Two          # TODO
+    domain: Module B            # MUST match a world.yaml product_module verbatim
+    target_share: 0.35
+    agents: [Feature B1]
+    keywords: [TODO keyword one, TODO keyword two]
+    buyer_pain: >-
+      TODO: The buyer's complaint for this use case.
+    lead_with: >-
+      TODO: The demo angle.
+    competitor_weights: { Competitor B: 2.5, Competitor A: 0.75, Competitor C: 0.75 }
+
+  - name: Use Case Three        # TODO
+    domain: Module C            # MUST match a world.yaml product_module verbatim
+    target_share: 0.25
+    agents: [Feature C1]
+    keywords: [TODO keyword one, TODO keyword two]
+    buyer_pain: >-
+      TODO: The buyer's complaint for this use case.
+    lead_with: >-
+      TODO: The demo angle.
+    # A largely-uncontested use case (weights below 1 for everyone) is a nice
+    # texture: greenfield conversations where no competitor dominates.
+    competitor_weights: { Competitor A: 0.5, Competitor B: 0.5, Competitor C: 2.0 }
