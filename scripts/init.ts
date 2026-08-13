@@ -128,8 +128,14 @@ function main(): void {
     console.log("    npm run hubspot:purge               # HubSpot test portal, if used");
     console.log("  Slack threads have no purge command — archive the channels or leave them.");
   }
-  console.log("\nNext: `npm run apply -- --backfill` to plan the historical world, then fill the");
-  console.log("generation requests and run `npm run apply -- --ingest --reconcile`.");
+  console.log("\nThe clock starts in the past so your world can carry believable history.");
+  console.log("Two ways to run from here:");
+  console.log("  · Week by week:  `npm run pipeline` advances ONE week per run (your first");
+  console.log("    increments carry historical dates until the clock catches up to today).");
+  console.log("  · Seed history:  `npm run apply -- --backfill` plans the whole back-catalog");
+  console.log("    in one shot — a large one-time fill job (see docs/getting-started.md).");
+  console.log("  (Plain `npm run apply` generates EVERY pending period up to today at once.)");
+  console.log("Then fill the generation requests and run `npm run apply -- --ingest`.");
 }
 
 main();

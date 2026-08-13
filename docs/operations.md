@@ -25,6 +25,10 @@ npm run apply -- --nudge="close one big enterprise win this week"   # Tier-3 twi
 
 If intake should *stay* higher, that's not a flag — it's a Tier-2 change (below).
 
+After each advance, `apply` prints a touch-point table grouped by deal. Rows labeled `(workspace)` — "workspace-level (not tied to one deal)" — are expected, not an error: workspace-level artifacts (the weekly `#competitive` questions) belong to the world as a whole, not to any one opportunity.
+
+A note on run modes, since three commands advance the world: `npm run pipeline` forces exactly one week; plain `npm run apply` generates every period the real calendar has produced (on a fresh world whose clock starts quarters in the past, that's the *entire* back-catalog at once); `npm run apply -- --backfill` is the same catch-up run under its intent flag — the one-time historical seed, a large fill job best driven by an agent loop. The first-run fork is laid out in [getting-started.md](getting-started.md#the-clock-starts-in-the-past--pick-your-first-run-path).
+
 ## The two motions — never confuse them
 
 | | Living increment | Detail-layer backfill |
@@ -128,9 +132,9 @@ Order matters when destinations are connected: purge the external systems *first
 | --- | --- |
 | `npm run init [-- --force] [-- --seed=X]` | Scaffold (or regenerate) `state/` from config |
 | `npm run pipeline` | One forced weekly increment (= `apply -- --weeks=1`) |
-| `npm run apply` | Generate the periods the real calendar has produced |
+| `npm run apply` | Generate every period the real calendar has produced (a fresh world's whole back-catalog) |
 | `npm run apply -- --ingest [--reconcile] [--opp=]` | Validate + file results (+ push) |
-| `npm run apply -- --backfill` | The one-time historical seed |
+| `npm run apply -- --backfill` | The one-time historical seed — the same catch-up run, under its intent flag |
 | `npm run apply -- --backfill-touchpoints --opp=` | Plant one deal's full detail layer |
 | `npm run apply -- --next=N` / `--refill=<artifactId>` | Backfill queue / reset one artifact |
 | `npm run lint [-- --sample=N] [-- --opp=] [-- --repetition]` | Coherence linter |

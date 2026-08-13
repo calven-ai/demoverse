@@ -394,7 +394,7 @@ async function main(): Promise<void> {
   const byDeal = new Map<string, string[]>();
   for (const a of world.artifacts) {
     if (!plantedIds.has(a.id)) continue;
-    const key = a.dealId ?? "(no deal)";
+    const key = a.dealId ?? "(workspace)";
     byDeal.set(key, [...(byDeal.get(key) ?? []), `${a.id}:${a.kind}`]);
   }
   if (byDeal.size > 0) {
@@ -402,7 +402,9 @@ async function main(): Promise<void> {
     console.log(`\nTouch points planted this increment (${plantedIds.size} across ${byDeal.size} deal(s)):`);
     for (const [dealId, arts] of [...byDeal].sort((a, b) => a[0].localeCompare(b[0]))) {
       const opp = world.opportunities.find((o) => o.id === dealId);
-      const label = opp ? `${led.account(opp.accountId).name} — ${opp.stage}/${opp.status}` : "unattached";
+      const label = opp
+        ? `${led.account(opp.accountId).name} — ${opp.stage}/${opp.status}`
+        : "workspace-level (not tied to one deal)";
       console.log(`  ${dealId}\t${label}\t${arts.join(" ")}`);
     }
   }

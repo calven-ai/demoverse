@@ -74,7 +74,7 @@ function companyShort(ctx: Ctx): string {
 function commonRules(ctx: Ctx): string {
   return [
     "GROUNDING RULES (strict):",
-    "- Use ONLY the names, companies, competitors, and the loss/win reason given below. Do not invent competitors or contacts.",
+    "- Use ONLY the names, companies, competitors and any recorded win/loss reason given in this brief. Do not invent competitors or contacts.",
     `- This is clearly-fabricated demo data for an internal demo of ${companyName(ctx)}. Keep it realistic but never reference real people.`,
     "- Stay consistent with the recorded facts: the same competitor(s) and the same win/loss reason must appear across this deal's transcript, win-loss artifact, and Slack thread.",
     bannedPhrasesRule(ctx.config.prose),

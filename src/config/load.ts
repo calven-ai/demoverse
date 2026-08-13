@@ -128,6 +128,19 @@ function validateCrossRefs(cfg: Config): void {
     }
   }
 
+  // A competitor's typical loss reasons must exist in the loss-reason
+  // vocabulary, or its skew silently no-ops and the data quietly flattens.
+  const lossReasons = new Set(Object.keys(cfg.world.winloss.loss_reasons));
+  for (const c of cfg.competitors.competitors) {
+    for (const reason of c.typical_loss_reasons) {
+      if (!lossReasons.has(reason)) {
+        warnings.push(
+          `competitors.yaml "${c.name}" typical_loss_reason "${reason}" is not in world.yaml winloss.loss_reasons.`,
+        );
+      }
+    }
+  }
+
   // Rep personas should line up with sales-team members by display name.
   const repNames = new Set([...cfg.salesTeam.managers, ...cfg.salesTeam.ics].map((r) => r.name));
   for (const p of cfg.slackPersonas.rep_personas) {

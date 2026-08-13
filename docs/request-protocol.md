@@ -106,7 +106,7 @@ Kind-specific rules ride along where they matter: a `winloss_post` for a "none"-
 }
 ```
 
-`contactRef` (optional) names the buyer contact this message is with — even when the rep is the sender — and lets ingest link the email to the right CRM contact. It accepts `Name <email>`, a bare email, or a name; unmatched refs are simply dropped.
+`contactRef` names the buyer contact this message is with, and lets ingest link the email to the right CRM contact. The emitted prompts require it on every message, and it is always the **buyer's** address — even when the rep is the sender. It accepts `Name <email>`, a bare email, or a name; unmatched refs are simply dropped (the message survives, but its CRM-contact link is lost).
 
 ## Ingest validation
 
