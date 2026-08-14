@@ -75,6 +75,12 @@ export class SalesforceClient {
     return this.instanceUrl;
   }
 
+  /** Session id for hand-built SOAP calls (request headers only, never logged). */
+  sessionId(): string {
+    if (!this.accessToken) throw new Error("SalesforceClient.sessionId called before login()");
+    return this.accessToken;
+  }
+
   /** Authenticated REST/Tooling/Metadata request. Throws a readable SF error. */
   async request<T = unknown>(
     method: string,
@@ -95,7 +101,15 @@ export class SalesforceClient {
     });
     if (res.status === 204) return undefined;
     const text = await res.text();
-    const json = text ? (JSON.parse(text) as unknown) : undefined;
+    // A maintenance page or proxy error is HTML, not JSON; keep the readable
+    // error path below instead of throwing a bare SyntaxError here.
+    let json: unknown;
+    try {
+      json = text ? (JSON.parse(text) as unknown) : undefined;
+    } catch {
+      if (res.ok) throw new Error(`HTTP ${res.status}: expected JSON, got ${text.slice(0, 300)}`);
+      json = undefined;
+    }
     if (!res.ok) {
       const arr = json as { errorCode?: string; message?: string; fields?: string[] }[] | undefined;
       const msg = Array.isArray(arr)

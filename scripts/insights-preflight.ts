@@ -1,5 +1,5 @@
 /**
- * Insight pre-flight is the Batch-1 review tool. See the plan, Part C.
+ * Insight pre-flight: check the ledger will chart well before any external push.
  *
  * Reads the generated ledger (state/world.json) and runs the SAME aggregations
  * the downstream product's dashboards (ICP / Win-Loss / CI / Persona) compute as Postgres

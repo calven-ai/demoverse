@@ -52,7 +52,7 @@ any agent tool (Claude Code, Codex, Cursor, Copilot, …). Three parts:
    - `output: slack_messages` → write `results/<artifactId>.json` as
      `{"messages":[{"personaHandle":"…","text":"…"}, …]}`.
    - `output: email_thread` → write `results/<artifactId>.json` as
-     `{"emails":[{"from":"…","to":["…"],"subject":"…","body":"…","date":"YYYY-MM-DD"}, …]}`
+     `{"emails":[{"from":"…","to":["…"],"subject":"…","body":"…","date":"YYYY-MM-DD","contactRef":"…"}, …]}`
      (one object per message, in send order).
 3. **Ingest.** Run `npm run apply -- --ingest --reconcile`. The engine validates
    each result, files markdown into `state/content/`, attaches Slack messages
@@ -211,8 +211,9 @@ weekly routine: `npm run pipeline` → fill → `npm run apply -- --ingest
 ## Part 3: Per-tool notes
 
 **Claude Code** gets the richest integration. `/setup` (this playbook),
-`/pipeline-update` (the weekly increment end to end), and `/backfill-opps N`
-(the detail-layer loop) live in `.claude/skills/`. The `opp-filler` subagent
+`/pipeline-update` (the weekly increment end to end), `/backfill-opps N`
+(the detail-layer loop), and `/import-hubspot` (the deterministic HubSpot
+structure import + verify) live in `.claude/skills/`. The `opp-filler` subagent
 (`.claude/agents/opp-filler.md`) fills one opportunity per subagent, so the main
 context stays lean. `CLAUDE.md` imports this file. For a long backfill, run
 `/backfill-opps` iteratively and commit per opportunity.

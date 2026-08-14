@@ -29,7 +29,7 @@ yet. It happens in a later increment, when the deal reaches Evaluation.
 
    ```
    opp-291  Acme Corp (Discovery/open)      art-xxx:call_transcript art-xxy:email_exchange
-   opp-285  Daktela (Negotiation/open)      art-xxz:call_transcript
+   opp-285  Veltrix (Negotiation/open)      art-xxz:call_transcript
    opp-278  Orchard Ledger (Closed/lost)    art-xya:survey art-xyb:ae_note
    ```
 

@@ -12,8 +12,8 @@ each command's output, act on it exactly as instructed, and don't improvise.
 
 ## Preconditions
 
-- `HUBSPOT_ACCESS_TOKEN` must be set in `.env`. That is a
-  HubSpot Service Key. See `docs/connectors/hubspot.md` for the required scopes. If
+- `HUBSPOT_ACCESS_TOKEN` must be set in `.env`. That is a HubSpot private-app
+  access token. See `docs/connectors/hubspot.md` for the required scopes. If
   it's missing, every command below fails fast with a clear message. Report
   that and stop. Do not invent a token or guess scopes.
 - `state/world.json` must exist (`npm run init` was already run). If not,
@@ -84,7 +84,7 @@ each command's output, act on it exactly as instructed, and don't improvise.
 
 ## If something looks wrong
 
-- **Never** edit `state/world.json`, `src/hubspot/*.ts`, or `scripts/hubspot-*.ts`
+- **Never** edit `state/world.json`, `src/connectors/hubspot/`, or `scripts/hubspot-*.ts`
   to work around a failure. Those are the deterministic package's job.
 - **Never** guess at a missing credential or scope; quote the exact error and
   stop.

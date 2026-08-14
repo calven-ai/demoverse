@@ -12,10 +12,10 @@ If your npm setup blocks lifecycle scripts ("allow-scripts" warnings at install 
 
 ## Clone and install
 
-Demoverse is a GitHub template repository. You clone it and own the copy. Your company's config and your world's state get committed to *your* clone, and there is nothing to sync back.
+Clone the repo (or, if GitHub offers "Use this template" on it, generate your own copy first) into your own private copy. You own that copy: your company's config and your world's state get committed to *your* clone, and there is nothing to sync back.
 
 ```bash
-git clone <your-copy-of-the-template> my-demo-world
+git clone https://github.com/calven-ai/demoverse my-demo-world
 cd my-demo-world
 npm ci
 npm run secrets:hook   # recommended, see below
@@ -127,7 +127,7 @@ Do a couple by hand first, to feel the protocol. Then hand the batch to your age
   { "emails": [{ "from": "Jordan Reyes <jordan@aurora-analytics.example>", "to": ["mia.chen@northwind.example"], "subject": "Following up from today", "body": "Mia, great talking today. ...", "date": "2026-03-04", "contactRef": "mia.chen@northwind.example" }] }
   ```
 
-  `contactRef` is required on every message. It's always the **buyer's** email, even when the rep is the sender, and it links the thread to the right CRM contact.
+  The emitted prompts require `contactRef` on every message. It's always the **buyer's** email, even when the rep is the sender, and it links the thread to the right CRM contact.
 
 **Via your agent.** Point it at the manifest and let it fill everything. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) plus a `/pipeline-update` command that runs the whole weekly loop. The full spec of prompts, result formats, and validation lives in [request-protocol.md](request-protocol.md).
 

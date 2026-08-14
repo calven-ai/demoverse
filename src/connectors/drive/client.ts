@@ -80,7 +80,7 @@ export class DriveClient {
     return created.data.id!;
   }
 
-  /** Smoke test: create -> read -> delete a temp file (Phase A). */
+  /** Smoke test: create -> read -> delete a temp file. */
   async smokeTest(): Promise<void> {
     const folder = await this.ensureFolder("_smoke");
     const id = await this.upsertMarkdown(folder, "smoke.md", "# smoke test\n");

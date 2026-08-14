@@ -1,6 +1,8 @@
 {
   "name": "demoverse",
   "version": "0.1.0",
+  "private": true,
+  "author": "Calven AI LLC",
   "description": "Grow a fictional company's entire sales history across CRM, calls, email and Slack, and keep it moving every week. Synthetic demo-data engine for building, testing and demoing B2B products.",
   "keywords": [
     "synthetic-data",

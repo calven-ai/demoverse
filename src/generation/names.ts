@@ -122,7 +122,9 @@ export function makeCompanyName(rng: Rng, industry: string): { name: string; dom
   const suffixes = COMPANY_SUFFIXES_BY_INDUSTRY[industry] ?? ["Group", "Co", "Partners"];
   const suffix = rng.pick(suffixes);
   const name = `${prefix} ${suffix}`;
-  const domain = `${prefix.toLowerCase()}${suffix.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`;
+  // Reserved `.example` TLD (RFC 2606): a fabricated company must never point
+  // at a real registered domain someone else owns.
+  const domain = `${prefix.toLowerCase()}${suffix.toLowerCase().replace(/[^a-z0-9]/g, "")}.example`;
   return { name, domain };
 }
 

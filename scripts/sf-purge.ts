@@ -208,6 +208,19 @@ async function purgeSample(): Promise<void> {
     console.log("\n✓ No sample data present. The org holds demo-world records only.");
     return;
   }
+  // A fresh Developer Edition ships a few dozen sample records. Hundreds of
+  // untagged records mean this is somebody's real org, not Salesforce's seed
+  // data; refuse outright rather than let --confirm through.
+  const SAMPLE_CEILING = 100;
+  if (total > SAMPLE_CEILING) {
+    console.error(
+      `\n✗ ${total} untagged record(s) found, but Salesforce seeds a Developer Edition with` +
+        `\n  far fewer than ${SAMPLE_CEILING}. This org does not look like a fresh dedicated org,` +
+        `\n  and --sample would delete every record the engine did not create.` +
+        `\n  Refusing. Use a dedicated Developer Edition org, or clean the org by hand.`,
+    );
+    process.exit(1);
+  }
   if (!confirm) {
     console.log(`\n(dry-run) ${total} record(s) would be deleted. Re-run with --confirm to delete.`);
     return;

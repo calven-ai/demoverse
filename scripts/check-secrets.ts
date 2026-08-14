@@ -74,11 +74,43 @@ function findCredentialFiles(files: string[]): string[] {
   return problems;
 }
 
-/** The template is tracked by design, so its contents get checked instead. */
-function findFilledTemplate(): string[] {
-  if (!existsSync(TEMPLATE)) return [];
+/**
+ * A file's content as it will be committed: the index blob in staged mode
+ * (so reverting the working copy after `git add` cannot slip past the check),
+ * the working tree otherwise.
+ */
+function contentOf(file: string, staged: boolean): string | null {
+  try {
+    if (staged) return execFileSync("git", ["show", `:${file}`], { encoding: "utf8" });
+    return existsSync(file) ? readFileSync(file, "utf8") : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Key material is recognizable by content whatever the file is called. Catches
+ * a GCP service-account key kept under its console download name
+ * (`<project-id>-<hex>.json`), which no basename pattern can predict.
+ */
+function findKeyMaterial(files: string[], staged: boolean): string[] {
   const problems: string[] = [];
-  const lines = readFileSync(TEMPLATE, "utf8").split("\n");
+  for (const file of files) {
+    if (!/\.json$/i.test(file) || file === "package-lock.json") continue;
+    const text = contentOf(file, staged);
+    if (text && /"private_key"\s*:/.test(text)) {
+      problems.push(`${file} contains a "private_key" field, so it is key material`);
+    }
+  }
+  return problems;
+}
+
+/** The template is tracked by design, so its contents get checked instead. */
+function findFilledTemplate(staged: boolean): string[] {
+  const content = contentOf(TEMPLATE, staged);
+  if (content === null) return [];
+  const problems: string[] = [];
+  const lines = content.split("\n");
   lines.forEach((rawLine, i) => {
     const line = rawLine.trim();
     if (!line || line.startsWith("#")) return;
@@ -98,7 +130,11 @@ function main(): void {
   const scope = staged ? "staged" : "tracked";
 
   const files = gitFiles(staged);
-  const problems = [...findCredentialFiles(files), ...findFilledTemplate()];
+  const problems = [
+    ...findCredentialFiles(files),
+    ...findKeyMaterial(files, staged),
+    ...findFilledTemplate(staged),
+  ];
 
   if (problems.length === 0) {
     console.log(`secrets: clean (${files.length} ${scope} files checked)`);

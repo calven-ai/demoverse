@@ -11,7 +11,7 @@ Drive holds the world's documents: call transcripts, AE notes, win-loss surveys 
 3. **IAM & Admin → Service Accounts** → **Create Service Account**. Name it something like `demoverse-drive`. No project roles are needed. Access comes from folder sharing, not IAM.
 4. Open the new service account → **Keys** → **Add Key** → **Create new key** → **JSON**. A key file downloads.
 
-Put the key file in the repo root (it's gitignored) or anywhere you like:
+Rename the download to `service-account.json` when placing it in the repo root. That exact name is what `.gitignore` covers; under the `<project-id>-<hex>.json` name GCP gives the download, the file is one `git add .` away from your remote, with only the secrets check's key-material scan left to catch it. Point `GOOGLE_APPLICATION_CREDENTIALS` in `.env` at it:
 
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=./service-account.json

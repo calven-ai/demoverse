@@ -403,7 +403,7 @@ async function ensureIndustryValues(
         `<met:standardValue><met:fullName>${xmlEsc(val)}</met:fullName><met:label>${xmlEsc(val)}</met:label><met:default>false</met:default></met:standardValue>`,
     )
     .join("");
-  const sid = (sf as unknown as { accessToken: string }).accessToken;
+  const sid = sf.sessionId();
   const envelope = `<?xml version="1.0" encoding="utf-8"?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:met="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <soapenv:Header><met:SessionHeader><met:sessionId>${sid}</met:sessionId></met:SessionHeader></soapenv:Header>

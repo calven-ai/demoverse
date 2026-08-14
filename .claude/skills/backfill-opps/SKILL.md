@@ -77,7 +77,7 @@ npm run lint -- --sample=40 --repetition
 
 Summarize for the operator: opps completed / skipped (with why), fix rounds
 needed, reconcile errors, and any repetition warnings (candidates for
-`BANNED_PHRASES` in `src/generation/variety.ts`).
+`banned_phrases` in `config/prose.yaml`).
 
 ## Rules
 
@@ -95,4 +95,4 @@ needed, reconcile errors, and any repetition warnings (candidates for
 For the full backfill, run as a self-paced loop: `/loop /backfill-opps 5`.
 Each iteration is independently resumable (idempotent planting, planned-only
 ingest, upsert reconcile, per-opp commits). The loop's stop condition:
-`npm run apply -- --next=1` prints nothing.
+`npm run apply -- --next=1` prints `(no opportunities need a detail layer)`.

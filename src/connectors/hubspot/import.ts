@@ -9,7 +9,7 @@
  *   - "all"         every account, contact, and opportunity in the ledger
  *
  * Target companies are REAL accounts (name/domain preserved as-is). See
- * `docs/repo-universe.md` / config/world.yaml `prospects`. Contacts and deals
+ * config/world.yaml `prospects` and src/generation/real-accounts.ts. Contacts and deals
  * are synthetic: contact emails are replaced with non-deliverable addresses,
  * and every record carries a `demo_world_notice` property saying so. Names
  * (company, contact and deal) are never decorated with a marker; they mirror
@@ -17,7 +17,7 @@
  * unique `demo_world_id` property, so reruns update rather than duplicate.
  *
  * Activities (calls, notes, emails) and owner provisioning are intentionally
- * out of scope. See the plan this module implements.
+ * out of scope.
  */
 
 import type { Account, Contact, Opportunity, Rep, World } from "../../ledger/schema.js";

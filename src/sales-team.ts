@@ -1,5 +1,5 @@
 /**
- * Sales-team helpers (config/sales-team.yaml). See the plan addendum.
+ * Sales-team helpers (config/sales-team.yaml).
  *
  * Builds the rep roster for the ledger (managers + ICs, with role + manager
  * links) and evaluates each AE's time-dependent win modifier, the per-rep

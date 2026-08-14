@@ -52,7 +52,7 @@ npm run apply -- --ingest --reconcile --opp=<id>
 git add -A && git commit -m "detail layer: <id>"
 ```
 
-Stop when `--next=1` prints nothing. For a bad result mid-loop, `npm run apply -- --refill=<artifactId>` resets it to `planned` and re-emits the prompt; it refuses once external records exist ([details](request-protocol.md#refilling-a-bad-result)).
+Stop when `--next=1` prints `(no opportunities need a detail layer)`. For a bad result mid-loop, `npm run apply -- --refill=<artifactId>` resets it to `planned` and re-emits the prompt; it refuses once external records exist ([details](request-protocol.md#refilling-a-bad-result)).
 
 ## The cohort
 
@@ -117,6 +117,8 @@ npm run sf:purge -- --noncohort|--sample|--activities|--all   # Salesforce (recy
 npm run hubspot:purge                                          # HubSpot (recycling bin, 90 days)
 npm run drive:audit -- --purge                                 # Drive orphans (trash, 30 days)
 ```
+
+After a real `--noncohort` run the purged records' stored Salesforce ids are cleared from the ledger, so the next reconcile treats them as never-pushed. Pass `--keep-ledger-ids` to skip that write-back.
 
 Slack posts age out on their own on the free plan's 90-day window.
 
@@ -192,11 +194,15 @@ tested default.
 | `npm run pipeline` | One forced weekly increment (= `apply -- --weeks=1`) |
 | `npm run apply` | Generate every period the real calendar has produced (a fresh world's whole back-catalog) |
 | `npm run apply -- --ingest [--reconcile] [--opp=]` | Validate + file results (+ push) |
+| `npm run apply -- --reconcile --sf-limit=N` | Salesforce smoke batch: push only the first N accounts (plus their contacts and opps); idempotent |
 | `npm run apply -- --backfill` | The one-time historical seed: the same catch-up run, under its intent flag |
 | `npm run apply -- --backfill-touchpoints --opp=` | Plant one deal's full detail layer |
+| `npm run apply -- --backfill-stage-history` | One-time migration: rebuild `stageHistory` for pre-field deals by deterministic replay; refuses to save on drift |
 | `npm run apply -- --next=N` / `--refill=<artifactId>` | Backfill queue / reset one artifact |
 | `npm run lint [-- --sample=N] [-- --opp=] [-- --repetition]` | Coherence linter |
 | `npm run cohort` / `cohort:select` / `cohort:prune-*` | Cohort status / selection / pruning |
+| `npm run assign-use-cases [-- --confirm]` | Backfill the primary use case onto pre-field deals and rename them; report-only without `--confirm` |
+| `npm run backfill:created-at [-- --dry-run]` | Stamp a deterministic `createdAt` datetime on pre-field opportunities; idempotent |
 | `npm run sf:setup` / `sf:stage-fields` / `sf:purge` | Salesforce provisioning / purge |
 | `npm run hubspot:setup` / `import` / `verify` / `purge` | HubSpot lifecycle |
 | `npm run drive:audit` | Drive orphan audit |

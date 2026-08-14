@@ -109,7 +109,19 @@ export function ingestResults(
     if (!artifact) continue;
     if (artifact.status !== "planned") continue; // already generated/reconciled
 
-    const result = readResult(periodIndex, req);
+    // A truncated or malformed result file must not abort the whole ingest:
+    // report it per-artifact and leave the artifact planned for a re-fill.
+    let result;
+    try {
+      result = readResult(periodIndex, req);
+    } catch (e) {
+      report.invalid.push({
+        artifactId: req.artifactId,
+        reason: `unreadable result file: ${(e as Error).message}`,
+      });
+      report.pending.push(req.artifactId);
+      continue;
+    }
     if (!result) {
       report.pending.push(req.artifactId);
       continue;

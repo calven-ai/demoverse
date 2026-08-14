@@ -13,6 +13,7 @@ Claude-Code-specific.
 | `/setup` | The onboarding playbook (AGENTS.md Part 2): interview → config → init → first increment → optional connectors |
 | `/pipeline-update [weeks]` | The routine weekly increment, end to end: advance → fill via `opp-filler` subagents → ingest → lint → fix → reconcile → commit |
 | `/backfill-opps [N]` | The detail-layer loop for N opportunities: plant → fill (one subagent per opp) → ingest → lint → fix → reconcile → commit per opp |
+| `/import-hubspot` | The deterministic HubSpot import: provision the schema → import the CRM structure into the dedicated test account → verify record-by-record |
 
 ## Subagent strategy (critical for context health)
 
@@ -32,7 +33,8 @@ freely (distinct result files).
 For a bulk detail-layer backfill, run the skill as a self-paced loop:
 `/loop /backfill-opps 5`. Each iteration is independently resumable, thanks to
 idempotent planting, planned-only ingest, upsert reconcile and per-opp commits.
-Stop when `npm run apply -- --next=1` prints nothing.
+Stop when `npm run apply -- --next=1` prints
+`(no opportunities need a detail layer)`.
 
 ## Session hygiene
 

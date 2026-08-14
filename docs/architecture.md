@@ -97,6 +97,8 @@ src/
                  # variety (seeded texture axes), names, vocab
   connectors/    # types.ts (the contract) · registry.ts · salesforce/ hubspot/ drive/ slack/
   pipeline/      # stage machinery (incl. stage-date field derivation)
+  domain/        # the firmographic band vocabulary, the one copy in code
+  util/          # seeded RNG · argv/usage helper · fs/date/env helpers
   clock.ts       # simulation clock
   trends.ts      # trajectory evaluation (Tier 2 materialized)
   directives.ts  # directive parsing
@@ -105,7 +107,11 @@ src/
   lint.ts        # structural + coherence + repetition checks
   reconcile.ts   # the orchestrator running connectors in registry order
   report.ts      # per-run summaries (runs/<date>-report.md)
-scripts/         # init · apply · lint · cohort-* · sf-* · hubspot-* · drive-audit · preflight
+  sales-team.ts  # rep roster builder + per-AE time-dependent win modifiers
+  use-cases.ts   # primary-use-case assignment and lookup
+scripts/         # init · apply · lint · cohort-* · sf-* · hubspot-* · drive-audit ·
+                 # preflight · assign-use-cases · backfill-created-at ·
+                 # check-secrets · lint-prose
 config/          # the Tier-1 world definition (templates in config/templates/)
 state/           # world.json · clock.json · trends.json · directives.md ·
                  # cohort.json · content/ · requests/ (gitignored scratch)

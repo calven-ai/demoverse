@@ -88,7 +88,7 @@ export class SlackClient {
     await this.web.chat.delete({ channel: channelId, ts }).catch(() => {});
   }
 
-  /** Smoke test: post -> delete a temp message (Phase A). */
+  /** Smoke test: post -> delete a temp message. */
   async smokeTest(channelName: string): Promise<void> {
     const ch = await this.channelId(channelName);
     const ts = await this.post(ch, "smoke test, please ignore", { username: "Demo-World Bot" });

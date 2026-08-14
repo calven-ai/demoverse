@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [20, 22]
+        node: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +24,7 @@ jobs:
       # what a fresh clone runs. The suite loads the templates directly (see
       # tests/fixture.ts), so it must stay green with no operator config at all.
       - run: npm run typecheck
-      - run: npx eslint .
+      - run: npm run lint:code
       - run: npm run format:check
       - run: npm run lint:prose
       - run: npm test
