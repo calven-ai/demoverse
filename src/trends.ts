@@ -11,13 +11,13 @@
  * This module is the engine's TIME-VARIANCE layer. Beyond the original win-rate
  * + competitor-strength ramps it now models, so the dashboards' over-time charts
  * have intentional shape:
- *   • volume ramp           — newOppsPerWeek grows (the velocity story)
- *   • competitor presence   — a competitor shows up in more deals over time
- *   • localized bumps       — a gaussian spike-then-recover on a competitor's
+ *   • volume ramp:            newOppsPerWeek grows (the velocity story)
+ *   • competitor presence:    a competitor shows up in more deals over time
+ *   • localized bumps:        a gaussian spike-then-recover on a competitor's
  *                             strength (the "we lose more, then recover" dip)
- *   • industry-weight drift — a segment grows its share over the year (the
+ *   • industry-weight drift:  a segment grows its share over the year (the
  *                             "emerging off-ICP segment" story)
- *   • per-segment win delta  — a segment converts above/below baseline
+ *   • per-segment win delta:  a segment converts above/below baseline
  */
 
 import { z } from "zod";
@@ -72,7 +72,7 @@ export const TrendsSchema = z.object({
     .default({}),
   /**
    * Market-intelligence cohort trajectory (the "win when PMM is
-   * involved" story). The cohort SHARE of new opps ramps over time — an emerging
+   * involved" story). The cohort SHARE of new opps ramps over time, an emerging
    * expansion opportunity. Seeded from world.yaml market_intelligence; the ramp
    * (shareDriftPerQuarter) is set here. Optional: absent → no MI cohort.
    */

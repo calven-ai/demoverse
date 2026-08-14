@@ -1,12 +1,13 @@
 # =============================================================================
-# product.yaml — product grounding for SALES-CALL TRANSCRIPTS
+# product.yaml
+# Product grounding for SALES-CALL TRANSCRIPTS.
 #
 # WHAT THIS FILE CONTROLS
 #   This is the durable messaging document the transcript builder injects into
 #   EVERY call-transcript prompt, so the fictional AE can position the product,
 #   run a believable demo, and map the right module to the buyer's pain. The
-#   better this file, the better every transcript in the world sounds — it is
-#   the single highest-leverage piece of prose authoring in the whole config.
+#   better this file, the better every transcript in the world sounds. It is
+#   the single most important piece of prose authoring in the whole config.
 #
 # HOW TO FILL IT IN (the /setup wizard walks you through this)
 #   1. Copy to config/product.yaml and replace every YOUR-* / TODO entry.
@@ -14,11 +15,11 @@
 #      concrete. Vague copy here produces vague transcripts everywhere.
 #   3. Keep `domains` aligned with world.yaml company.product_modules (one
 #      domain per module is the simplest mapping), and keep the agent/feature
-#      `name`s consistent with use-cases.yaml `agents` — the use-case picker
+#      `name`s consistent with use-cases.yaml `agents`. The use-case picker
 #      tells the AE which of these to demo on each deal.
 #
 # LEAK-SAFETY / GUARDRAILS
-#   • This is RAW INPUT — what a salesperson says on a call. Never paste in the
+#   • This is RAW INPUT, what a salesperson says on a call. Never paste in the
 #     kind of derived analytics your downstream demo tool is supposed to
 #     produce (competitor databases, persona docs, trend reports); the demo
 #     payoff is that those get derived live from the raw world.
@@ -27,9 +28,9 @@
 # =============================================================================
 
 positioning:
-  # TODO: one sentence a rep could actually say — who it's for, what it does,
-  # and the outcome. Pattern: "<COMPANY> is the <category> for <audience> that
-  # <core value>, so <buyer> can <outcome>."
+  # TODO: one sentence a rep could actually say. Name who it's for, what it
+  # does, and the outcome. Pattern: "<COMPANY> is the <category> for <audience>
+  # that <core value>, so <buyer> can <outcome>."
   one_liner: >-
     YOUR-COMPANY is the [category] platform for [target audience] that
     [core value proposition], so [buyer role] can [outcome] instead of
@@ -37,21 +38,21 @@ positioning:
   # TODO: how the rep frames the category and the honest competitive
   # comparison. Good pattern: "the real comparison is X, not vendor Y."
   category: >-
-    TODO: Describe the category story — what the product is a member of or a
-    replacement for, and what the honest comparison is ("YOUR-COMPANY vs. the
+    TODO: Describe the category story. Say what the product is a member of or
+    a replacement for, and what the honest comparison is ("YOUR-COMPANY vs. the
     fragmented stack of tools you run manually", not "vs. one competitor").
-  # TODO: the product's connective tissue / platform concept, if it has one —
-  # the thing the demo keeps coming back to (a shared workspace, a knowledge
-  # graph, a data layer). If your product has no such concept, describe the
-  # core workflow the modules share.
+  # TODO: the product's connective tissue / platform concept, if it has one.
+  # This is the thing the demo keeps coming back to (a shared workspace, a
+  # knowledge graph, a data layer). If your product has no such concept,
+  # describe the core workflow the modules share.
   universe: >-
-    TODO: Describe the shared foundation your modules build on — the single
-    source of truth, data model, or workflow that connects them, and why it
+    TODO: Describe the shared foundation your modules build on. Name the single
+    source of truth, data model, or workflow that connects them, and say why it
     doesn't go stale or fall apart the way the status-quo alternative does.
 
 # The demo surface: each domain (ideally = one world.yaml product_module) with
 # the features/agents the AE can walk in a demo. The AE demos ONLY the ones
-# mapped to the pain uncovered in discovery — never the whole catalog.
+# mapped to the pain uncovered in discovery. Never the whole catalog.
 domains:
   - name: Module A            # TODO: should match a world.yaml product_module
     summary: >-
@@ -60,8 +61,8 @@ domains:
     agents:
       - name: Feature A1      # TODO: the feature/agent name reps say out loud
         value_prop: >-
-          TODO: One line the AE can say in a demo — what it does, continuously
-          or on demand, and what the buyer sees.
+          TODO: One line the AE can say in a demo. Say what it does,
+          continuously or on demand, and what the buyer sees.
         solves: >-
           TODO: The buyer pain this feature exists for, phrased the way the
           buyer complains about it.
@@ -94,28 +95,28 @@ domains:
 # Pain → module map: given the buyer's role and the pain surfaced in
 # discovery, which module/feature the AE leads with and the question that
 # actually decides it for that persona. Cover your main buying-committee
-# roles (see personas.yaml). Optional but strongly recommended — this is what
+# roles (see personas.yaml). Optional but strongly recommended. This is what
 # stops every transcript demoing the same thing.
 pain_to_module:
-  - persona: TODO — your champion persona (e.g. "VP of Operations (Champion)")
+  - persona: "TODO: your champion persona (e.g. 'VP of Operations (Champion)')"
     pain: >-
-      TODO: The champion's day-to-day pain in their own words — what's on the
-      line for them personally.
+      TODO: The champion's day-to-day pain in their own words. Include what's
+      on the line for them personally.
     lead_with: >-
       TODO: The module/feature and the FRAMING the AE opens with for this
       persona (a metaphor or outcome, not a feature list).
     decision_driver: "TODO: the one question this persona is really asking"
-  - persona: TODO — your economic buyer (e.g. "CFO / COO (Economic Buyer)")
+  - persona: "TODO: your economic buyer (e.g. 'CFO / COO (Economic Buyer)')"
     pain: >-
       TODO: The executive-level pain (cost, speed, risk, story to the board).
     lead_with: >-
       TODO: The consolidation/ROI math or strategic narrative that lands with
       an executive.
     decision_driver: "TODO: e.g. 'Does this measurably move a number I own?'"
-  - persona: TODO — your technical evaluator (e.g. "IT / Security (Technical Buyer)")
+  - persona: "TODO: your technical evaluator (e.g. 'IT / Security (Technical Buyer)')"
     pain: >-
-      TODO: Security review, SSO/SAML, data handling, API limits — whatever
-      can veto the deal late.
+      TODO: Security review, SSO/SAML, data handling, API limits, or whatever
+      else can veto the deal late.
     lead_with: >-
       TODO: The security/integration posture (note this usually only comes up
       at Negotiation).
@@ -126,12 +127,12 @@ pain_to_module:
 # deal naturally. 3–6 crisp rules; the two below about claims and competitors
 # are worth keeping in some form for realism.
 brand_guardrails:
-  - "TODO: the core framing rule — how the product IS positioned (e.g. as a
+  - "TODO: the core framing rule for how the product IS positioned (e.g. as a
     system/team you adopt, not another dashboard)."
-  - "TODO: the anti-framing rule — what the AE never calls it (e.g. not an
+  - "TODO: the anti-framing rule for what the AE never calls it (e.g. not an
     'all-in-one platform', not a 'chatbot')."
   - Don't claim specific metrics (hours saved, ROI %, cost cuts) unless the
-    fictional company would plausibly have validated customer numbers — use
+    fictional company would plausibly have validated customer numbers. Use
     outcome claims instead.
   - The AE doesn't name competitors unprompted. When the BUYER raises the
     competitor on the deal, handle it on the merits.

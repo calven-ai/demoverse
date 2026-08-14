@@ -141,7 +141,7 @@ export function emailFor(full: string, domain: string): string {
  * A clearly-fake, non-resolving email domain for a synthetic contact, derived
  * from the account's (possibly REAL) domain. Uses the reserved `.example` TLD
  * (RFC 2606) so a fabricated contact at a real logo can never
- * produce a plausible real mailbox — accounts are real, people never are
+ * produce a plausible real mailbox. Accounts are real, people never are
  * (DESIGN §18). Keeping the account label makes emails unique per account.
  */
 export function demoEmailDomain(accountDomain: string, syntheticDomain = "demo.example"): string {

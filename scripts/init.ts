@@ -1,5 +1,5 @@
 /**
- * `npm run init` — scaffold the world state from config. See DESIGN.md §7.4 (init scaffolder).
+ * `npm run init` scaffolds the world state from config. See DESIGN.md §7.4 (init scaffolder).
  *
  * Validates the Tier-1 config, seeds the reps into the ledger, and writes the
  * clock + trends baselines plus the state/ skeleton (an empty directives file).
@@ -7,7 +7,7 @@
  *
  * `--force` is the reset: besides the ledger/clock/trends it also clears the
  * derived state a previous world left behind (generated prose, cohort files,
- * request scratch, run reports) — leaving any of it would orphan content the
+ * request scratch, run reports). Leaving any of it would orphan content the
  * new ledger knows nothing about. External systems are NOT touched; the purge
  * commands for those are printed at the end.
  *
@@ -126,14 +126,14 @@ function main(): void {
     console.log("    npm run sf:purge -- --all           # Salesforce demo records (dry-run first)");
     console.log("    npm run drive:audit                 # find orphaned Drive files");
     console.log("    npm run hubspot:purge               # HubSpot test portal, if used");
-    console.log("  Slack threads have no purge command — archive the channels or leave them.");
+    console.log("  Slack threads have no purge command. Archive the channels or leave them.");
   }
   console.log("\nThe clock starts in the past so your world can carry believable history.");
   console.log("Two ways to run from here:");
   console.log("  · Week by week:  `npm run pipeline` advances ONE week per run (your first");
   console.log("    increments carry historical dates until the clock catches up to today).");
   console.log("  · Seed history:  `npm run apply -- --backfill` plans the whole back-catalog");
-  console.log("    in one shot — a large one-time fill job (see docs/getting-started.md).");
+  console.log("    in one shot. This is a large one-time fill job (see docs/getting-started.md).");
   console.log("  (Plain `npm run apply` generates EVERY pending period up to today at once.)");
   console.log("Then fill the generation requests and run `npm run apply -- --ingest`.");
 }

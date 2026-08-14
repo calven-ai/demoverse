@@ -4,7 +4,7 @@
  *
  * Auth uses the SOAP partner `login` call (username + password + security token)
  * to obtain a session id + instance URL; all record I/O then goes through the
- * REST sObject API. We deliberately avoid the jsforce SDK — its HTTP transport
+ * REST sObject API. We deliberately avoid the jsforce SDK because its HTTP transport
  * hangs under this runtime (tsx/Node) while raw fetch works reliably.
  *
  * Custom fields expected on the org are created by `scripts/sf-setup.ts`
@@ -130,7 +130,7 @@ export class SalesforceClient {
     try {
       res = (await this.request("POST", path, fields)) as typeof res;
     } catch (e) {
-      // The ledger is the source of truth — if it holds two same-named contacts,
+      // The ledger is the source of truth. If it holds two same-named contacts,
       // Salesforce must mirror it. Bypass the org's duplicate rule and retry once.
       if (!(e instanceof Error) || !e.message.includes("DUPLICATES_DETECTED")) throw e;
       res = (await this.request("POST", path, fields, {

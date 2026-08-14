@@ -4,7 +4,7 @@
  * The world is meant to accumulate its history a slice at a time: an increment
  * opens a couple of deals, moves each open deal at most one stage, and plants
  * only the touch points those events earned. These tests pin the two properties
- * that keep that motion honest — the forced clock (an increment runs on demand,
+ * that keep that motion honest: the forced clock (an increment runs on demand,
  * not when the calendar allows it) and the per-run intake override.
  */
 
@@ -35,7 +35,7 @@ function freshWorld() {
 
 test("a forced increment runs even when the world is already current", () => {
   const clock = clockAt("2026-08-13");
-  // The calendar owes nothing — this is the exact state a routine run finds.
+  // The calendar owes nothing. This is the exact state a routine run finds.
   assert.equal(pendingPeriods(clock, "2026-08-13").length, 0);
 
   const periods = forcedPeriods(clock, 1);
@@ -69,7 +69,7 @@ test("--new-opps overrides intake exactly, for that run only", () => {
   advanceWorld(world, cfg, trends, START, periods, new CohortIndex(EMPTY_COHORT), { newOppsPerPeriod: 5 });
   assert.equal(world.opportunities.length, 10, "5 deals per period, exactly");
 
-  // The standing rate is untouched — a later run without the flag falls back to it.
+  // The standing rate is untouched. A later run without the flag falls back to it.
   assert.deepEqual(trends.volume.newOppsPerWeek, cfg.world.volume.new_opps_per_week);
 });
 

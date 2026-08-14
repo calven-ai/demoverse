@@ -2,7 +2,7 @@
  * Derive Salesforce's STANDARD firmographic fields from the ledger's band enums.
  *
  * Why this exists: downstream CRM ingestion treats `NumberOfEmployees`,
- * `AnnualRevenue` and `BillingCountry` as always-imported — enrichment derives `size`,
+ * `AnnualRevenue` and `BillingCountry` as always-imported, and enrichment derives `size`,
  * `employee_band`, `revenue_band` and `region` from those raw numbers. The
  * engine's own vocabulary is the BAND (crm-shared.ts enums), so we pick a
  * representative point INSIDE each band rather than leaving the standard
@@ -16,7 +16,7 @@
 import { Rng } from "../../util/rng.js";
 import { employeeSpan, REVENUE_SPANS } from "../../domain/bands.js";
 
-/** Round to a believable precision — nobody records 4,317 employees. */
+/** Round to a believable precision. Nobody records 4,317 employees. */
 function roundEmployees(n: number): number {
   if (n < 100) return Math.round(n / 5) * 5;
   if (n < 1000) return Math.round(n / 25) * 25;
@@ -36,7 +36,7 @@ export interface StandardFirmographics {
 
 /**
  * Representative standard-field values for one account. Unknown bands are
- * omitted rather than guessed — a null is honest, a wrong number is not.
+ * omitted rather than guessed. A null is honest, a wrong number is not.
  */
 export function standardFirmographics(
   account: {

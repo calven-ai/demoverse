@@ -36,7 +36,7 @@ export const WorldConfigSchema = z.object({
      * under the reserved .example TLD so a synthetic mailbox can never resolve.
      */
     synthetic_email_domain: z.string().default("demo.example"),
-    /** The company's product modules — options for the win-loss `product_modules` question. */
+    /** The company's product modules. Options for the win-loss `product_modules` question. */
     product_modules: z.array(z.string()).default([]),
   }),
   generate: z
@@ -46,7 +46,7 @@ export const WorldConfigSchema = z.object({
       slack: z.boolean().default(true),
       internal_collateral: z.boolean().default(true),
       // Touch-point kinds for the live weekly engine (advanceWorld). The
-      // retroactive backfill planner does NOT consult these — it plants the full
+      // retroactive backfill planner does NOT consult these. It plants the full
       // touch-point set on demand, gated only by the per-deal cadence below.
       ae_notes: z.boolean().default(false),
       emails: z.boolean().default(false),
@@ -160,7 +160,7 @@ export const WorldConfigSchema = z.object({
   /**
    * The market-intelligence buying motion (the "win when PMM is
    * involved" story). A larger-company cohort where a fraction of deals have no
-   * product-marketing persona driving — encoded purely as sampling bias. The
+   * product-marketing persona driving, encoded purely as sampling bias. The
    * cohort share ramps over time via state/trends.json. Optional: configs without
    * it simply have no MI cohort.
    */
@@ -412,9 +412,9 @@ const PainToModule = z.object({
 });
 
 /**
- * Durable product grounding for sales-call transcripts — positioning,
- * the domain/agent catalog (the demo surface), the pain→module map, and brand
- * guardrails — the company's messaging document rendered into every call prompt.
+ * Durable product grounding for sales-call transcripts: positioning, the
+ * domain/agent catalog (the demo surface), the pain→module map, and brand
+ * guardrails. The company's messaging document, rendered into every call prompt.
  */
 export const ProductConfigSchema = z.object({
   positioning: z.object({
@@ -472,7 +472,7 @@ export type SalesIc = z.infer<typeof SalesIc>;
 // --- aggregate ---------------------------------------------------------------
 
 /**
- * Domain use cases — what the buyer walked in asking for. Coarser than the
+ * Domain use cases. What the buyer walked in asking for. Coarser than the
  * product's 10 agents on purpose (a buyer says "get on top of our competitors",
  * not "a Battle Card agent"), so each use case maps to the agent(s) demoed for it.
  */
@@ -488,7 +488,7 @@ export const UseCaseSchema = z.object({
   buyer_pain: z.string(),
   lead_with: z.string(),
   /**
-   * Relative sampling weight per competitor on the deal — a skew, not a rule.
+   * Relative sampling weight per competitor on the deal. A skew, not a rule.
    * Competitors absent here score `default_weight`.
    */
   competitor_weights: z.record(z.string(), z.number().nonnegative()).default({}),
@@ -508,7 +508,7 @@ export type UseCasesConfig = z.infer<typeof UseCasesConfigSchema>;
 // the engine only draws from it deterministically.
 
 export const ProseConfigSchema = z.object({
-  /** Why THIS buyer is looking — the deal's backstory, one per deal. */
+  /** Why THIS buyer is looking. The deal's backstory, one per deal. */
   narrative_angles: z.array(z.string()).min(4),
   /** How the buying group communicates, one per deal. */
   buyer_tones: z.array(z.string()).min(3),
@@ -532,7 +532,7 @@ export type ProseConfig = z.infer<typeof ProseConfigSchema>;
 // --- connectors.yaml ---------------------------------------------------------
 // Per-destination wiring: whether each connector runs, and the destination-side
 // naming the engine writes into (CRM stage names, Drive folder tree, Slack
-// channels). Credentials stay in `.env` — this file is safe to commit.
+// channels). Credentials stay in `.env`, so this file is safe to commit.
 
 export const ConnectorsConfigSchema = z.object({
   salesforce: z

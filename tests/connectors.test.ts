@@ -61,7 +61,7 @@ test("a disabled connector no-ops with disabled stats and writes nothing", async
 
 test("an enabled connector without credentials or work reports cleanly (no throw)", async () => {
   // Empty world + enabled connectors: each must either no-op on "nothing to
-  // do" or on absent credentials — never attempt a network call.
+  // do" or on absent credentials. Neither may attempt a network call.
   const world = emptyWorld("connector-test-2");
   const stats = await reconcileAll(world, cfg, { dryRun: true });
   for (const s of stats) {

@@ -1,5 +1,6 @@
 # =============================================================================
-# prose.yaml — the story banks
+# prose.yaml
+# The story banks.
 #
 # WHAT THIS FILE CONTROLS
 #   Seeded variety axes, per-artifact structural shapes, per-stage call focus,
@@ -8,7 +9,7 @@
 #   the engine only draws from it deterministically (one stable draw per deal
 #   / artifact).
 #
-#   This template ships COMPLETE generic-B2B defaults — it works as-is. Make
+#   This template ships COMPLETE generic-B2B defaults. It works as-is. Make
 #   it yours over time by appending entries in your product's vocabulary.
 #
 # ORDER MATTERS
@@ -23,7 +24,7 @@
 #   won and lost deals alike.
 # =============================================================================
 
-# Why THIS buyer is looking — the deal's backstory, one per deal.
+# Why THIS buyer is looking. One backstory per deal.
 narrative_angles:
   - A newly-hired team lead is building the function from scratch and wants tooling before headcount.
   - The work was outsourced to an agency; the team is pulling it in-house and needs to replace the agency's deliverables.
@@ -40,13 +41,13 @@ narrative_angles:
 
 # How the buying group communicates, one per deal.
 buyer_tones:
-  - skeptical and numbers-first — wants proof, quantifies everything, allergic to marketing language
-  - enthusiastic early adopter — excited by new tooling, moves fast, occasionally overpromises internally
-  - terse and distracted — short answers, reschedules, hard to pin down, but engaged when it matters
-  - process-heavy — procurement-minded, wants security reviews and references early, follows a formal evaluation rubric
-  - warm but budget-constrained — likes the product and the people, keeps steering to price and phasing
-  - technically probing — asks how things work under the hood, tests claims, distrusts demos
-  - delegation-happy executive — sets direction in one call then routes everything through a lieutenant
+  - Skeptical and numbers-first. Wants proof, quantifies everything, allergic to marketing language.
+  - Enthusiastic early adopter. Excited by new tooling, moves fast, occasionally overpromises internally.
+  - Terse and distracted. Short answers, reschedules, hard to pin down, but engaged when it matters.
+  - Process-heavy and procurement-minded. Wants security reviews and references early, follows a formal evaluation rubric.
+  - Warm but budget-constrained. Likes the product and the people, keeps steering to price and phasing.
+  - Technically probing. Asks how things work under the hood, tests claims, distrusts demos.
+  - Delegation-happy executive. Sets direction in one call, then routes everything through a lieutenant.
 
 # Friction the rep must handle. Leak-safe: an objection exists on won AND lost deals.
 objection_themes:
@@ -63,11 +64,11 @@ objection_themes:
 timeline_pressures:
   - a hard budget-cycle deadline makes this quarter decisive
   - an upcoming external event gives the evaluation real urgency
-  - no particular urgency — the buyer is deliberate and won't be rushed
+  - no particular urgency, because the buyer is deliberate and won't be rushed
   - an internal reorg could freeze spending, so the champion is pushing pace
   - a new exec starts soon and the champion wants this decided before priorities reshuffle
 
-# Per-artifact structural variants — one draw per ARTIFACT (not per deal), so
+# Per-artifact structural variants. One draw per ARTIFACT (not per deal), so
 # the same deal's two AE notes or two calls don't share a template either.
 artifact_shapes:
   call_transcript:
@@ -79,23 +80,23 @@ artifact_shapes:
     - The buyer opens with a pointed question before any pleasantries.
   ae_note:
     - one run-on sentence, no bullets, the way a rep types between meetings
-    - 2 bullets, logistics only (what happened, next step) — no insight at all
+    - 2 bullets, logistics only (what happened, next step) and no insight at all
     - shorthand with abbreviations (nxt stp, EB, POC, w/) and no full sentences
-    - next-steps only — a dated to-do line or two, nothing about the call itself
-    - 4–6 bullets, unusually thorough for this rep — a rare detailed entry
+    - a dated to-do line or two about next steps, nothing about the call itself
+    - 4–6 bullets, a rare detailed entry that is unusually thorough for this rep
   survey:
     - "terse respondent: one-word or one-line answers, skips every optional question"
     - writes short paragraphs in the free-text fields; ratings get a clause of justification
     - answers in bullet fragments, inconsistent capitalization, clearly rushed
     - "dutiful respondent: answers everything asked, neutral corporate tone"
   interview:
-    - chatty — over-shares, wanders into war stories, the interviewer has to steer back
-    - guarded — short answers until one question unlocks a candid stretch
-    - rushed — 15 minutes between meetings, blunt and compressed
-    - venting — has opinions about the whole evaluation process and shares them
+    - chatty and prone to war stories, so the interviewer has to steer back
+    - guarded, giving short answers until one question unlocks a candid stretch
+    - rushed, squeezed into 15 minutes between meetings, blunt and compressed
+    - venting about the whole evaluation process, with opinions to spare
   email_exchange:
     - the buyer goes quiet for a stretch, then re-engages with an apology and a concrete ask
-    - one buyer message is clearly typed on a phone — short, typo'd, no signature
+    - one buyer message is clearly typed on a phone, all short lines and typos, no signature
     - the champion forwards a colleague's internal question into the thread
     - a scheduling misfire (wrong timezone or double-booking) costs the thread a few days
     - the buyer answers only half the rep's questions; the rep has to re-ask one
@@ -111,9 +112,10 @@ stage_focus:
   Discovery: |-
     A ~30–45 min first discovery call. Brief rapport, then the rep runs structured discovery/qualification
     (BANT/MEDDPICC: budget, authority, need, timeline, decision process, metrics, champion). The rep asks far
-    more than they tell — current tooling and process, team size and who does what, where the time goes,
-    what's painful, what triggered the look. Position the product only at a high level and tease the one or
-    two capabilities that map to the pain heard. No pricing deep-dive, and keep it small — no IT/security.
+    more than they tell, digging into current tooling and process, team size and who does what, where the
+    time goes, what's painful, and what triggered the look. Position the product only at a high level and
+    tease the one or two capabilities that map to the pain heard. No pricing deep-dive. Keep the room small,
+    with no IT or security.
   Evaluation: |-
     A ~45–60 min working session that includes a real DEMO. The rep walks the specific modules/features that
     map to the pain uncovered in discovery, shows how they work, and ties each back to the buyer's stated
@@ -124,13 +126,13 @@ stage_focus:
     economic buyer, and confirms the buying process and timeline.
   Negotiation: |-
     A ~45–60 min late-stage call: objection handling, competitor head-to-head (raised by the buyer), the
-    security review (IT joins — SSO/SAML, SOC 2, data handling), procurement/redlines, and final timeline.
+    security review (IT joins for SSO/SAML, SOC 2, data handling), procurement/redlines, and final timeline.
   default: |-
     A realistic sales call: the rep discovers needs, demos where relevant, and addresses the competitor(s) and any pricing/product reaction.
 
 # Anti-repetition blocklist. Starts with generic LLM-isms; as your world grows,
-# run the repetition linter and PROMOTE recurring phrases here — appending at
-# the end (order matters above does not apply here, but appending keeps diffs
+# run the repetition linter and PROMOTE recurring phrases here. Append at the
+# end (order matters above does not apply here, but appending keeps diffs
 # clean). Banned phrases may never appear in generated prose.
 banned_phrases:
   - game changer
@@ -142,7 +144,7 @@ banned_phrases:
 
 vocab:
   # Product-feedback option list sampled onto closed deals (CRM picklist).
-  # Generic B2B SaaS set — TODO: adjust to the feedback themes your product
+  # Generic B2B SaaS set. TODO: adjust to the feedback themes your product
   # would actually receive.
   product_feedback:
     - Integrations

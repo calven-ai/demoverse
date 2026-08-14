@@ -1,9 +1,10 @@
 # =============================================================================
-# sales-team.yaml — the fictional company's revenue org
+# sales-team.yaml
+# The fictional company's revenue org.
 #
 # WHAT THIS FILE CONTROLS
 #   The sellers. ICs become CRM users and OWN the opportunities (every deal is
-#   owned by an IC); managers purely manage — they own no deals, and a
+#   owned by an IC); managers purely manage. They own no deals, and a
 #   manager's number is the rollup of their reports. This is what powers a rep
 #   leaderboard and manager/team comparisons in downstream analytics, and ties
 #   each win-loss survey to the AE who owned the deal.
@@ -11,12 +12,12 @@
 # HOW TO FILL IT IN (the /setup wizard walks you through this)
 #   1. Copy to config/sales-team.yaml. Rename everyone to obviously-fictional
 #      people and point emails at YOUR fictional domain (keep it `.example`
-#      or your invented company domain — never a real person or mailbox).
+#      or your invented company domain). Never a real person or mailbox.
 #   2. Spread `win_modifier` so a real leaderboard emerges instead of noise:
 #      it is an ADDITIVE bias on each deal's win probability (e.g. +0.10 =
 #      ten points above baseline, -0.08 = below). Keep the spread within
 #      roughly ±0.10.
-#   3. `ramp_per_quarter` (optional) improves a rep's modifier over time — use
+#   3. `ramp_per_quarter` (optional) improves a rep's modifier over time. Use
 #      it on one rep for a "ramping new hire" arc.
 #   4. `region` values must match world.yaml segments.regions keys; deals are
 #      routed to reps by region. Region averages can encode a planted
@@ -31,17 +32,17 @@ managers:
     name: Morgan Hale             # TODO: fictional NA manager
     email: morgan.hale@your-company.example
     region: NA
-    title: Regional Sales Manager — NA
+    title: NA Regional Sales Manager
   - id: rep-002
     name: Ingrid Larsen           # TODO: fictional EMEA manager
     email: ingrid.larsen@your-company.example
     region: EMEA
-    title: Regional Sales Manager — EMEA
+    title: EMEA Regional Sales Manager
 
-# Individual contributors — the deal owners. reports_to → a manager id.
+# Individual contributors own the deals. reports_to → a manager id.
 ics:
   - id: rep-003
-    name: Avery Stone             # TODO: fictional AE — the strong closer
+    name: Avery Stone             # TODO: fictional AE (the strong closer)
     email: avery.stone@your-company.example
     region: NA
     title: Account Executive
@@ -49,7 +50,7 @@ ics:
     win_modifier: 0.08            # leaderboard top
 
   - id: rep-004
-    name: Casey Nguyen            # TODO: fictional AE — solid mid-pack
+    name: Casey Nguyen            # TODO: fictional AE (solid mid-pack)
     email: casey.nguyen@your-company.example
     region: NA
     title: Account Executive
@@ -57,7 +58,7 @@ ics:
     win_modifier: 0.02
 
   - id: rep-005
-    name: Riley Foster            # TODO: fictional AE — the ramping new hire
+    name: Riley Foster            # TODO: fictional AE (the ramping new hire)
     email: riley.foster@your-company.example
     region: EMEA
     title: Account Executive
@@ -66,7 +67,7 @@ ics:
     ramp_per_quarter: 0.03        # …and visibly improves quarter over quarter
 
   - id: rep-006
-    name: Sam Whitfield           # TODO: fictional AE — the struggler
+    name: Sam Whitfield           # TODO: fictional AE (the struggler)
     email: sam.whitfield@your-company.example
     region: EMEA
     title: Account Executive

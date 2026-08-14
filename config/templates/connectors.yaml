@@ -1,5 +1,6 @@
 # =============================================================================
-# connectors.yaml — per-destination wiring
+# connectors.yaml
+# Per-destination wiring.
 #
 # WHAT THIS FILE CONTROLS
 #   Which external systems the engine reconciles into, and the
@@ -15,7 +16,7 @@
 #     • the destination is a DEDICATED, ISOLATED demo org/workspace (never a
 #       production system), and
 #     • its credentials are in `.env`.
-#   You can run the whole engine with everything disabled — artifacts are
+#   You can run the whole engine with everything disabled. Artifacts are
 #   still generated and filed locally.
 # =============================================================================
 
@@ -27,7 +28,7 @@ salesforce:
   # Engine pipeline stage → Salesforce Opportunity StageName picklist value
   # (keys = world.yaml pipeline.stages, open stages only). Closed deals map to
   # "Closed Won"/"Closed Lost" from the deal status. The defaults below target
-  # the standard out-of-the-box Salesforce picklist — adjust only if your org
+  # the standard out-of-the-box Salesforce picklist. Adjust only if your org
   # customized it.
   stage_map:
     Discovery: Qualification
@@ -35,15 +36,15 @@ salesforce:
     Proposal: Proposal/Price Quote
     Negotiation: Negotiation/Review
 
-# Structure-only CRM alternative (companies, contacts, deals, associations —
-# no activity timeline). Flip on only against a dedicated test portal.
+# Structure-only CRM alternative (companies, contacts, deals, associations,
+# but no activity timeline). Flip on only against a dedicated test portal.
 hubspot:
   enabled: false
 
 drive:
   # Flip to true once a dedicated shared Drive folder + service credentials
-  # are wired up in .env. Files are filed
-  # <folder>/<Account Name>/<date> — <title>.md.
+  # are wired up in .env. Files land under <folder>/<Account Name>/, named
+  # from the artifact's date and title.
   enabled: false
   # Artifact kind → top-level folder inside the shared demo folder.
   folders:

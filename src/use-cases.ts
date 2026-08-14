@@ -1,19 +1,19 @@
 /**
- * Domain use cases — assignment and lookup. See config/use-cases.yaml.
+ * Domain use cases: assignment and lookup. See config/use-cases.yaml.
  *
  * Every opportunity carries one primary use case: what the buyer walked in
  * asking for. It names the deal ("<Account> - <Use Case>") and is the dominant
  * theme of that deal's prose.
  *
  * Assignment is skewed by the competitor on the deal, because that is how it
- * works in reality — you run into a competitive-enablement vendor because you
+ * works in reality. You run into a competitive-enablement vendor because you
  * are in a competitive-intelligence deal, and into a research platform because
  * you are in a market-research
  * one. The skew is deliberately soft: every use case still sees several
  * competitors, so no bucket collapses to a single-competitor story.
  *
  * What this must NOT do is move any tuned statistic. Win rate, ICP tier and
- * loss reason are decided elsewhere and are not inputs here — the use case is
+ * loss reason are decided elsewhere and are not inputs here. The use case is
  * downstream of the competitor, never upstream of the outcome.
  */
 
@@ -40,7 +40,7 @@ export function findUseCase(cfg: Config, name: string | undefined): UseCase | un
  * competitor skews toward it". Without it a use case liked by three of the four
  * competitors wins on volume as well as on skew, and one CI-heavy bucket eats
  * the pipeline. After normalizing, a use case that likes every competitor
- * equally scores 1.0 everywhere and gains nothing overall — only the RATIOS
+ * equally scores 1.0 everywhere and gains nothing overall. Only the RATIOS
  * inside a use case survive, which is exactly the skew we want.
  */
 function normalizedAffinity(cfg: Config): Map<string, Map<string, number>> {
@@ -63,8 +63,8 @@ function normalizedAffinity(cfg: Config): Map<string, Map<string, number>> {
  *
  * Base rate is `target_share`; the competitors on the deal then tilt it by the
  * GEOMETRIC MEAN of their normalized affinities. Geometric mean rather than a
- * product so a second competitor refines the signal instead of compounding it —
- * a two-CI-vendor deal should look like "a CI deal", not "a CI deal squared".
+ * product so a second competitor refines the signal instead of compounding it.
+ * A two-CI-vendor deal should look like "a CI deal", not "a CI deal squared".
  * Deals with no competitor fall back to the plain target shares.
  */
 export function useCaseWeights(cfg: Config, competitors: string[]): Record<string, number> {
@@ -80,7 +80,7 @@ export function useCaseWeights(cfg: Config, competitors: string[]): Record<strin
       tilt = Math.exp(logSum / present.length);
     }
     // Floor keeps every bucket reachable for every competitor. A skew that
-    // becomes a hard rule is not a pattern worth discovering — it is one we
+    // becomes a hard rule is not a pattern worth discovering. It is one we
     // hard-coded and then congratulated the downstream product for finding.
     weights[uc.name] = Math.max(uc.target_share * tilt, 0.01);
   }
@@ -97,15 +97,15 @@ export function pickUseCase(cfg: Config, competitors: string[], rng: Rng): strin
  *
  * Needed because the demo cohort is only ~50 deals. An independent per-deal draw
  * is right for the open-ended ledger, but over 50 deals it leaves buckets with
- * one or two members — and analytics products suppress any dashboard slice too thin to be
- * meaningful, so a whole use case silently vanishes from the demo.
+ * one or two members, and analytics products suppress any dashboard slice too thin
+ * to be meaningful, so a whole use case silently vanishes from the demo.
  *
  * Quotas fix HOW MANY of each; affinity fixes WHICH deals. Repeatedly takes the
  * use case with the largest unmet quota and gives it the remaining deal that
  * wants it most, so the scarcest bucket always gets first pick of the deals that
  * genuinely suit it.
  *
- * `preassigned` counts toward the quotas — deals whose use case was inferred
+ * `preassigned` counts toward the quotas. Deals whose use case was inferred
  * from existing prose are immovable and must not be double-counted.
  */
 export function allocateUseCases(

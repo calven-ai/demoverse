@@ -1,8 +1,8 @@
 /**
- * `npm run sf:purge` — every way of deleting demo-world data from Salesforce,
- * in one place. ALL modes are DRY-RUN BY DEFAULT: they print exactly what they
- * would delete and exit; pass `--confirm` to execute. Deleted rows land in the
- * org's Recycle Bin, where Salesforce keeps them for 15 days.
+ * `npm run sf:purge` collects every way of deleting demo-world data from
+ * Salesforce in one place. ALL modes are DRY-RUN BY DEFAULT: they print exactly
+ * what they would delete and exit; pass `--confirm` to execute. Deleted rows
+ * land in the org's Recycle Bin, where Salesforce keeps them for 15 days.
  *
  *   npm run sf:purge -- --noncohort [--confirm] [--keep-ledger-ids]
  *       Shrink the org to the cohort: delete demo records whose opportunity is
@@ -14,7 +14,7 @@
  *   npm run sf:purge -- --sample [--confirm]
  *       Remove Salesforce's OWN seeded sample data (the "Edge Communications"
  *       Accounts etc. a fresh Developer Edition ships with). Only touches
- *       records where `Demo_World_Id__c` is NULL — never the engine's records.
+ *       records where `Demo_World_Id__c` is NULL. Never the engine's records.
  *
  *   npm run sf:purge -- --activities [--opp=opp-027] [--confirm]
  *       Delete the activity records (Tasks + transcript Files) for demo
@@ -141,12 +141,12 @@ async function connect(): Promise<SalesforceClient> {
   const sf = SalesforceClient.fromEnv();
   await sf.login();
   console.log(
-    `✓ connected to ${sf.getInstanceUrl()}${confirm ? "" : "   [DRY RUN — nothing will be deleted]"}\n`,
+    `✓ connected to ${sf.getInstanceUrl()}${confirm ? "" : "   [DRY RUN: nothing will be deleted]"}\n`,
   );
   return sf;
 }
 
-/** `--all` — every demo-world record. */
+/** `--all` deletes every demo-world record. */
 async function purgeAll(): Promise<void> {
   const sf = await connect();
   // Attached transcript Files first: delete the ContentDocument (its versions +
@@ -176,7 +176,7 @@ async function purgeAll(): Promise<void> {
   }
 }
 
-/** `--sample` — Salesforce's own seeded sample data (Demo_World_Id__c IS NULL). */
+/** `--sample` removes Salesforce's own seeded sample data (Demo_World_Id__c IS NULL). */
 async function purgeSample(): Promise<void> {
   const sf = await connect();
   // Child → parent order. Case first: seeded cases hang off sample contacts and
@@ -205,7 +205,7 @@ async function purgeSample(): Promise<void> {
     if (rows.length > 8) console.log(`   … +${rows.length - 8} more`);
   }
   if (total === 0) {
-    console.log("\n✓ No sample data present — the org holds demo-world records only.");
+    console.log("\n✓ No sample data present. The org holds demo-world records only.");
     return;
   }
   if (!confirm) {
@@ -236,11 +236,11 @@ async function purgeSample(): Promise<void> {
   }
 }
 
-/** `--noncohort` — shrink the org to the cohort; ledger keeps everything. */
+/** `--noncohort` shrinks the org to the cohort; ledger keeps everything. */
 async function purgeNoncohort(): Promise<void> {
   const cohortFile = loadCohort();
   if (cohortFile.members.length === 0) {
-    console.error("No cohort selected — run `npm run cohort:select` first.");
+    console.error("No cohort selected. Run `npm run cohort:select` first.");
     console.error("Refusing to purge: without a cohort every demo record would qualify for deletion.");
     process.exit(1);
   }
@@ -299,7 +299,7 @@ async function purgeNoncohort(): Promise<void> {
     console.error(
       `\n✗ Refusing to proceed: only ${survivingOpps} opportunities would survive but the cohort has ${cohort.size}.`,
     );
-    console.error(`  Some cohort members are missing from the org — reconcile them before purging.`);
+    console.error(`  Some cohort members are missing from the org. Reconcile them before purging.`);
     process.exit(1);
   }
 
@@ -373,7 +373,7 @@ async function purgeNoncohort(): Promise<void> {
   console.log(`Verify with: npm run cohort`);
 }
 
-/** `--activities` — reset Tasks + Files so reconcile re-inserts them backdated. */
+/** `--activities` resets Tasks + Files so reconcile re-inserts them backdated. */
 async function purgeActivities(): Promise<void> {
   const world = loadWorld();
   const opps = world.opportunities.filter((o) => o.external.salesforceId && (!oppArg || o.id === oppArg));

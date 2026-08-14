@@ -1,5 +1,6 @@
 # =============================================================================
-# use-cases.yaml — domain use cases (what the buyer walked in asking for)
+# use-cases.yaml
+# Domain use cases (what the buyer walked in asking for).
 #
 # Every opportunity carries exactly ONE primary use case. It does two jobs:
 #
@@ -7,8 +8,8 @@
 #      a CRM where the deal is named after the account and nothing else tells
 #      you nothing about what the deal is.
 #   2. It is the DOMINANT theme of that deal's prose. Transcripts, emails and
-#      AE notes lead with it. Other capabilities may come up in passing —
-#      buyers rarely want exactly one thing — but they stay secondary.
+#      AE notes lead with it. Other capabilities may come up in passing, since
+#      buyers rarely want exactly one thing. They stay secondary.
 #
 # HOW TO FILL IT IN (the /setup wizard walks you through this)
 #   1. Copy to config/use-cases.yaml. Define 3–6 use cases, deliberately
@@ -16,15 +17,15 @@
 #      our reporting", not "we need Feature A2". Each use case maps to the
 #      feature(s)/agent(s) the AE demos for it.
 #   2. `domain` MUST reuse a world.yaml company.product_modules string
-#      VERBATIM — the win-loss surveys' product_module question and this field
+#      VERBATIM. The win-loss surveys' product_module question and this field
 #      speak the same vocabulary.
-#   3. `agents` should name entries from product.yaml — that is what tells the
+#   3. `agents` should name entries from product.yaml. That is what tells the
 #      transcript builder what to demo on this deal.
 #   4. `keywords` are lowercase phrases that identify the use case in prose;
 #      the linter uses them to check each artifact actually leads with its
 #      deal's use case. Include your buyers' natural vocabulary and synonyms.
 #
-# THE TWO KNOBS, deliberately separated — they answer different questions:
+# THE TWO KNOBS, deliberately separated because they answer different questions:
 #
 #   `target_share`       how common the use case is OVERALL. Shares are
 #                        relative and get normalized, so they read as
@@ -36,7 +37,7 @@
 #
 # Keeping these separate is what stops the two effects fighting: the marginal
 # distribution tracks target_share while the conditional distribution given a
-# competitor still skews hard — which is the discoverable pattern
+# competitor still skews hard. That is the discoverable pattern
 # ("Competitor A turns up mostly in Use-Case-One deals"), not a lopsided
 # pipeline. A competitor absent from a map scores `default_weight`. None of
 # this touches win rate, ICP tier or loss reason.
@@ -51,7 +52,7 @@ use_cases:
     agents: [Feature A1, Feature A2]   # product.yaml names the AE demos here
     # Lowercase phrases that identify this use case in prose (matching + lint).
     keywords: [TODO keyword one, TODO keyword two, TODO synonym]
-    # What the buyer actually says in discovery — the AE hears this, not the
+    # What the buyer actually says in discovery. The AE hears this, not the
     # use-case label. Prose generators lead with it.
     buyer_pain: >-
       TODO: The complaint that starts this kind of deal, in the buyer's own

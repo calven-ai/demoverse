@@ -81,7 +81,7 @@ export class SlackClient {
   }
 
   /** Delete a previously-posted message (used to re-post under a changed
-   * username/avatar — Slack can't change those on chat.update). */
+   * username/avatar, which chat.update cannot do). */
   async deleteMessage(channelId: string, ts: string): Promise<void> {
     await this.web.chat.delete({ channel: channelId, ts }).catch(() => {});
   }
@@ -89,7 +89,7 @@ export class SlackClient {
   /** Smoke test: post -> delete a temp message (Phase A). */
   async smokeTest(channelName: string): Promise<void> {
     const ch = await this.channelId(channelName);
-    const ts = await this.post(ch, "smoke test — please ignore", { username: "Demo-World Bot" });
+    const ts = await this.post(ch, "smoke test, please ignore", { username: "Demo-World Bot" });
     await this.web.chat.delete({ channel: ch, ts }).catch(() => {});
   }
 }

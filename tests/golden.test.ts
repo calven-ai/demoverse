@@ -2,7 +2,7 @@
  * Golden-seed snapshot: pins the simulation's draws across refactors.
  *
  * Runs a 30-week world from a fixed seed with the prospect pool disabled
- * (synthetic names only — self-contained and free of real company names) and
+ * (synthetic names only, keeping it self-contained and free of real company names) and
  * compares a structural digest against the committed snapshot. Any change to
  * RNG draw order, sampling, outcomes, or touch-point planning shows up here.
  *

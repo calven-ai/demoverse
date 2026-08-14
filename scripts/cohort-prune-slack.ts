@@ -1,18 +1,18 @@
 /**
- * `npm run cohort:prune-slack` — drop UNFILLED Slack artifacts from seed cohort
+ * `npm run cohort:prune-slack` drops UNFILLED Slack artifacts from seed cohort
  * members.
  *
  * Deals backfilled before the cohort existed were planted with Slack threads,
  * #competitive questions and #win-loss post-mortems. Seed members never post to
  * Slack, so any of those still sitting at `planned` is work that would be
- * requested, written and then never published — and, worse, keeps its deal
+ * requested, written and then never published. Worse, it keeps its deal
  * showing up in the `apply --next` queue forever, so `/backfill-opps` can never
  * report the cohort finished.
  *
  * Only `planned` artifacts are removed. Ones already GENERATED keep their prose:
  * it cost tokens to write, it is valid content, and it stays in the repo in case
  * a deal is later promoted to `weekly`. Anything carrying an external id is
- * refused outright — that would orphan a live Slack message.
+ * refused outright. That would orphan a live Slack message.
  *
  *   npm run cohort:prune-slack              # report only
  *   npm run cohort:prune-slack -- --confirm # remove them
@@ -25,7 +25,7 @@ const confirm = process.argv.includes("--confirm");
 
 const cohortFile = loadCohort();
 if (cohortFile.members.length === 0) {
-  console.error("No cohort selected — run `npm run cohort:select` first.");
+  console.error("No cohort selected. Run `npm run cohort:select` first.");
   process.exit(1);
 }
 const cohort = new CohortIndex(cohortFile);
@@ -41,7 +41,7 @@ const kept = world.artifacts.filter(
 // Never strand a published message.
 const published = doomed.filter((a) => a.external.slackThreadTs || a.external.slackChannel);
 if (published.length > 0) {
-  console.error(`✗ ${published.length} artifact(s) carry a Slack id despite being 'planned' — refusing.`);
+  console.error(`✗ ${published.length} artifact(s) carry a Slack id despite being 'planned'. Refusing.`);
   for (const a of published.slice(0, 5)) console.error(`   ${a.id} ${a.kind} ${a.dealId}`);
   process.exit(1);
 }
@@ -54,10 +54,10 @@ console.log(
   `  unfilled (to remove) : ${doomed.length}  ${
     Object.entries(byKind)
       .map(([k, n]) => `${k} ${n}`)
-      .join(" · ") || "—"
+      .join(" · ") || "(none)"
   }`,
 );
-console.log(`  already written (keep): ${kept.length}  — prose retained, simply never published`);
+console.log(`  already written (keep): ${kept.length}  prose retained, simply never published`);
 
 const deals = [...new Set(doomed.map((a) => a.dealId))];
 if (doomed.length > 0) {

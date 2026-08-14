@@ -2,7 +2,7 @@
  * Tier-2 active-directive reader (state/directives.md). See DESIGN.md §11.
  *
  * The directives file is human-authored markdown; the engine only needs to echo
- * the active entries back each run (so the operator sees what's in force) — the
+ * the active entries back each run (so the operator sees what's in force). The
  * actual materialization lives in trends.json, which the agent edits when a
  * directive is set. This parses the bullet entries under the `## Active` heading.
  */

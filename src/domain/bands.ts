@@ -1,5 +1,5 @@
 /**
- * The firmographic band vocabulary — the ONE copy in code. Everything that
+ * The firmographic band vocabulary, the ONE copy in code. Everything that
  * buckets an employee count, picks a representative number inside a band, or
  * names a band (`config/*.yaml segments.by_size`, the CSV prospect mapper, the
  * CRM firmographics writer) derives from these tables; config band labels are

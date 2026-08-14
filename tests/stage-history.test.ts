@@ -4,8 +4,8 @@
  * `stageHistory` is the raw material for time-in-stage / pipeline-velocity
  * analysis, and the backfill REPLAYS the engine's own schedule rather than
  * inventing dates. The property that matters is that a replay of an
- * already-advanced world reproduces exactly what the live run recorded — so
- * these tests advance a world, wipe the histories, replay, and compare.
+ * already-advanced world reproduces exactly what the live run recorded. These
+ * tests advance a world, wipe the histories, replay, and compare.
  */
 
 import { test } from "node:test";

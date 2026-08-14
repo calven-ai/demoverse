@@ -1,14 +1,14 @@
 /**
- * `npm run sf:stage-fields` — create the per-stage entry-date custom fields on
+ * `npm run sf:stage-fields` creates the per-stage entry-date custom fields on
  * Opportunity, and grant the running user's profile read/write on them.
  *
  * The field list is DERIVED from `config/world.yaml pipeline.stages` via
- * `stageDateFields()` (src/pipeline/stages.ts) — the same function the
- * reconciler writes through — so the provisioning script and the engine can
+ * `stageDateFields()` (src/pipeline/stages.ts), the same function the
+ * reconciler writes through, so the provisioning script and the engine can
  * never disagree about a field's name, and the org can be rebuilt from this
  * repo rather than from memory.
  *
- * Uses the Tooling API — the REST *data* API cannot create schema. Creating a
+ * Uses the Tooling API. The REST *data* API cannot create schema. Creating a
  * CustomField does NOT grant field-level security, so a freshly created field is
  * invisible (and unwritable) even to a System Administrator until FLS is set;
  * this script does both, then verifies the field is actually writable.
@@ -60,7 +60,7 @@ async function main(): Promise<void> {
   }
 
   // Field-level security: a Tooling-created field is not readable or writable by
-  // ANY profile until permissions are granted — including the admin that made it.
+  // ANY profile until permissions are granted, including the admin that made it.
   const me = await client.query<{ ProfileId: string }>(
     `SELECT ProfileId FROM User WHERE Username = '${env("SF_USERNAME", true)!.replace(/'/g, "\\'")}'`,
   );

@@ -49,7 +49,7 @@ export async function reconcileDrive(
 
   if (!hasEnv("GOOGLE_APPLICATION_CREDENTIALS", "DRIVE_ROOT_FOLDER_ID")) {
     stats.disabled = true;
-    stats.note = "Drive credentials absent (.env) — skipped";
+    stats.note = "Drive credentials absent (.env), skipped";
     stats.skipped = pending.length;
     return stats;
   }
@@ -80,7 +80,7 @@ export async function reconcileDrive(
       } else {
         folderId = await client.ensureFolder(topFolder);
       }
-      const name = `${artifact.date} — ${artifact.title}.md`;
+      const name = `${artifact.date} — ${artifact.title}.md`; // prose-lint: allow-emdash (external record name)
       const existing = artifact.external.driveFileId;
       const fileId = await client.upsertMarkdown(folderId, name, content, existing);
       artifact.external.driveFileId = fileId;

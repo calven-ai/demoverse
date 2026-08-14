@@ -1,5 +1,5 @@
 /**
- * Real target-account ingestion — turns the operator's prospect CSVs (config
+ * Real target-account ingestion. Turns the operator's prospect CSVs (config
  * `world.prospects`) into a pool of REAL companies the generator draws account
  * objects from (name/domain/industry/firmographics), while the pipeline,
  * contacts and outcomes stay synthetic.
@@ -12,7 +12,7 @@
  * generation never fails and the planted industry distribution is honored.
  *
  * Guardrail (DESIGN §18): only the account/logo is real. Contacts are fabricated
- * (see names.ts demoEmailDomain) — no real person or real contact info is used.
+ * (see names.ts demoEmailDomain). No real person or real contact info is used.
  */
 
 import { readText, repoPath, fileExists } from "../util/fs.js";
@@ -46,7 +46,7 @@ export interface RealAccountPool {
   /**
    * Draw an unused real company, preferring the requested industry bucket (and,
    * for the market-intelligence cohort, a genuinely large/Enterprise vendor).
-   * Marks it consumed. Returns null when the bucket is exhausted — the caller
+   * Marks it consumed. Returns null when the bucket is exhausted, and the caller
    * then falls back to a synthetic name.
    */
   pick(rng: Rng, opts?: { industry?: string; large?: boolean }): RealCompany | null;
@@ -135,7 +135,7 @@ function regionFor(hqRaw: string, fixedRegion: string | undefined): string {
   if (fixedRegion) return fixedRegion;
   if (NA_HINTS.test(hqRaw)) return "NA";
   if (EMEA_HINTS.test(hqRaw)) return "EMEA";
-  return "NA"; // global lists skew US — default NA when unknown
+  return "NA"; // global lists skew US, so default NA when unknown
 }
 
 /** Best-effort engine funding_stage from free text; null → sample downstream. */
@@ -180,7 +180,7 @@ function normalizeRow(
 
   const categoryText = firstNonEmpty(rec, ["Sub-Category", "Industry/Vertical", "Vertical", "Industry"]);
   const industry = fileCfg.industry ?? industryFromText(categoryText, wcfg);
-  // Only configured industries enter the pool — anything else would break the
+  // Only configured industries enter the pool. Anything else would break the
   // planted industry distribution downstream.
   if (!industry || !(industry in wcfg.segments.industries)) return null;
 
@@ -270,7 +270,7 @@ export function buildRealAccountPool(world: World, wcfg: WorldConfig): RealAccou
       // The requested industry is NEVER crossed: exhaustion returns null so the
       // caller falls back to a SYNTHETIC name of that industry, preserving the
       // planted industry distribution. `large` (MI cohort) is a hard preference
-      // for an Enterprise vendor within the industry — if none, null → synthetic
+      // for an Enterprise vendor within the industry; if none, null → synthetic
       // forced-Enterprise, which keeps the "bigger ICP" size story intact.
       if (large) return draw(rng, (c) => c.size === "Enterprise" && inIndustry(c));
       return draw(rng, inIndustry);

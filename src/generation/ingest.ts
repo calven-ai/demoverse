@@ -2,7 +2,7 @@
  * Ingest filled generation results back into the ledger. See DESIGN.md §12.
  *
  * After the agent fills the requests, this validates each result, files markdown
- * bodies into the content store (state/content/<id>.md — committed, so the world
+ * bodies into the content store (state/content/<id>.md, committed, so the world
  * is rebuildable and diffs are readable), and attaches structured Slack messages
  * to their artifacts. Schema/shape failures leave the artifact "planned" so it is
  * re-requested rather than written as bad data.
@@ -69,7 +69,7 @@ function personaResolver(
   const withRole = (name: string, role?: string): string => (role ? `${name} (${role})` : name);
   // The customer's sales org: deal-owning ICs are Account Executives; managers
   // show their management title. (Their CRM `title` may say something else, e.g.
-  // "Co-founder" — in the Slack sales context they are AEs.)
+  // "Co-founder", but in the Slack sales context they are AEs.)
   const repRole = (r: World["reps"][number]): string =>
     r.role === "manager" ? (r.title ?? "Sales Manager") : "Account Executive";
   for (const r of world.reps) {

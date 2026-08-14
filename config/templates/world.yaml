@@ -1,5 +1,6 @@
 # =============================================================================
-# world.yaml — Tier 1 standing config (the input contract)
+# world.yaml
+# Tier 1 standing config (the input contract).
 #
 # WHAT THIS FILE CONTROLS
 #   • WHO the fictional company is (name, domain, product modules)
@@ -12,7 +13,7 @@
 #   1. Copy this file from config/templates/ to config/world.yaml.
 #   2. Replace every `YOUR-*` placeholder and resolve every `TODO:` comment.
 #   3. Everything WITHOUT a TODO is a sane generic-B2B default that encodes a
-#      realism rule — you can keep those numbers as they are. The comments on
+#      realism rule, so you can keep those numbers as they are. The comments on
 #      each one explain what it protects; read before changing.
 #
 # HARD RULES
@@ -37,11 +38,11 @@ company:
   # TODO: the fictional company's website domain (fine to invent one).
   domain: your-company.example
   # Suffix for fabricated buyer-contact email domains (`<account>.<suffix>`).
-  # Keep it under `.example` — reserved TLD, guaranteed never to resolve.
+  # Keep it under `.example`, a reserved TLD guaranteed never to resolve.
   synthetic_email_domain: demo.example
   # TODO: your product's top-level modules (3 is a good number). These are the
   # options for the win-loss surveys' `product_modules` question AND the exact
-  # `domain` vocabulary in use-cases.yaml — same strings, verbatim.
+  # `domain` vocabulary in use-cases.yaml. Same strings, verbatim.
   product_modules:
     - Module A
     - Module B
@@ -49,8 +50,8 @@ company:
 
 # WHICH artifact types are produced (master switches). Full picture by default:
 # structured CRM data + the whole prose detail layer. Where each lands:
-#   transcripts  → document store (e.g. Drive) ONLY — deliberately NOT on the
-#                  CRM timeline (downstream tools ingest them from the folder)
+#   transcripts  → document store (e.g. Drive) ONLY, and deliberately NOT on
+#                  the CRM timeline (downstream tools ingest them from the folder)
 #   ae_notes     → CRM activity timeline AND the document store
 #   emails       → CRM activity timeline
 #   slack        → the demo Slack workspace
@@ -59,7 +60,7 @@ generate:
   transcripts: true           # call transcripts
   winloss: true               # win-loss surveys / interviews / #win-loss posts
   slack: true                 # deal threads + competitive questions
-  internal_collateral: false  # one-off seeding only — not part of the weekly run
+  internal_collateral: false  # one-off seeding, outside the weekly run
   ae_notes: true              # touch points → CRM timeline + document store
   emails: true                # touch points → CRM timeline
 
@@ -83,7 +84,7 @@ volume:
   # week; raise it only if you will also generate the prose to match.
   new_opps_per_week: [1, 2]
   # FIXED self-service pricing (no discounts). The ONLY base-price variable is
-  # the billing term — annual prepay gives roughly two months free.
+  # the billing term. Annual prepay gives roughly two months free.
   # `monthly` = annualized run-rate of a monthly contract; `annual` = annual
   # prepay. TODO: replace with your fictional price book (round numbers read
   # more believable than precise ones).
@@ -91,10 +92,10 @@ volume:
     professional: { monthly: 14400, annual: 12000 }   # TODO: e.g. $1,200/mo tier
     enterprise:   { monthly: 28800, annual: 24000 }   # TODO: e.g. $2,400/mo tier
     # Share of deals on an annual contract (vs monthly). ~0.6 is a realistic
-    # B2B SaaS split — keep unless your story says otherwise.
+    # B2B SaaS split. Keep it unless your story says otherwise.
     annual_billing_rate: 0.6
     # Per account-size, the {tier: weight} mix used to pick a deal's tier.
-    # Tier correlates with size — big companies mostly buy the big tier.
+    # Tier correlates with size. Big companies mostly buy the big tier.
     tier_by_size:
       Enterprise:  { enterprise: 0.90, professional: 0.10 }
       Mid-market:  { enterprise: 0.70, professional: 0.30 }
@@ -109,7 +110,7 @@ volume:
 pipeline:
   # The engine's stage vocabulary. Keep the default unless you have a strong
   # reason: personas.yaml attendees_by_stage, prose.yaml stage_focus and
-  # connectors.yaml stage_map are all keyed by these names — change them
+  # connectors.yaml stage_map are all keyed by these names. Change them
   # together or validation/lookup falls back to defaults.
   stages: [Discovery, Evaluation, Proposal, Negotiation, Closed]
   # 2–8 weeks = a short, sales-assisted motion. Deals accumulate their history
@@ -119,7 +120,7 @@ pipeline:
 winloss:
   baseline_win_rate: 0.50
   win_rate_trend_per_quarter: 0.03   # slight improvement over time (the "we're getting better" arc)
-  # The CRM loss-reason picklist and its mix. Generic B2B set — TODO: adjust
+  # The CRM loss-reason picklist and its mix. Generic B2B set. TODO: adjust
   # weights (or add/remove reasons) to fit your market's story.
   loss_reasons:
     Price: 0.22
@@ -134,22 +135,22 @@ winloss:
   competitor_present_rate: 1.0
   # Win-loss is SCARCE and that is the point: no real team runs an exit
   # interview or a survey on every closed deal, so a world where most closes
-  # carry one reads as generated on sight — and the absence stops carrying
+  # carry one reads as generated on sight. The absence also stops carrying
   # information. ~1 closed deal in 3 gets one; the other two thirds are `none`
   # BY DESIGN. Keep `none` at ≈0.67; raising coverage re-creates the problem.
   mode_mix: { interview: 0.13, survey: 0.20, none: 0.67 }
 
 # -----------------------------------------------------------------------------
-# OPTIONAL — real target-account source lists (advanced).
+# Real target-account source lists (OPTIONAL, advanced).
 #
 # By default every account is fully synthetic (names come from the engine's
 # name banks). If you have curated prospect CSVs of real *logos* you are
 # allowed to demo with, uncomment this block and the engine will draw account
-# name/domain/industry/firmographics from them instead — contacts and the
+# name/domain/industry/firmographics from them instead. Contacts and the
 # whole pipeline STAY synthetic (real logos, never real people).
 #
-#   dir    — directory of prospect CSVs, relative to the repo root
-#   files  — CSVs within `dir` to load and merge (dedup by domain). A fixed
+#   dir      directory of prospect CSVs, relative to the repo root
+#   files    CSVs within `dir` to load and merge (dedup by domain). A fixed
 #            `industry` maps every row of a single-vertical list; omit it for
 #            mixed lists (rows then map via segments.industry_keywords below).
 #            A fixed `region` overrides per-row headquarters detection.
@@ -169,7 +170,7 @@ segments:
   # relative weights. This is the segmentation your downstream "win rate by
   # industry" charts will slice by, so pick verticals your demo story cares
   # about. Tip: include one deliberately OFF-ICP vertical (down-weighted here,
-  # scored low in icp.yaml) — that's what makes the in/out-of-ICP story work.
+  # scored low in icp.yaml). That is what makes the in/out-of-ICP story work.
   industries:
     Software & SaaS: 0.25
     Financial Services: 0.20
@@ -194,7 +195,7 @@ segments:
     EMEA: United Kingdom
 
   # Account-size mix. Labels MUST stay SMB / Mid-market / Enterprise.
-  # Weight your sweet spot highest — it drives the ICP story.
+  # Weight your sweet spot highest. It drives the ICP story.
   sizes:
     Enterprise: 0.28
     Mid-market: 0.47
@@ -202,7 +203,7 @@ segments:
 
   # Conditional firmographics: drawn AFTER size so employee/revenue/funding are
   # internally coherent (no SMB with $1B revenue). Band labels are fixed
-  # engine vocabulary — reweight freely, but do not rename the labels.
+  # engine vocabulary. Reweight freely, but do not rename the labels.
   by_size:
     Enterprise:
       employee_bands: { "2001-5000": 0.55, "5000+": 0.45 }
@@ -223,7 +224,7 @@ segments:
     EMEA: 0.30
 
   # Independent presence probability per tool (each account's tech_stack[]).
-  # TODO: swap in the tools YOUR buyers actually run — icp.yaml tech_stack
+  # TODO: swap in the tools YOUR buyers actually run. The icp.yaml tech_stack
   # levels should score the same tool names.
   tech_stack:
     Salesforce: 0.70
@@ -244,10 +245,10 @@ segments:
     Restructuring: 0.10
 
 # -----------------------------------------------------------------------------
-# OPTIONAL — a second buying motion / cohort (advanced storytelling).
+# A second buying motion / cohort (OPTIONAL, advanced storytelling).
 #
 # Uncomment to plant a distinct cohort of larger-company deals where a
-# different persona drives the evaluation and one competitor dominates —
+# different persona drives the evaluation and one competitor dominates. It is
 # encoded purely as sampling bias (which contacts, which competitor, the
 # outcome), so downstream analytics can DISCOVER the pattern rather than being
 # told it. Requires: `competitor` = a competitors.yaml name (give it
@@ -275,7 +276,7 @@ artifacts:
     Evaluation: 1
     Proposal: [0, 1]
   # AE notes logged across the cycle (CRM activity timeline). Every stage is a
-  # coin-flip ([0,1] ≈ 50%) so notes are frequently MISSING — real field teams
+  # coin-flip ([0,1] ≈ 50%) so notes are frequently MISSING. Real field teams
   # don't log a note on every touch. This sparseness is deliberate: the CRM
   # alone shouldn't carry the whole win/loss signal.
   ae_notes_per_deal:
@@ -293,7 +294,7 @@ artifacts:
   competitive_q_rate: 0.25
   # Chance a closed deal carries the rep's closing AE note. Deliberately below
   # 1.0: a CRM where every close is neatly written up needs no win-loss
-  # programme downstream — incompleteness is what makes the surveys matter.
+  # programme downstream. Incompleteness is what makes the surveys matter.
   ae_close_note_rate: 0.5
   internal_collateral:
     count: [4, 8]

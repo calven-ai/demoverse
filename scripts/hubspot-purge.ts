@@ -1,8 +1,8 @@
 /**
  * Reversible cleanup of a HubSpot test account: finds every company, contact,
  * and deal that carries a `demo_world_id` (i.e. every record this engine could
- * have created) and archives it (HubSpot recycling bin — restorable for 90
- * days). Strictly scoped to `demo_world_id`-tagged records; never touches
+ * have created) and archives it (the HubSpot recycling bin keeps it restorable
+ * for 90 days). Strictly scoped to `demo_world_id`-tagged records; never touches
  * anything else in the portal.
  *
  * Defaults to a dry-run (list + count only). Pass --confirm to actually archive.

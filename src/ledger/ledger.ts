@@ -37,7 +37,7 @@ export function loadWorld(): World {
 }
 
 export function saveWorld(world: World): void {
-  // Validate before persisting — never write a malformed ledger.
+  // Validate before persisting. Never write a malformed ledger.
   writeJson(WORLD_PATH, World.parse(world));
 }
 

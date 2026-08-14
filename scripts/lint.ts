@@ -1,5 +1,5 @@
 /**
- * `npm run lint` — coherence linter entrypoint. See DESIGN.md §15.
+ * `npm run lint` is the coherence linter entrypoint. See DESIGN.md §15.
  *
  * Runs structural integrity + cross-system coherence checks over the ledger and
  * exits non-zero if any errors are found (CI / pre-commit friendly).
@@ -7,7 +7,7 @@
  * Flags:
  *   --sample=N     limit cross-system checks to N random closed deals (default: all)
  *   --opp=<id>     scope cross-system checks to a single deal (structural checks
- *                  still cover the whole ledger — they're cheap)
+ *                  still cover the whole ledger; they're cheap)
  *   --repetition   also run the cross-deal repetition detector (warn-only):
  *                  flags distinctive phrases recurring across many deals so they
  *                  can be promoted into config/prose.yaml banned_phrases

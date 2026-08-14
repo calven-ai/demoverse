@@ -29,7 +29,7 @@ import type { Period } from "../src/clock.js";
 
 const cfg = loadConfig();
 
-// --- The reference CRM vocabulary — the fidelity oracle. Every value the
+// --- The reference CRM vocabulary is the fidelity oracle. Every value the
 // generator emits for these fields MUST be a member of the matching set (kept
 // in lockstep with the shipped config; the private deployment mirrors its CRM
 // enums through the same sets).
@@ -99,7 +99,7 @@ const periods: Period[] = [
 ];
 
 /** A longer run so closed deals (with reasons/feedback) exist for assertions. */
-/** An inactive cohort gate — every deal passes, nothing is Slack-suppressed. */
+/** An inactive cohort gate. Every deal passes, nothing is Slack-suppressed. */
 const EMPTY_COHORT: Cohort = { version: 1, targetSize: 0, members: [] };
 
 function bigWorld(seed = "big-seed") {
@@ -108,7 +108,7 @@ function bigWorld(seed = "big-seed") {
   // These are STATISTICAL assertions (win-rate lifts, cohort sizes), so they need
   // a large sample regardless of the operator's current velocity setting. Pin the
   // volume here rather than inheriting config, which is a Tier-2 knob the operator
-  // is free to retune — a demo-org policy change must not fail engine tests.
+  // is free to retune. A demo-org policy change must not fail engine tests.
   trends.volume = { newOppsPerWeek: [6, 10], trendPerQuarter: 1 };
   const many: Period[] = [];
   let cursor = "2025-06-23";
@@ -158,7 +158,7 @@ test("every emitted enum value is a member of the reference CRM vocab", () => {
     subset(a.techStack, CRM_VOCAB.TECH_STACK, "account.techStack");
     assert.ok(["Tier 1", "Tier 2", "Tier 3"].includes(a.icpTier));
     // industry intentionally uses the configured ICP sub-verticals (NOT generic
-    // ACCOUNT_INDUSTRY_OPTIONS) — assert it matches the configured set instead.
+    // ACCOUNT_INDUSTRY_OPTIONS). Assert it matches the configured set instead.
     assert.ok(a.industry in cfg.world.segments.industries, `industry "${a.industry}" not in config`);
   }
   for (const c of w.contacts) subset([c.buyingRole], CRM_VOCAB.BUYING_ROLE, "contact.buyingRole");
@@ -176,7 +176,7 @@ test("every emitted enum value is a member of the reference CRM vocab", () => {
 test("firmographics are internally coherent (bands consistent with size)", () => {
   const w = bigWorld("coh-seed");
   // The size a real-account employee band maps back to (mirrors real-accounts.ts
-  // sizeFor thresholds) — real accounts derive employees/size from the target
+  // sizeFor thresholds). Real accounts derive employees/size from the target
   // list, so their band need not sit in the synthetic by_size conditional table,
   // but it MUST still be coherent with the size class.
   const bandSize: Record<string, string> = {
@@ -193,8 +193,8 @@ test("firmographics are internally coherent (bands consistent with size)", () =>
     // synthetic alike) → strict membership holds for everyone.
     assert.ok(a.revenueBand in bySize.revenue_bands, `${a.size} bad revenueBand ${a.revenueBand}`);
     if (a.source) {
-      // Real account: employee/funding come from real data — valid CRM enums
-      // (guarded by the enum-vocab test) and coherent size↔band by ingestion.
+      // Real account: employee/funding come from real data. They are valid CRM
+      // enums (guarded by the enum-vocab test) and coherent size↔band by ingestion.
       assert.equal(
         bandSize[a.employeeBand],
         a.size,
@@ -226,7 +226,7 @@ test("opportunity name is '<Account> - <Use Case>' (never the bare account name)
     assert.ok(known.has(o.useCase!), `use case "${o.useCase}" is not in use-cases.yaml`);
     assert.equal(o.name, `${acct} - ${o.useCase}`, `opp name "${o.name}" is not "<Account> - <Use Case>"`);
     // A CRM where the deal is named after the account and nothing else tells you
-    // nothing about the deal — that was the whole point of adding use cases.
+    // nothing about the deal. That was the whole point of adding use cases.
     assert.notEqual(o.name, acct, `opp name must not be the bare account name`);
     const vendor = cfg.world.company.short_name ?? cfg.world.company.name;
     assert.ok(!o.name.includes(vendor), `opp name "${o.name}" must not contain a vendor suffix`);
@@ -265,7 +265,7 @@ test("use case skews toward the competitor on the deal, without becoming a rule"
   for (const uc of cfg.useCases.use_cases) {
     assert.ok(
       w.opportunities.some((o) => o.useCase === uc.name),
-      `no deal drew use case "${uc.name}" — the skew has collapsed into a rule`,
+      `no deal drew use case "${uc.name}". The skew has collapsed into a rule`,
     );
   }
 });
@@ -340,7 +340,7 @@ test("pricing is fixed, round, and add-ons stay a small minority < $50K", () => 
 
 test("ICP scoring is monotonic: a core-ICP account beats an off-ICP one", () => {
   // Fixtures derived from the scorecard itself: the best-scoring value of
-  // every dimension vs the worst — monotonicity must hold for ANY config.
+  // every dimension vs the worst. Monotonicity must hold for ANY config.
   const levelsOf = (dim: string): [string, number][] => Object.entries(cfg.icp.dimensions[dim]?.levels ?? {});
   const best = (dim: string) => [...levelsOf(dim)].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
   const worst = (dim: string) => [...levelsOf(dim)].sort((a, b) => a[1] - b[1])[0]?.[0] ?? "";
@@ -429,7 +429,7 @@ test("sales team: managers own no deals; every owner is an IC; leaderboard has s
 });
 
 test("committed state/trends.json (when present) is valid and sane", () => {
-  // A fresh clone has no state yet — nothing to validate until `npm run init`.
+  // A fresh clone has no state yet. Nothing to validate until `npm run init`.
   if (!fileExists(repoPath("state", "trends.json"))) return;
   const trends = loadTrends();
   assert.ok(trends.volume.newOppsPerWeek[0]! >= 1, "expected a positive weekly deal volume");
@@ -543,7 +543,7 @@ test("linter flags a closed deal whose win-loss prose omits the competitor", () 
   w.opportunities = [
     {
       id: "opp-001",
-      name: "Acme — Vendor",
+      name: "Acme — Vendor", // prose-lint: allow-emdash (mirrors generated artifact title)
       accountId: "acc-001",
       ownerRepId: "rep-003",
       amount: 24000,
@@ -571,7 +571,7 @@ test("linter flags a closed deal whose win-loss prose omits the competitor", () 
       id: "art-001",
       kind: "survey",
       dealId: "opp-001",
-      title: "Acme — win-loss survey",
+      title: "Acme — win-loss survey", // prose-lint: allow-emdash (mirrors generated artifact title)
       detailLevel: "low",
       date: "2025-07-14",
       grounding: {},
@@ -703,8 +703,8 @@ test("backfillTouchpoints plants a full, leak-safe touch-point set on a closed d
 
 test("advanceWorld reports cohort enrollment but never writes state/cohort.json", () => {
   // Regression guard. advanceWorld used to persist enrollment itself, so running
-  // the test suite — which advances dozens of synthetic worlds whose opp ids
-  // collide with real ones — silently enrolled hundreds of phantom deals into
+  // the test suite (which advances dozens of synthetic worlds whose opp ids
+  // collide with real ones) silently enrolled hundreds of phantom deals into
   // the operator's live cohort file.
   const before = fileExists(COHORT_PATH) ? readText(COHORT_PATH) : null;
   const w = seededWorld("enroll-seed");
@@ -730,7 +730,7 @@ test("seed cohort members are planted with no Slack artifacts at all", () => {
   const arts = w.artifacts.filter((a) => a.dealId === "opp-001");
   const kinds = new Set(arts.map((a) => a.kind));
 
-  // Suppressed at PLANTING time, not merely at push time — otherwise the agent
+  // Suppressed at PLANTING time, not merely at push time. Otherwise the agent
   // spends tokens writing prose for a destination it can never reach.
   for (const k of ["slack_deal_thread", "competitive_q", "winloss_post"]) {
     assert.ok(!kinds.has(k as Artifact["kind"]), `seed member must not be planted a ${k}`);
@@ -759,7 +759,7 @@ test("linter only warns (not errors) when an early-stage artifact omits the comp
     id: "art-early",
     kind: "email_exchange",
     dealId: "opp-001",
-    title: "Acme — email thread (Discovery)",
+    title: "Acme — email thread (Discovery)", // prose-lint: allow-emdash (mirrors generated artifact title)
     detailLevel: "medium",
     date: "2025-06-30",
     grounding: { stage: "Discovery", outcome: "open" },
@@ -794,7 +794,7 @@ test("ingest resolves an email thread's contactRef to a real contact id", () => 
     id: "art-eml",
     kind: "email_exchange",
     dealId: "opp-001",
-    title: "Acme — email thread (Discovery)",
+    title: "Acme — email thread (Discovery)", // prose-lint: allow-emdash (mirrors generated artifact title)
     detailLevel: "medium",
     date: "2025-06-30",
     grounding: { stage: "Discovery", outcome: "open" },

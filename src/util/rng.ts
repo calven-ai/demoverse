@@ -8,7 +8,7 @@
  * same way.
  */
 
-/** mulberry32 — small, fast, good-enough PRNG for synthetic data. */
+/** mulberry32. Small, fast, good-enough PRNG for synthetic data. */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -85,7 +85,7 @@ export class Rng {
   }
 
   /**
-   * Triangular distribution — natural for deal sizes (min/mode/max).
+   * Triangular distribution, natural for deal sizes (min/mode/max).
    * Returns an integer.
    */
   triangular(min: number, mode: number, max: number): number {

@@ -198,7 +198,7 @@ test("HubSpot deal mapping keeps the ledger name and marks the deal synthetic ou
     external: {},
   };
   const deal = dealProperties(opportunity("opp-1", "acc-1", "won"), owner, undefined, pipeline);
-  // The name mirrors the ledger verbatim — no "[DEMO]"/marker decoration.
+  // The name mirrors the ledger verbatim. No "[DEMO]"/marker decoration.
   assert.equal(deal.dealname, "opp-1 deal");
   assert.ok(deal.demo_world_notice?.includes("fabricated"));
   assert.equal(deal.demo_world_account_executive, "Jordan Rep");

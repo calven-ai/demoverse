@@ -1,5 +1,5 @@
 /**
- * `npm run apply` — the period entrypoint. See DESIGN.md §12–13.
+ * `npm run apply` is the period entrypoint. See DESIGN.md §12–13.
  *
  * Two phases, by design (the generation-request protocol):
  *
@@ -33,7 +33,7 @@
  *                  Machine-parseable, one per line:
  *                  oppId<TAB>status<TAB>accountName<TAB>untouched|planned:K
  *   --weeks=N      force N period(s) forward from simNow even when the world is
- *                  already current — the on-demand "live increment" (see
+ *                  already current. This is the on-demand "live increment" (see
  *                  `npm run pipeline`). Without it, apply only generates the
  *                  periods the real calendar has actually produced.
  *   --new-opps=N   one-off override of how many deals each advanced period
@@ -41,7 +41,7 @@
  *   --refill=<artifactId>  reset ONE generated artifact back to `planned` and
  *                  re-emit its prompt, so a bad result can be regenerated during
  *                  the lint-fix loop. Refuses if the artifact (or any of its
- *                  messages/emails) already carries an external id — that would
+ *                  messages/emails) already carries an external id. That would
  *                  duplicate records in Salesforce/Slack.
  */
 
@@ -91,13 +91,13 @@ async function main(): Promise<void> {
   const world = loadWorld();
   const clock = loadClock();
   const trends = loadTrends();
-  // A live world must speak the configured stage vocabulary — fail loudly, early.
+  // A live world must speak the configured stage vocabulary. Fail loudly, early.
   validateWorldStages(world, cfg);
 
   // --- --next=N: list opportunities that still need a detail layer ----------
   // Read-only. "Needs work" = no artifacts at all (untouched), or has artifacts
-  // still `planned` (planted but unfilled — reappears here so a crashed batch
-  // resumes cleanly). Ordered by opp id for a stable, deterministic queue.
+  // still `planned` (planted but unfilled). Those reappear here so a crashed
+  // batch resumes cleanly. Ordered by opp id for a stable, deterministic queue.
   if (nextArg !== undefined) {
     const n = Number(nextArg) || 10;
     const artCount = new Map<string, number>();
@@ -123,7 +123,7 @@ async function main(): Promise<void> {
       const state = (artCount.get(o.id) ?? 0) === 0 ? "untouched" : `planned:${planned}`;
       console.log(`${o.id}\t${o.status}\t${ledger.account(o.accountId).name}\t${state}`);
     }
-    if (pending.length === 0) console.log("(no opportunities need a detail layer — all filled)");
+    if (pending.length === 0) console.log("(no opportunities need a detail layer)");
     return;
   }
 
@@ -135,7 +135,7 @@ async function main(): Promise<void> {
     const { updated, skipped, mismatches } = backfillStageHistory(world, cfg, clock.startDate, clock.simNow);
     console.log(`Stage history: rebuilt ${updated} deal(s), ${skipped} already had one.`);
     if (mismatches.length > 0) {
-      console.log(`\n✗ ${mismatches.length} replay mismatch(es) — NOT saving:`);
+      console.log(`\n✗ ${mismatches.length} replay mismatch(es). NOT saving:`);
       for (const m of mismatches.slice(0, 10)) console.log(`   ${m}`);
       if (mismatches.length > 10) console.log(`   … +${mismatches.length - 10} more`);
       process.exitCode = 1;
@@ -159,7 +159,7 @@ async function main(): Promise<void> {
     const art = world.artifacts.find((a) => a.id === refillId);
     if (!art) throw new Error(`--refill: no artifact ${refillId} in the ledger`);
     if (art.status === "planned") {
-      console.log(`${refillId} is already planned — fill its result and re-run --ingest.`);
+      console.log(`${refillId} is already planned. Fill its result and re-run --ingest.`);
       return;
     }
     const hasExternal =
@@ -174,7 +174,7 @@ async function main(): Promise<void> {
       (art.emails ?? []).some((m) => m.salesforceId);
     if (hasExternal) {
       throw new Error(
-        `--refill: ${refillId} already has external records (status=${art.status}) — regenerating would duplicate them. Refusing.`,
+        `--refill: ${refillId} already has external records (status=${art.status}). Regenerating would duplicate them. Refusing.`,
       );
     }
     delete art.messages;
@@ -245,7 +245,7 @@ async function main(): Promise<void> {
     if (!dryRun) writeText(repoPath("runs", `${date}-report.md`), md);
     console.log(`\n${dryRun ? "(dry-run) " : ""}Run report → runs/${date}-report.md`);
     if (stillPending > 0)
-      console.log(`Note: ${stillPending} artifact(s) still need generation — fill them and re-run --ingest.`);
+      console.log(`Note: ${stillPending} artifact(s) still need generation. Fill them and re-run --ingest.`);
     return;
   }
 
@@ -349,8 +349,8 @@ async function main(): Promise<void> {
   saveWorld(world);
   saveClock(clock);
 
-  // Enroll this run's new deals in the Salesforce cohort as `weekly` members —
-  // they get the full detail layer, Slack included. Deliberately AFTER
+  // Enroll this run's new deals in the Salesforce cohort as `weekly` members.
+  // They get the full detail layer, Slack included. Deliberately AFTER
   // saveWorld: cohort.json must never name a deal the ledger did not keep.
   const cohort = loadCohort();
   if (cohort.members.length > 0 && result.enrolled.length > 0) {
@@ -358,7 +358,7 @@ async function main(): Promise<void> {
     if (added > 0) {
       saveCohort(cohort);
       console.log(
-        `\nCohort: enrolled ${added} new deal(s) as 'weekly' (Slack included) — ${cohort.members.length} members total.`,
+        `\nCohort: enrolled ${added} new deal(s) as 'weekly' (Slack included). ${cohort.members.length} members total.`,
       );
     }
   }
@@ -369,7 +369,7 @@ async function main(): Promise<void> {
   // backlog of artifacts planned for deals nobody intends to fill (deals outside
   // the cohort, planted before the cohort gate existed), and re-emitting all of
   // them would bury a ten-artifact increment in a two-hundred-request bundle.
-  // Leftovers are not lost — they keep their own earlier bundle on disk, and
+  // Leftovers are not lost. They keep their own earlier bundle on disk, and
   // `--ingest` still files any of them that get filled.
   const plantedThisRun = new Set(result.plannedArtifactIds);
   const emitting = world.artifacts.filter((a) => a.status === "planned" && plantedThisRun.has(a.id));
@@ -388,8 +388,8 @@ async function main(): Promise<void> {
 
   // Per-deal breakdown of THIS run's touch points. The living increment plants
   // a handful of artifacts spread over many deals (not a full detail layer on
-  // one), so the operator — or `npm run pipeline`, which dispatches one filler
-  // per deal — needs them grouped by opportunity, not as a flat list.
+  // one), so the operator (or `npm run pipeline`, which dispatches one filler
+  // per deal) needs them grouped by opportunity, not as a flat list.
   const plantedIds = new Set(result.plannedArtifactIds);
   const byDeal = new Map<string, string[]>();
   for (const a of world.artifacts) {
@@ -403,7 +403,7 @@ async function main(): Promise<void> {
     for (const [dealId, arts] of [...byDeal].sort((a, b) => a[0].localeCompare(b[0]))) {
       const opp = world.opportunities.find((o) => o.id === dealId);
       const label = opp
-        ? `${led.account(opp.accountId).name} — ${opp.stage}/${opp.status}`
+        ? `${led.account(opp.accountId).name} (${opp.stage}/${opp.status})`
         : "workspace-level (not tied to one deal)";
       console.log(`  ${dealId}\t${label}\t${arts.join(" ")}`);
     }

@@ -1,5 +1,6 @@
 # =============================================================================
-# surveys.yaml — the win-loss questionnaires
+# surveys.yaml
+# The win-loss questionnaires.
 #
 # WHAT THIS FILE CONTROLS
 #   TWO outcome-keyed question sets:
@@ -9,12 +10,12 @@
 #     survey    -> respondent TYPES  -> structured answers + short free-text
 #     interview -> respondent SPEAKS -> same questions, long conversational
 #                                       transcript
-#     (none     -> no artifact; the signal comes from CRM fields + Slack only
-#                  — and most closed deals ARE `none`, see world.yaml
+#     (none     -> no artifact; the signal comes from CRM fields + Slack only.
+#                  Most closed deals ARE `none`, see world.yaml
 #                  winloss.mode_mix)
 #
 # HOW TO FILL IT IN (the /setup wizard walks you through this)
-#   These are standard win/loss questions and WORK AS-IS — most users only
+#   These are standard win/loss questions and WORK AS-IS. Most users only
 #   tweak wording. Substitutions happen at generation time:
 #     `{company}`            -> world.yaml company.name
 #     vendor references      -> the competitor(s) recorded on the deal

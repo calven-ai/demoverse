@@ -1,11 +1,11 @@
 /**
- * `npm run drive:audit` — reconcile the Drive folder against the ledger.
+ * `npm run drive:audit` reconciles the Drive folder against the ledger.
  *
  * Drive is the one destination the downstream product ingests blind: its watched-folder
  * connector reads whatever is in there, with no CRM join to check it against.
- * So a file left behind by a previous world generation does not sit harmlessly —
- * the product ingests it and derives accounts, deals and quotes for a company that
- * exists nowhere in Salesforce.
+ * So a file left behind by a previous world generation does not sit harmlessly.
+ * The product ingests it and derives accounts, deals and quotes for a company
+ * that exists nowhere in Salesforce.
  *
  * That is exactly what a `init --force` regeneration produces: the new ledger
  * carries no driveFileId for anything, so the engine re-uploads, and the old
@@ -121,7 +121,7 @@ async function main(): Promise<void> {
   if (emptyFolders.length > 0) console.log(`  empty folders      ${emptyFolders.length}`);
   console.log();
 
-  // Cosmetic pass — safe to run whether or not orphans remain.
+  // Cosmetic pass. Safe to run whether or not orphans remain.
   if (pruneEmpty && emptyFolders.length > 0) {
     if (!confirm) {
       console.log(`--prune-empty requires --confirm. Nothing changed.`);
@@ -143,7 +143,7 @@ async function main(): Promise<void> {
     console.log("✓ Drive matches the ledger exactly.");
     if (emptyFolders.length > 0 && !pruneEmpty) {
       console.log(
-        `  (${emptyFolders.length} empty account folder(s) remain — clear with --prune-empty --confirm)`,
+        `  (${emptyFolders.length} empty account folder(s) remain. Clear with --prune-empty --confirm)`,
       );
     }
     return;
@@ -160,14 +160,14 @@ async function main(): Promise<void> {
   const live = [...byAccount].filter(([n]) => ledgerAccounts.has(n));
 
   console.log(
-    `Orphans under accounts NO LONGER IN THE LEDGER — ${stale.reduce((s, [, v]) => s + v.length, 0)} file(s), ${stale.length} account(s):`,
+    `Orphans under accounts NO LONGER IN THE LEDGER: ${stale.reduce((s, [, v]) => s + v.length, 0)} file(s), ${stale.length} account(s):`,
   );
   for (const [name, files] of stale.slice(0, 15)) console.log(`   ${name.padEnd(26)} ${files.length}`);
   if (stale.length > 15) console.log(`   … +${stale.length - 15} more account(s)`);
 
   if (live.length > 0) {
     console.log(
-      `\n⚠ Orphans under accounts that DO exist — ${live.reduce((s, [, v]) => s + v.length, 0)} file(s), ${live.length} account(s).`,
+      `\n⚠ Orphans under accounts that DO exist: ${live.reduce((s, [, v]) => s + v.length, 0)} file(s), ${live.length} account(s).`,
     );
     console.log(`  These are likely duplicates from a re-upload; review before purging.`);
     for (const [name, files] of live.slice(0, 10)) console.log(`   ${name.padEnd(26)} ${files.length}`);

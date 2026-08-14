@@ -5,7 +5,7 @@
  *  - no-op with `disabled: true` when it is switched off in
  *    `config/connectors.yaml` or its credentials are absent from the env;
  *  - honor `opts.dryRun` (compute + report, write nothing);
- *  - honor the cohort gate (`opts.cohort`) — only member deals reach the world;
+ *  - honor the cohort gate (`opts.cohort`), so only member deals reach the world;
  *  - record external ids on the ledger so re-runs update instead of duplicate.
  *
  * Registration lives in `./registry.ts`; the orchestrator (`src/reconcile.ts`)
@@ -31,7 +31,7 @@ export interface ReconcileOptions {
    */
   oppId?: string;
   /**
-   * Cohort gate — the membership list every target filters through (see
+   * Cohort gate. The membership list every target filters through (see
    * src/cohort.ts). Loaded from state/cohort.json when omitted; pass it
    * explicitly to share one index across all connectors, or to override it in
    * tests. An unselected cohort passes everything.
@@ -66,6 +66,6 @@ export function disabledStats(system: string, skipped = 0): ReconcileStats {
     ...emptyStats(system),
     disabled: true,
     skipped,
-    note: `disabled in config/connectors.yaml — skipped`,
+    note: `disabled in config/connectors.yaml, skipped`,
   };
 }

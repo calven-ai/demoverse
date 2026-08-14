@@ -67,7 +67,7 @@ const FIELDS: Record<string, FieldSpec[]> = {
     pick("Billing_Term__c", "Billing Term", ["monthly", "annual"]),
     pick("Complexity__c", "Complexity", ["Low", "Medium", "High"]),
     pick("Price_Feedback__c", "Price Feedback", ["Less expensive", "On par", "More expensive"]),
-    // AE-believed loss reason (owner's view) — distinct from Win_Loss_Reason__c (prospect).
+    // AE-believed loss reason (owner's view). Distinct from Win_Loss_Reason__c (prospect).
     pick("AE_Believed_Loss_Reason__c", "AE-Believed Loss Reason", [
       "Price",
       "Missing feature",
@@ -81,7 +81,7 @@ const FIELDS: Record<string, FieldSpec[]> = {
     text("Account_Executive__c", "Account Executive"),
     text("AE_Email__c", "AE Email"),
     text("Sales_Manager__c", "Sales Manager"),
-    // Realistic deal creation instant — the native audit CreatedDate can't be
+    // Realistic deal creation instant. The native audit CreatedDate can't be
     // backdated on update, so reconcile writes the demo's true creation date here.
     datetime("Original_Created_Date__c", "Original Created Date"),
   ],
@@ -89,7 +89,7 @@ const FIELDS: Record<string, FieldSpec[]> = {
   // custom fields: Tasks are idempotent via the ledger-stored id and cascade-purge
   // with their Opportunity; transcript files purge via their opportunity link.
   // (Custom fields can't be created on Task directly, and FLS isn't settable on
-  // Task/ContentVersion — so we deliberately avoid a marker field there.)
+  // Task/ContentVersion, so we deliberately avoid a marker field there.)
 };
 
 // Existing picklists we must ensure accept our values (only if restricted).
@@ -202,7 +202,7 @@ async function main(): Promise<void> {
   if (failed > 0) process.exitCode = 1;
 }
 
-/** All custom fields the reconciler writes — must be readable+editable by the user. */
+/** All custom fields the reconciler writes. Must be readable+editable by the user. */
 const RECONCILED_FIELDS: Record<string, string[]> = {
   Account: [
     "Demo_World_Id__c",
@@ -249,7 +249,7 @@ async function ensureFls(sf: SalesforceClient, dry: boolean): Promise<void> {
   // System permission to set CreatedDate/CreatedById on insert, so reconcile can
   // backdate the activity timeline to when each touch point happened. Requires
   // the org-level "Set Audit Fields upon Record Creation" toggle (Setup → User
-  // Interface) to be ON, else this PATCH fails. Idempotent — safe to re-PATCH.
+  // Interface) to be ON, else this PATCH fails. Idempotent and safe to re-PATCH.
   if (dry) {
     console.log(`  ~ would grant ${psName}.PermissionsCreateAuditFields`);
   } else {
@@ -322,13 +322,13 @@ async function ensurePicklistValues(
   dry: boolean,
 ): Promise<void> {
   if (!f) {
-    console.log(`  ! ${sobject}.${devName}__c absent — skipping value check`);
+    console.log(`  ! ${sobject}.${devName}__c absent. Skipping value check`);
     return;
   }
   const active = new Set((f.picklistValues ?? []).filter((p) => p.active).map((p) => p.value));
   const missing = want.filter((v2) => !active.has(v2));
   if (f.restrictedPicklist === false) {
-    console.log(`  = ${sobject}.${devName}__c unrestricted — values accepted as-is`);
+    console.log(`  = ${sobject}.${devName}__c unrestricted. Values accepted as-is`);
     return;
   }
   if (missing.length === 0) {
@@ -355,7 +355,7 @@ async function ensurePicklistValues(
     Metadata: Record<string, unknown>;
   };
   const md = rec.Metadata;
-  // Replace the value set wholesale with exactly the canonical values — the
+  // Replace the value set wholesale with exactly the canonical values. The
   // existing set may carry differently-cased entries (e.g. "champion") that
   // would collide on a merge. Our data only ever emits these `want` values.
   md.valueSet = {
@@ -385,7 +385,7 @@ async function ensureIndustryValues(
   const active = (f.picklistValues ?? []).filter((p) => p.active).map((p) => p.value);
   const missing = want.filter((v2) => !active.includes(v2));
   if (f.restrictedPicklist === false) {
-    console.log(`  = Account.Industry unrestricted — values accepted as-is`);
+    console.log(`  = Account.Industry unrestricted. Values accepted as-is`);
     return;
   }
   if (missing.length === 0) {

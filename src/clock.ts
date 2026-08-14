@@ -17,7 +17,7 @@ export const ClockSchema = z.object({
   simNow: z.string(),
   /** Period granularity. */
   period: z.enum(["week", "month"]),
-  /** Count of periods generated so far — used as the deterministic RNG salt. */
+  /** Count of periods generated so far. Used as the deterministic RNG salt. */
   periodIndex: z.number().int().nonnegative(),
   /** The historical start date of the world (simNow at backfill time). */
   startDate: z.string(),
@@ -74,7 +74,7 @@ export function pendingPeriods(clock: Clock, today: ISODate = todayISO()): Perio
  * The world is meant to stay alive between real weeks: the operator runs an
  * increment when they want the pipeline to move, not when the calendar allows
  * it (`npm run pipeline`). Since `simNow` is normally already at today, that
- * means stepping into the near future — a deal created by this run carries a
+ * means stepping into the near future. A deal created by this run carries a
  * `createdDate` inside the period and closes on its boundary, so the demo org
  * can show records dated a few days ahead. That is the accepted trade: the
  * alternative (re-running the trailing week) cannot progress a single deal,

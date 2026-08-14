@@ -84,7 +84,7 @@ function validateCrossRefs(cfg: Config): void {
     warnings.push(`winloss.mode_mix sums to ${modeSum.toFixed(3)}, expected ~1.0 (it will be normalized).`);
   }
 
-  // Use-case domains must speak the product_modules vocabulary — the win-loss
+  // Use-case domains must speak the product_modules vocabulary. The win-loss
   // surveys report product_module, so a drifted label would split one concept
   // into two in the downstream analysis.
   const modules = new Set(cfg.world.company.product_modules);

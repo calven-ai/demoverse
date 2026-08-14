@@ -1,5 +1,5 @@
 /**
- * Retroactive planners — replay a deal's stage history and plant its whole
+ * Retroactive planners. They replay a deal's stage history and plant its whole
  * sales-cycle touch-point set on demand. Split from advance.ts.
  */
 
@@ -110,8 +110,8 @@ export function backfillTouchpoints(
   // Slack is decided per deal by cohort membership, not globally: the one-time
   // `seed` backfill posts nothing (its volume would bury the handful of live
   // threads that are the point of the Slack story), while deals added week by
-  // week get the full layer. Deciding this at PLANTING time — not just at push
-  // time — means no prose is ever generated for a destination it cannot reach.
+  // week get the full layer. Deciding this at PLANTING time, not just at push
+  // time, means no prose is ever generated for a destination it cannot reach.
   const cohort = cohortIndex ?? new CohortIndex();
   for (const opp of targets) {
     if (world.artifacts.some((a) => a.dealId === opp.id)) continue; // already backfilled

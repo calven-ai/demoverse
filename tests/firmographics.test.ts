@@ -88,7 +88,7 @@ test("region maps to the country the downstream product derives region back from
   assert.equal(emea.BillingCountry, "United Kingdom");
 });
 
-// Values must not churn between reconciles — a re-run would otherwise rewrite
+// Values must not churn between reconciles. A re-run would otherwise rewrite
 // every account and make the diff meaningless.
 test("values are deterministic per account id", () => {
   const acct = { id: "acc-042", employeeBand: "501-2000", revenueBand: "$50-250M", region: "NA" };
@@ -114,7 +114,7 @@ test("different accounts in one band get a spread of values", () => {
   assert.ok(seen.size > 10, `expected a spread, got ${seen.size} distinct values`);
 });
 
-// An unknown band is a config drift signal — omit the field rather than invent
+// An unknown band is a config drift signal. Omit the field rather than invent
 // a number the downstream product would then derive a wrong band from.
 test("unknown bands omit the field instead of guessing", () => {
   const f = standardFirmographics(

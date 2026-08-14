@@ -1,5 +1,6 @@
 # =============================================================================
-# icp.yaml — the ICP fit scorecard
+# icp.yaml
+# The ICP fit scorecard.
 #
 # WHAT THIS FILE CONTROLS
 #   The weighted model the generator uses INTERNALLY to derive each account's
@@ -8,7 +9,7 @@
 #   downstream "in vs out of ICP" analytics meaningful.
 #
 #   LEAK-SAFETY: the engine generates ONLY the raw firmographics and NEVER
-#   emits a fit score or tier — if your downstream demo tool computes ICP fit,
+#   emits a fit score or tier. If your downstream demo tool computes ICP fit,
 #   it should re-derive it live from the same raw fields. Mirroring your demo
 #   tool's own scoring model here keeps the two coherent.
 #
@@ -17,13 +18,13 @@
 #      ideal customer high: your priority industries at 1.0, your sweet-spot
 #      size/bands at 1.0, and at least one deliberately off-ICP industry near
 #      0 (that's the planted "looks out-of-ICP" story).
-#   2. Every level key must match the vocabulary in world.yaml segments —
+#   2. Every level key must match the vocabulary in world.yaml segments:
 #      industries, sizes, band labels, tech_stack tools, trigger names. A key
 #      the account doesn't match scores 0 for that dimension.
-#   3. Dimension KEYS are fixed engine vocabulary — only these are scored:
+#   3. Dimension KEYS are fixed engine vocabulary. Only these are scored:
 #        industry, size, employee_band, revenue_band, funding_stage,
 #        tech_stack, triggers
-#      (an unknown key contributes weight but can never score — don't invent
+#      (an unknown key contributes weight but can never score, so don't invent
 #      new ones). Reweight and re-level freely.
 #
 # SCORING RULE (normalize-over-available): earned = Σ(weight ×
@@ -34,9 +35,9 @@
 thresholds:
   tier1: 80          # score ≥ 80 → Tier 1 (core ICP)
   tier2: 58          # 58–79      → Tier 2 (expansion ICP); < 58 → Tier 3 (out-of-ICP)
-  # Tuned so a realistic ~25–30% of pipeline lands out-of-ICP (Tier 3) — the
-  # slice an ICP-analytics story exists to surface. Adjust after a dry-run if
-  # your level values shift the distribution.
+  # Tuned so a realistic ~25–30% of pipeline lands out-of-ICP (Tier 3). That
+  # slice is what an ICP-analytics story exists to surface. Adjust after a
+  # dry-run if your level values shift the distribution.
 
 # In-ICP = Tier 1 or Tier 2; out-of-ICP = Tier 3.
 
@@ -65,7 +66,7 @@ dimensions:
       Enterprise: 0.8
       SMB: 0.3
 
-  # Band labels are fixed engine vocabulary — reweight, don't rename.
+  # Band labels are fixed engine vocabulary. Reweight, don't rename.
   employee_band:
     weight: 5
     match: exact
