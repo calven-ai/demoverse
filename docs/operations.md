@@ -35,10 +35,10 @@ Three commands advance the world, so a note on run modes. `npm run pipeline` for
 | --- | --- | --- |
 | Command | `npm run pipeline` (`/pipeline-update`) | `apply -- --backfill-touchpoints --opp=` (`/backfill-opps`) |
 | Motion | a thin slice across **many** deals | the **whole** sales cycle of **one** deal |
-| Per deal | 1–3 touch points, this stage only | every artifact the deal will ever have |
+| Per deal | 0–3 touch points, this stage only | every stage the deal actually reached |
 | When | the routine run, forever | once, to seed history |
 
-The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email. Its Evaluation call happens in a *later* run, once it reaches Evaluation. The backfill exists to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, and a deal born with a complete history reads as fake on sight.
+The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email. Its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts to its name. The backfill exists to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, and a deal born with a complete history reads as fake on sight.
 
 The backfill loop, per opportunity (resume-safe, one deal at a time):
 

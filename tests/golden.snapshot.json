@@ -1,9 +1,9 @@
 {
   "totals": {
     "accounts": 44,
-    "contacts": 98,
+    "contacts": 97,
     "opportunities": 44,
-    "artifacts": 528
+    "artifacts": 512
   },
   "opportunities": [
     {
@@ -19,12 +19,12 @@
         "Competitor A"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-08-04",
+      "closeDate": "2025-08-11",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
-        "call_transcript",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -47,7 +47,7 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-08-18",
+      "closeDate": "2025-07-21",
       "winLossReason": "Incumbent",
       "artifacts": [
         "ae_note",
@@ -55,6 +55,8 @@
         "ae_note",
         "call_transcript",
         "call_transcript",
+        "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -75,12 +77,13 @@
         "Competitor C"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-08-04",
+      "closeDate": "2025-08-11",
       "winLossReason": "No decision",
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -105,11 +108,9 @@
         "Competitor A"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-09-01",
+      "closeDate": "2025-08-11",
       "winLossReason": null,
       "artifacts": [
-        "ae_note",
-        "ae_note",
         "ae_note",
         "ae_note",
         "ae_note",
@@ -136,10 +137,9 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-08-11",
+      "closeDate": "2025-10-27",
       "winLossReason": "Price",
       "artifacts": [
-        "ae_note",
         "ae_note",
         "ae_note",
         "call_transcript",
@@ -166,15 +166,18 @@
         "Competitor A"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-09-15",
+      "closeDate": "2025-08-18",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
-        "call_transcript",
+        "email_exchange",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -196,15 +199,15 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-09-01",
+      "closeDate": "2025-09-15",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
+        "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -226,7 +229,7 @@
         "Competitor C"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-09-01",
+      "closeDate": "2025-08-25",
       "winLossReason": "Incumbent",
       "artifacts": [
         "ae_note",
@@ -236,7 +239,6 @@
         "call_transcript",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -257,7 +259,7 @@
         "Competitor A"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-09-22",
+      "closeDate": "2025-08-25",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
@@ -265,8 +267,6 @@
         "ae_note",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
-        "email_exchange",
         "email_exchange",
         "interview",
         "slack_deal_thread",
@@ -280,18 +280,21 @@
       "size": "SMB",
       "region": "EMEA",
       "stage": "Closed",
-      "status": "lost",
+      "status": "won",
       "amount": 28800,
       "competitors": [
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-08-25",
-      "winLossReason": "Incumbent",
+      "closeDate": "2025-09-22",
+      "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
+        "ae_note",
         "call_transcript",
+        "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -312,11 +315,15 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-08-25",
+      "closeDate": "2025-09-22",
       "winLossReason": "No decision",
       "artifacts": [
         "ae_note",
+        "ae_note",
         "call_transcript",
+        "call_transcript",
+        "email_exchange",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -337,10 +344,9 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-09-15",
+      "closeDate": "2025-09-29",
       "winLossReason": null,
       "artifacts": [
-        "ae_note",
         "ae_note",
         "ae_note",
         "ae_note",
@@ -368,17 +374,13 @@
         "Competitor C"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-10-06",
+      "closeDate": "2025-09-01",
       "winLossReason": "Brand/trust",
       "artifacts": [
         "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
         "email_exchange",
-        "email_exchange",
-        "email_exchange",
-        "slack_deal_thread",
         "slack_deal_thread",
         "winloss_post"
       ]
@@ -396,11 +398,11 @@
         "Competitor B"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-09-22",
+      "closeDate": "2025-10-20",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
-        "ae_note",
+        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -424,14 +426,14 @@
         "Competitor A"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-10-06",
+      "closeDate": "2025-10-13",
       "winLossReason": "Price",
       "artifacts": [
         "ae_note",
         "ae_note",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
+        "call_transcript",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -446,21 +448,23 @@
       "size": "Mid-market",
       "region": "NA",
       "stage": "Closed",
-      "status": "lost",
+      "status": "won",
       "amount": 28800,
       "competitors": [
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-10-13",
-      "winLossReason": "Price",
+      "closeDate": "2025-11-17",
+      "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -482,7 +486,7 @@
         "Competitor B"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-11-10",
+      "closeDate": "2025-10-06",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
@@ -513,13 +517,11 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-10-27",
+      "closeDate": "2025-10-13",
       "winLossReason": "Incumbent",
       "artifacts": [
         "ae_note",
-        "ae_note",
-        "ae_note",
-        "ae_note",
+        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -549,11 +551,10 @@
       "artifacts": [
         "ae_note",
         "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -574,16 +575,17 @@
         "Competitor C"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-11-10",
+      "closeDate": "2025-11-03",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -608,10 +610,11 @@
       "winLossReason": "No decision",
       "artifacts": [
         "ae_note",
+        "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -632,15 +635,12 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-11-24",
+      "closeDate": "2025-10-27",
       "winLossReason": "Integrations",
       "artifacts": [
         "ae_note",
-        "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -655,14 +655,14 @@
       "size": "SMB",
       "region": "EMEA",
       "stage": "Closed",
-      "status": "lost",
+      "status": "won",
       "amount": 14400,
       "competitors": [
         "Competitor B"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-11-03",
-      "winLossReason": "Price",
+      "closeDate": "2026-01-19",
+      "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
@@ -670,6 +670,7 @@
         "call_transcript",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -690,12 +691,13 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-11-03",
+      "closeDate": "2025-11-17",
       "winLossReason": "Integrations",
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -719,12 +721,13 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-11-17",
+      "closeDate": "2025-11-24",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
-        "call_transcript",
+        "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -748,13 +751,13 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-11-24",
+      "closeDate": "2026-01-12",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
-        "ae_note",
+        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -778,15 +781,15 @@
         "Competitor B"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-12-08",
+      "closeDate": "2025-12-01",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
-        "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -807,15 +810,14 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-12-15",
+      "closeDate": "2025-11-24",
       "winLossReason": "Missing feature",
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -837,9 +839,11 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-11-10",
-      "winLossReason": "Price",
+      "closeDate": "2026-01-05",
+      "winLossReason": "No decision",
       "artifacts": [
+        "ae_note",
+        "ae_note",
         "ae_note",
         "call_transcript",
         "call_transcript",
@@ -863,15 +867,13 @@
         "Competitor B"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-12-08",
+      "closeDate": "2025-12-01",
       "winLossReason": "Integrations",
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -885,26 +887,27 @@
       "industry": "Financial Services",
       "size": "SMB",
       "region": "NA",
-      "stage": "Closed",
-      "status": "lost",
+      "stage": "Negotiation",
+      "status": "open",
       "amount": 14400,
       "competitors": [
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2025-12-01",
-      "winLossReason": "Missing feature",
+      "closeDate": null,
+      "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
+        "ae_note",
+        "call_transcript",
+        "call_transcript",
         "call_transcript",
         "email_exchange",
         "email_exchange",
         "email_exchange",
-        "slack_deal_thread",
-        "slack_deal_thread",
-        "winloss_post"
+        "slack_deal_thread"
       ]
     },
     {
@@ -920,14 +923,13 @@
         "Competitor B"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-12-15",
+      "closeDate": "2026-01-05",
       "winLossReason": "Missing feature",
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
         "ae_note",
-        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
@@ -952,26 +954,20 @@
         "Competitor A"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2025-12-22",
+      "closeDate": "2025-12-01",
       "winLossReason": null,
       "artifacts": [
-        "ae_note",
         "call_transcript",
         "call_transcript",
-        "call_transcript",
         "email_exchange",
-        "email_exchange",
-        "email_exchange",
-        "email_exchange",
-        "slack_deal_thread",
         "slack_deal_thread",
         "winloss_post"
       ]
     },
     {
       "id": "opp-034",
-      "account": "Quill Co",
-      "industry": "Healthcare",
+      "account": "Vantage Partners",
+      "industry": "Professional Services",
       "size": "Mid-market",
       "region": "NA",
       "stage": "Closed",
@@ -981,20 +977,20 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2026-01-12",
+      "closeDate": "2025-12-29",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
-        "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
         "email_exchange",
+        "email_exchange",
+        "email_exchange",
         "slack_deal_thread",
         "slack_deal_thread",
-        "winloss_post"
+        "survey"
       ]
     },
     {
@@ -1011,15 +1007,14 @@
         "Competitor B"
       ],
       "useCase": "Use Case One",
-      "closeDate": "2026-01-12",
+      "closeDate": "2026-01-05",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -1041,17 +1036,14 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2026-01-12",
+      "closeDate": "2025-12-29",
       "winLossReason": null,
       "artifacts": [
         "ae_note",
         "ae_note",
         "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
-        "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -1073,20 +1065,12 @@
         "Competitor C"
       ],
       "useCase": "Use Case Three",
-      "closeDate": "2025-12-29",
+      "closeDate": "2025-12-15",
       "winLossReason": "Integrations",
       "artifacts": [
         "ae_note",
-        "ae_note",
-        "ae_note",
-        "ae_note",
-        "call_transcript",
-        "call_transcript",
         "call_transcript",
         "email_exchange",
-        "email_exchange",
-        "email_exchange",
-        "slack_deal_thread",
         "slack_deal_thread",
         "survey"
       ]
@@ -1109,10 +1093,8 @@
       "artifacts": [
         "ae_note",
         "ae_note",
-        "ae_note",
         "call_transcript",
         "call_transcript",
-        "email_exchange",
         "email_exchange",
         "email_exchange",
         "email_exchange",
@@ -1132,12 +1114,14 @@
         "Competitor B"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2026-01-12",
+      "closeDate": "2026-01-19",
       "winLossReason": "Missing feature",
       "artifacts": [
         "ae_note",
+        "ae_note",
         "call_transcript",
         "call_transcript",
+        "email_exchange",
         "email_exchange",
         "email_exchange",
         "slack_deal_thread",
@@ -1151,26 +1135,22 @@
       "industry": "Manufacturing",
       "size": "SMB",
       "region": "NA",
-      "stage": "Closed",
-      "status": "lost",
+      "stage": "Proposal",
+      "status": "open",
       "amount": 28800,
       "competitors": [
         "Competitor A"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2026-01-19",
-      "winLossReason": "Brand/trust",
+      "closeDate": null,
+      "winLossReason": null,
       "artifacts": [
-        "ae_note",
         "call_transcript",
         "call_transcript",
         "call_transcript",
         "email_exchange",
         "email_exchange",
         "email_exchange",
-        "email_exchange",
-        "interview",
-        "slack_deal_thread",
         "slack_deal_thread"
       ]
     },
@@ -1180,25 +1160,24 @@
       "industry": "Healthcare",
       "size": "Enterprise",
       "region": "NA",
-      "stage": "Closed",
-      "status": "lost",
+      "stage": "Proposal",
+      "status": "open",
       "amount": 28800,
       "competitors": [
         "Competitor A",
         "Competitor C"
       ],
       "useCase": "Use Case Two",
-      "closeDate": "2026-01-12",
-      "winLossReason": "Price",
+      "closeDate": null,
+      "winLossReason": null,
       "artifacts": [
         "ae_note",
         "call_transcript",
         "call_transcript",
+        "call_transcript",
         "email_exchange",
         "email_exchange",
-        "slack_deal_thread",
-        "slack_deal_thread",
-        "survey"
+        "slack_deal_thread"
       ]
     },
     {
@@ -1207,7 +1186,7 @@
       "industry": "Software & SaaS",
       "size": "Enterprise",
       "region": "NA",
-      "stage": "Negotiation",
+      "stage": "Proposal",
       "status": "open",
       "amount": 24000,
       "competitors": [
@@ -1221,6 +1200,8 @@
         "ae_note",
         "call_transcript",
         "call_transcript",
+        "call_transcript",
+        "email_exchange",
         "email_exchange",
         "slack_deal_thread"
       ]

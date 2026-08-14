@@ -167,16 +167,31 @@ export function planDealTouchpoints(
   const created = opp.createdDate;
   const end = opp.closeDate ?? horizonDate;
   const span = Math.max(0, daysBetween(created, end));
-  // Distribute the stages the deal reached across [created, end]: Discovery at
-  // the start, later stages interpolated. Closed deals reach every stage; an
-  // open deal reaches up to its current stage.
+  // Which stages this deal ACTUALLY visited, and when.
+  //
+  // Prefer the recorded `stageHistory`: a deal that skipped Evaluation (short
+  // cycles routinely do) must not be handed an Evaluation transcript here, or
+  // the backfill would contradict the ledger the live engine wrote. Deals
+  // predating `stageHistory` fall back to the old assumption, every stage in
+  // order, interpolated evenly across [created, end].
   const stages = openStages(cfg);
-  const reachedIdx = opp.status === "open" ? stageRank(stages, opp.stage) : stages.length - 1;
-  const stageDate = (i: number): ISODate => addDays(created, Math.round((span * i) / stages.length));
+  const openVisits = opp.stageHistory.filter((h) => stages.includes(h.stage));
+  const visits: { stage: string; date: ISODate }[] =
+    openVisits.length > 0
+      ? openVisits.map((h) => ({ stage: h.stage, date: h.date }))
+      : (() => {
+          const reachedIdx = opp.status === "open" ? stageRank(stages, opp.stage) : stages.length - 1;
+          const out: { stage: string; date: ISODate }[] = [];
+          for (let i = 0; i <= reachedIdx && i < stages.length; i++) {
+            out.push({
+              stage: stages[i]!,
+              date: addDays(created, Math.round((span * i) / stages.length)),
+            });
+          }
+          return out;
+        })();
 
-  for (let i = 0; i <= reachedIdx && i < stages.length; i++) {
-    const stage = stages[i]!;
-    const date = stageDate(i);
+  for (const [i, { stage, date }] of visits.entries()) {
     // Leak-safe grounding: an early-stage artifact must not reference the
     // eventual outcome, so override outcome/reason to the open state.
     const groundingOpen = { ...dealFacts(ledger, opp), stage, outcome: "open", winLossReason: undefined };
@@ -225,13 +240,20 @@ export function planDealTouchpoints(
 
   // An opportunity-scoped #competitive question on a subset of deals. The AE
   // flags a competitor they ran into on this deal.
-  if (allowSlack && opp.competitors.length > 0 && rng.chance(cfg.world.artifacts.competitive_q_rate)) {
+  if (
+    allowSlack &&
+    visits.length > 0 &&
+    opp.competitors.length > 0 &&
+    rng.chance(cfg.world.artifacts.competitive_q_rate)
+  ) {
     planned({
       id: nextId(world.artifacts, "art"),
       kind: "competitive_q",
       dealId: opp.id,
       title: `#competitive — ${opp.competitors[0]} on ${acctName}`, // prose-lint: allow-emdash (external record name)
-      date: stageDate(Math.min(1, reachedIdx)),
+      // Early in the cycle: the second stage the deal reached, or the first if
+      // it never got that far.
+      date: visits[Math.min(1, visits.length - 1)]!.date,
       grounding: { competitor: opp.competitors[0] },
     });
   }

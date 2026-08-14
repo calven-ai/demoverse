@@ -35,10 +35,11 @@ any agent tool (Claude Code, Codex, Cursor, Copilot, …). It has three parts:
 1. **Plan.** Run `npm run pipeline` for one living increment on demand. It
    equals `npm run apply -- --weeks=1`. Plain `npm run apply` generates only the
    periods the real calendar has produced, and `-- --backfill` covers the first
-   big run. The engine advances the world: a couple of new deals, one stage
-   forward for each open deal, closes for the deals whose cycle is up. Then it
-   writes a request bundle holding **only the touch points those events earned**,
-   1–3 per deal. Never a deal's whole history. Filling that is what
+   big run. The engine advances the world: a couple of new deals, each open deal
+   moved along its own cycle (usually one stage, more for a short deal, none at
+   all for one that has gone quiet), closes for the deals whose cycle is up.
+   Then it writes a request bundle holding **only the touch points those events
+   earned**, 1–3 per deal. Never a deal's whole history. Filling that is what
    `--backfill-touchpoints` does:
    ```
    state/requests/<periodIndex>/manifest.json        # index of all requests
@@ -91,8 +92,10 @@ The prompt carries `GROUNDING RULES`. Honor them exactly. In short:
 
 ### Detail-layer backfill contract (bulk filling of existing deals)
 
-The living increment adds 1–3 touch points per deal per week. The one-time
-historical seed instead fills a deal's **whole** sales cycle. Per opportunity:
+The living increment adds 1–3 touch points per deal per week (0 for a stalled
+deal that period, and a fast-track deal may end its whole life with 2). The
+one-time historical seed instead fills a deal's **whole** sales cycle. Per
+opportunity:
 
 1. `npm run apply -- --next=N` lists the next opps needing work: `untouched`,
    or `planned:K` for planted-but-unfilled, which is resumable.

@@ -92,7 +92,43 @@ export const WorldConfigSchema = z.object({
   }),
   pipeline: z.object({
     stages: z.array(z.string()).min(2),
+    /**
+     * The TYPICAL band, not the envelope. Most deals are drawn triangularly
+     * inside it (mode = the midpoint); `cycle_outliers` is what reaches beyond.
+     */
     avg_sales_cycle_weeks: IntRange,
+    /**
+     * The tails. A pipeline where every deal lands inside one band reads as
+     * generated, for the same reason uniform diligence does: real ones always
+     * carry a few one-week closes, a few quarter-long grinds, and a few that go
+     * quiet and die of no decision. Optional, with defaults, so a config
+     * written before this existed keeps validating.
+     */
+    cycle_outliers: z
+      .object({
+        /** Warm inbound: closes almost immediately, leaving barely a trail. */
+        fast: z
+          .object({ rate: z.number().min(0).max(1).default(0.05), weeks: IntRange.default([1, 2]) })
+          .default({}),
+        /** Enterprise grind: procurement and security review drag it out. */
+        slog: z
+          .object({
+            rate: z.number().min(0).max(1).default(0.05),
+            weeks: IntRange.default([12, 16]),
+          })
+          .default({}),
+        /**
+         * Goes dark mid-cycle: the stage clock pauses, so the deal sits in one
+         * stage for weeks earning NO touch points, then resumes or dies.
+         */
+        stalled: z
+          .object({
+            rate: z.number().min(0).max(1).default(0.05),
+            stall_weeks: IntRange.default([3, 6]),
+          })
+          .default({}),
+      })
+      .default({}),
   }),
   winloss: z.object({
     baseline_win_rate: z.number().min(0).max(1),

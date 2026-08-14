@@ -129,8 +129,11 @@ discovery call, not a full paper trail. Run it again next week and the same deal
 moves a stage and earns another one or two. That is what gives the dataset a
 past to chart and a direction to steer.
 
+The six weeks below are one deal's story, not the template. Another closes in a
+week, another sits in Evaluation for a month without a word.
+
 <p align="center">
-  <img src="docs/assets/living-week-8bit.svg" alt="One deal accumulating history across six weekly runs" width="640">
+  <img src="docs/assets/living-week-8bit.svg" alt="One deal accumulating history week by week, from a discovery call through to a win-loss debrief" width="640">
 </p>
 
 ## What makes it believable
@@ -142,10 +145,17 @@ past to chart and a direction to steer.
   seeded texture: backstory, buyer tone, live objections, timeline pressure,
   artifact shape, and a banned-phrase list. A repetition detector feeds phrases
   back into the blocklist. You edit all of it in `config/prose.yaml`.
-- **Living, not a dump.** Deals take 2–8 weeks and earn 1–3 touch points per
-  week. Win-loss debriefs are deliberately scarce (~1 in 3 closed deals) and AE
-  notes are terse and imperfect. Uniform diligence is what makes synthetic data
-  read as synthetic.
+- **Living, not a dump.** A typical deal runs about five weeks and earns one to
+  three touch points a week. Win-loss debriefs are deliberately scarce (~1 in 3
+  closed deals) and AE notes are terse and imperfect. Uniform diligence is what
+  makes synthetic data read as synthetic.
+- **No two deals the same shape.** Cycle length is drawn per deal, peaking
+  around five weeks, and the tails are real: a few warm inbound deals close in a
+  week with barely two touch points to their name, a few grind through a
+  quarter of procurement, and a few go dark for a month before dying of "No
+  decision". Short deals skip stages outright. So your demo has the edge cases a
+  real pipeline has, not one archetype repeated three hundred times. Tune or
+  disable each one in `config/world.yaml`.
 - **Cohort-gated pushes.** The ledger holds hundreds of deals so the statistics
   are real. Only a curated ~50 ever reach external systems, each one fully
   populated. Nothing leaves the repo by accident.

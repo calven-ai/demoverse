@@ -38,11 +38,11 @@ The world advances in **periods** (default one week), tracked in `state/clock.js
 Each advanced period, the engine:
 
 1. **Opens** new deals (rate from `state/trends.json` `volume.newOppsPerWeek`), drawing accounts, buying groups, competitors, a use case, and a full deterministic schedule.
-2. **Progresses** open deals along the configured stages, on each deal's own 2–8-week cycle.
+2. **Progresses** open deals along the configured stages, on each deal's own cycle. Length is drawn per deal from a shape archetype (`src/pipeline/shape.ts`): most land inside `pipeline.avg_sales_cycle_weeks` and peak at its midpoint, while a small share close in a week, grind for a quarter, or stall and go quiet for a month. Stages follow from elapsed fraction, so a short deal genuinely skips some and a stalled one holds still, earning nothing while its clock is paused.
 3. **Closes** deals whose cycle is up, sampling outcome from the current win-rate trajectory (biased by ICP fit and competitor strength) and a loss reason from the configured weights; assigns the win-loss mode.
 4. **Plans touch points**, meaning only the artifacts these events earned *this period*: a discovery call and maybe an intro email for a new deal, an evaluation call for a deal that just reached Evaluation, a win-loss artifact and post-mortem for a close. Grounding for each artifact is snapshotted at planning time, so an early-stage transcript reflects the world as it was at the call date and never leaks the eventual outcome.
 
-![A single deal accumulating history across six weekly runs: discovery call and intro email in week 1, demo call and Slack thread during Evaluation, an AE note, a proposal email, and finally a win-loss interview and post-mortem when it closes in week 6.](assets/living-week-8bit.svg)
+![One deal accumulating history week by week: discovery call and intro email in week 1, demo call and Slack thread during Evaluation, an AE note, a proposal email, and finally a win-loss interview and post-mortem when it closes. Six weeks is this deal's cycle, not every deal's.](assets/living-week-8bit.svg)
 
 This is the **living increment**, and it's the core motion: a deal accumulates its history across many runs, exactly as a real one does. Its complement is the **detail-layer backfill** (`apply -- --backfill-touchpoints --opp=`), which plants the *whole* cycle of *one* deal at once and exists solely for seeding history. The failure mode the split prevents is a freshly-opened deal with a complete past. See [operations.md](operations.md#the-two-motions) for when to use which.
 

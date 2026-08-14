@@ -58,7 +58,9 @@ yet. It happens in a later increment, when the deal reaches Evaluation.
      demo, pricing has not come up, the buying group is half-formed.
    - A **progressed** deal's artifact picks up where the last one left off. The
      prompt carries the deal's recorded facts (stage, competitors, buying group,
-     use case). The new touch point moves exactly one stage's worth of ground.
+     use case). The new touch point covers the ground between the deal's last
+     recorded stage and this one, which for a short cycle can be more than one
+     stage, and for a deal coming back from a stall follows weeks of silence.
    - A **closing** deal's artifacts carry the recorded outcome and reason.
    - The deal's **primary use case stays the dominant theme** across every
      artifact it will ever have, increment after increment.
@@ -85,10 +87,11 @@ yet. It happens in a later increment, when the deal reaches Evaluation.
 
 ## Watch for
 
-- **Detail-layer creep.** If a single deal in the work list has more than ~3
+- **Detail-layer creep.** If a single deal in the work list has more than ~5
   artifacts this increment, something is wrong. Check whether
   `--backfill-touchpoints` was run by mistake. The whole point is that a deal
-  accumulates its history a slice at a time.
+  accumulates its history a slice at a time. Note the low end is legitimately
+  0: a stalled deal has gone quiet, and that silence is deliberate.
 - **Win-loss scarcity.** ~2 closed deals in 3 carry no survey or interview
   (`config/world.yaml` `winloss.mode_mix`, `none: 0.67`). If most of an
   increment's closes have one, stop and reconcile the config before generating.

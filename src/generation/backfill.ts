@@ -9,7 +9,8 @@ import type { Config } from "../config/schema.js";
 import { CohortIndex } from "../cohort.js";
 import { Ledger } from "../ledger/ledger.js";
 import type { World } from "../ledger/schema.js";
-import { openStages, stageForFraction, stageRank } from "../pipeline/stages.js";
+import { openStages, stageRank } from "../pipeline/stages.js";
+import { dealShape, stageForElapsed } from "../pipeline/shape.js";
 import { closeTarget } from "./advance.js";
 import { planArtifact, artifactDetail, planDealTouchpoints, type PlanFn } from "./touchpoints.js";
 
@@ -46,6 +47,9 @@ export function backfillStageHistory(
     }
     const history: { stage: string; date: ISODate }[] = [{ stage: "Discovery", date: opp.createdDate }];
     const target = closeTarget(world, cfg, opp);
+    // Same shape the live run used; both sides read it from the one helper, so
+    // the replay cannot drift from what actually happened.
+    const shape = dealShape(world, cfg, opp.id);
     let stage = "Discovery";
     let closedOn: ISODate | undefined;
 
@@ -63,8 +67,12 @@ export function backfillStageHistory(
         closedOn = end;
         break;
       }
-      const frac = daysBetween(opp.createdDate, end) / Math.max(1, daysBetween(opp.createdDate, target));
-      const newStage = stageForFraction(openStages(cfg), frac);
+      const newStage = stageForElapsed(
+        cfg,
+        daysBetween(opp.createdDate, end),
+        Math.max(1, daysBetween(opp.createdDate, target)),
+        shape,
+      );
       if (newStage !== stage && stageRank(openStages(cfg), newStage) > stageRank(openStages(cfg), stage)) {
         stage = newStage;
         history.push({ stage, date: end });

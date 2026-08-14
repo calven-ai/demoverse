@@ -113,9 +113,25 @@ pipeline:
   # connectors.yaml stage_map are all keyed by these names. Change them
   # together or validation/lookup falls back to defaults.
   stages: [Discovery, Evaluation, Proposal, Negotiation, Closed]
-  # 2–8 weeks = a short, sales-assisted motion. Deals accumulate their history
-  # across that many weekly increments, exactly as real ones do.
+  # The TYPICAL band, not the envelope: 2–8 weeks = a short, sales-assisted
+  # motion. Most deals are drawn triangularly inside it, peaking at the midpoint
+  # (~5 weeks), so the middle is common and the edges are rare. Deals accumulate
+  # their history across that many weekly increments, exactly as real ones do.
   avg_sales_cycle_weeks: [2, 8]
+  # The tails, which is where realism actually lives. A world where every deal
+  # fits one band reads as generated, for the same reason uniform diligence
+  # does. Each rate is the share of deals taking that shape; set one to 0 to
+  # switch that edge case off entirely.
+  cycle_outliers:
+    # Warm inbound. Closes in a week or two, skipping most of the pipeline and
+    # leaving barely a trail: roughly two touch points in TOTAL, not per week.
+    fast: { rate: 0.05, weeks: [1, 2] }
+    # The enterprise grind. Security review and procurement drag it out over a
+    # quarter, and it collects far more touch points than a normal deal.
+    slog: { rate: 0.05, weeks: [12, 16] }
+    # Goes dark. The stage clock pauses, so the deal sits in one stage for weeks
+    # earning NO touch points at all, then resumes or dies of "No decision".
+    stalled: { rate: 0.05, stall_weeks: [3, 6] }
 
 winloss:
   baseline_win_rate: 0.50

@@ -31,7 +31,8 @@ import { icWinModifier } from "../sales-team.js";
 import { createdAtFor } from "./created-at.js";
 
 import { buildRealAccountPool } from "./real-accounts.js";
-import { openStages, stageForFraction, stageRank } from "../pipeline/stages.js";
+import { openStages, stageRank } from "../pipeline/stages.js";
+import { dealShape, isThin, stageForElapsed, totalWeeks } from "../pipeline/shape.js";
 import {
   pickRep,
   sampleCompetitors,
@@ -83,14 +84,24 @@ export interface AdvanceResult {
   enrolled: { oppId: string; accountName: string; source: "weekly" }[];
 }
 
-/** Deterministic per-deal cycle length (recomputable from the seed). */
+/**
+ * The loss reason a stalled deal gravitates to. Matched against the configured
+ * `winloss.loss_reasons` picklist, and skipped when an operator has removed it.
+ */
+const NO_DECISION = "No decision";
+
+/**
+ * Deterministic per-deal cycle length (recomputable from the seed).
+ *
+ * Selling weeks only. A stalled deal's silent weeks are calendar time on top of
+ * this, so use `closeTarget` for anything date-shaped.
+ */
 export function cycleWeeks(world: World, cfg: Config, oppId: string): number {
-  const [lo, hi] = cfg.world.pipeline.avg_sales_cycle_weeks;
-  return new Rng(`${world.seed}|cycle|${oppId}`).int(lo, hi);
+  return dealShape(world, cfg, oppId).cycleWeeks;
 }
 
 export function closeTarget(world: World, cfg: Config, opp: Opportunity): ISODate {
-  return addWeeks(opp.createdDate, cycleWeeks(world, cfg, opp.id));
+  return addWeeks(opp.createdDate, totalWeeks(dealShape(world, cfg, opp.id)));
 }
 
 /**
@@ -216,6 +227,11 @@ export function advanceWorld(
       };
       world.opportunities.push(opp);
       summary.newOpps++;
+      // A fast-track deal closes before a real buying process could leave a
+      // paper trail, so it skips the optional extras below and lands ~2 touch
+      // points in total. The gate is applied AFTER `shouldEmitPerStage` so the
+      // rng draw still happens and the per-period stream stays aligned.
+      const thin = isThin(dealShape(world, cfg, opp.id));
       // Deals born in a live run join the Salesforce cohort as `weekly` members:
       // they are the handful the operator adds each week and they get the FULL
       // detail layer, Slack included. (Enrollment is a no-op until a cohort has
@@ -236,7 +252,8 @@ export function advanceWorld(
       }
       if (
         cfg.world.generate.ae_notes &&
-        shouldEmitPerStage(cfg.world.artifacts.ae_notes_per_deal, "Discovery", rng)
+        shouldEmitPerStage(cfg.world.artifacts.ae_notes_per_deal, "Discovery", rng) &&
+        !thin
       ) {
         planned({
           id: nextId(world.artifacts, "art"),
@@ -249,7 +266,8 @@ export function advanceWorld(
       }
       if (
         cfg.world.generate.emails &&
-        shouldEmitPerStage(cfg.world.artifacts.emails_per_deal, "Discovery", rng)
+        shouldEmitPerStage(cfg.world.artifacts.emails_per_deal, "Discovery", rng) &&
+        !thin
       ) {
         planned({
           id: nextId(world.artifacts, "art"),
@@ -260,7 +278,7 @@ export function advanceWorld(
           grounding: { ...dealFacts(ledger, opp), stage: "Discovery" },
         });
       }
-      if (cfg.world.generate.slack && slackFor(opp.id)) {
+      if (cfg.world.generate.slack && slackFor(opp.id) && !thin) {
         planned({
           id: nextId(world.artifacts, "art"),
           kind: "slack_deal_thread",
@@ -281,6 +299,7 @@ export function advanceWorld(
       if (isBefore(period.end, opp.createdDate)) continue; // not created yet in this period
 
       const target = closeTarget(world, cfg, opp);
+      const shape = dealShape(world, cfg, opp.id);
       const dealRng = new Rng(`${world.seed}|close|${opp.id}`);
       // A non-cohort deal still lives its whole life here. It stages, closes,
       // and records its outcome, because that is what grounds the win-rate,
@@ -305,6 +324,13 @@ export function advanceWorld(
         opp.stageHistory.push({ stage: "Closed", date: period.end });
         if (!won) {
           opp.winLossReason = pickLossReason(cfg, opp, dealRng);
+          // A deal that went dark for weeks and then lost usually died of
+          // indecision, not of a competitor or a price. Nudge the recorded
+          // reason to match the shape the ledger already shows. `dealRng` is
+          // per-deal, so the extra draw cannot disturb any other deal.
+          if (shape.stallWeeks > 0 && NO_DECISION in cfg.world.winloss.loss_reasons && dealRng.chance(0.7)) {
+            opp.winLossReason = NO_DECISION;
+          }
           opp.repLossReason = pickRepLossReason(cfg, opp.winLossReason, dealRng);
         }
         opp.priceFeedback = pickPriceFeedback(dealRng, won, opp.winLossReason);
@@ -321,7 +347,8 @@ export function advanceWorld(
           planCloseArtifacts(world, cfg, ledger, opp, period.end, planned, rng, slackFor(opp.id));
         // Closing AE note, the rep's own win/loss recap (grounds repLossReason,
         // the belief-vs-reality gap). Carries the closed facts (outcome + reason).
-        if (cfg.world.generate.ae_notes && withProse) {
+        // A fast-track deal skips it: nobody writes up a deal that closed itself.
+        if (cfg.world.generate.ae_notes && withProse && !isThin(shape)) {
           planned({
             id: nextId(world.artifacts, "art"),
             kind: "ae_note",
@@ -346,9 +373,15 @@ export function advanceWorld(
         }
       } else {
         // Progress the stage; plan a transcript when entering Evaluation/Proposal.
-        const frac =
-          daysBetween(opp.createdDate, period.end) / Math.max(1, daysBetween(opp.createdDate, target));
-        const newStage = stageForFraction(openStages(cfg), frac);
+        // A stalled deal's clock is frozen inside its stall window, so this
+        // returns the same stage for several periods running and the deal
+        // quietly earns nothing, which is the point.
+        const newStage = stageForElapsed(
+          cfg,
+          daysBetween(opp.createdDate, period.end),
+          Math.max(1, daysBetween(opp.createdDate, target)),
+          shape,
+        );
         if (
           newStage !== opp.stage &&
           stageRank(openStages(cfg), newStage) > stageRank(openStages(cfg), opp.stage)
