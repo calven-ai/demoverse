@@ -1,5 +1,5 @@
 /**
- * Ingest filled generation results back into the ledger. See DESIGN.md §12.
+ * Ingest filled generation results back into the ledger. See docs/architecture.md#the-generation-request-protocol.
  *
  * After the agent fills the requests, this validates each result, files markdown
  * bodies into the content store (state/content/<id>.md, committed, so the world

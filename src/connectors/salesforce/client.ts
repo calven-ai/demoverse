@@ -1,6 +1,6 @@
 /**
  * Salesforce (Developer Edition) client over the raw REST + SOAP-login APIs via
- * `fetch`. See DESIGN.md §3, §14.
+ * `fetch`. See docs/architecture.md#connectors.
  *
  * Auth uses the SOAP partner `login` call (username + password + security token)
  * to obtain a session id + instance URL; all record I/O then goes through the

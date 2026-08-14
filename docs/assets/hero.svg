@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" shape-rendering="crispEdges" role="img" aria-label="An 8-bit pixel-art office on a white background: a green LED wall sign reads DEMOVERSE HQ — AGENTS AT WORK above two agents sitting at desks typing on green-on-black CRT terminals; on a loop, one picks up the phone for a call, they turn to chat with each other in a speech-bubble exchange, then the other takes a call and both go back to typing.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 356" shape-rendering="crispEdges" role="img" aria-label="An 8-bit pixel-art office on a white background: a green LED wall sign reads DEMOVERSE HQ — AGENTS AT WORK above two agents sitting at desks typing on green-on-black CRT terminals; on a loop, one picks up the phone and closes a deal — their CRT flashes WON with a big checkmark while they throw their arms up and cheer under falling confetti and gold coins — then the two chat in a speech-bubble exchange, the other takes a call and wins a deal of their own, and everyone goes back to typing.">
   <defs>
     <pattern id="stripes" width="8" height="8" patternUnits="userSpaceOnUse">
       <rect width="8" height="8" fill="#ffffff"/>
@@ -133,6 +133,82 @@
       </rect>
     </g>
 
+    <!-- cheer pose: arms pumping overhead, open smile -->
+    <g id="a-cheer">
+      <rect x="8" y="0" width="40" height="12" fill="#111"/>
+      <rect x="8" y="12" width="6" height="8" fill="#111"/>
+      <rect x="42" y="12" width="6" height="8" fill="#111"/>
+      <rect x="14" y="12" width="28" height="22" fill="#eec39a"/>
+      <rect x="19" y="20" width="5" height="5" fill="#222"/>
+      <rect x="32" y="20" width="5" height="5" fill="#222"/>
+      <rect x="25" y="29" width="6" height="3" fill="#7a4a2b"/>
+      <rect x="24" y="34" width="8" height="4" fill="#eec39a"/>
+      <rect x="4" y="38" width="48" height="46"/>
+      <g>
+        <rect x="-2" y="12" width="8" height="30"/>
+        <rect x="50" y="12" width="8" height="30"/>
+        <rect x="-2" y="4" width="10" height="8" fill="#eec39a"/>
+        <rect x="48" y="4" width="10" height="8" fill="#eec39a"/>
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".5s" repeatCount="indefinite"/>
+      </g>
+      <g opacity="0">
+        <rect x="-2" y="24" width="8" height="18"/>
+        <rect x="50" y="24" width="8" height="18"/>
+        <rect x="-2" y="16" width="10" height="8" fill="#eec39a"/>
+        <rect x="48" y="16" width="10" height="8" fill="#eec39a"/>
+        <animate attributeName="opacity" calcMode="discrete" values="0;1" keyTimes="0;.5" dur=".5s" repeatCount="indefinite"/>
+      </g>
+    </g>
+
+    <!-- CRT win takeover, sized to the 60x42 inner screen: flashing frame, WON, big checkmark -->
+    <g id="win-screen">
+      <rect width="60" height="42" fill="#22c55e">
+        <animate attributeName="opacity" calcMode="discrete" values="1;0" keyTimes="0;.5" dur=".8s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="3" y="3" width="54" height="36" fill="#161616"/>
+      <g fill="#22c55e" transform="translate(13,6)">
+        <use href="#g-W"/>
+        <use href="#g-O" x="12"/>
+        <use href="#g-N" x="24"/>
+      </g>
+      <rect x="14" y="22" width="6" height="6" fill="#22c55e"/>
+      <rect x="18" y="26" width="6" height="6" fill="#22c55e"/>
+      <rect x="22" y="30" width="6" height="6" fill="#22c55e"/>
+      <rect x="26" y="26" width="6" height="6" fill="#22c55e"/>
+      <rect x="30" y="22" width="6" height="6" fill="#22c55e"/>
+      <rect x="34" y="18" width="6" height="6" fill="#22c55e"/>
+    </g>
+
+    <!-- gold coin, 8x8 -->
+    <g id="coin">
+      <rect width="8" height="8" fill="#c9a86f"/>
+      <rect x="2" y="2" width="4" height="4" fill="#e7cfa4"/>
+    </g>
+
+    <!-- celebration confetti + coins, cluster ~92 wide, three fall phases -->
+    <g id="confetti">
+      <g>
+        <rect x="0" y="0" width="4" height="4" fill="#22c55e"/>
+        <rect x="22" y="10" width="4" height="4" fill="#c9a86f"/>
+        <rect x="44" y="4" width="4" height="4" fill="#15803d"/>
+        <rect x="66" y="12" width="4" height="4" fill="#111"/>
+        <rect x="88" y="6" width="4" height="4" fill="#22c55e"/>
+        <animateTransform attributeName="transform" type="translate" calcMode="discrete" values="0 0;0 16;0 32;0 48;0 64;0 80;0 96;0 112" keyTimes="0;.125;.25;.375;.5;.625;.75;.875" dur="2s" repeatCount="indefinite"/>
+      </g>
+      <g>
+        <rect x="12" y="-14" width="4" height="4" fill="#15803d"/>
+        <rect x="34" y="-4" width="4" height="4" fill="#111"/>
+        <rect x="56" y="-12" width="4" height="4" fill="#e7cfa4"/>
+        <rect x="78" y="-2" width="4" height="4" fill="#22c55e"/>
+        <animateTransform attributeName="transform" type="translate" calcMode="discrete" values="0 0;0 16;0 32;0 48;0 64;0 80;0 96;0 112" keyTimes="0;.125;.25;.375;.5;.625;.75;.875" dur="2.6s" repeatCount="indefinite"/>
+      </g>
+      <g>
+        <use href="#coin" x="16" y="-8"/>
+        <use href="#coin" x="70" y="0"/>
+        <animateTransform attributeName="transform" type="translate" calcMode="discrete" values="0 0;0 16;0 32;0 48;0 64;0 80;0 96;0 112" keyTimes="0;.125;.25;.375;.5;.625;.75;.875" dur="3.2s" repeatCount="indefinite"/>
+      </g>
+    </g>
+
     <!-- 5x5 pixel font (2-unit pixels, 10x10 glyphs); rects unfilled so <g fill> colors them -->
     <g id="g-A"><rect x="2" width="6" height="2"/><rect y="2" width="2" height="8"/><rect x="8" y="2" width="2" height="8"/><rect x="2" y="4" width="6" height="2"/></g>
     <g id="g-D"><rect width="8" height="2"/><rect y="2" width="2" height="6"/><rect x="8" y="2" width="2" height="6"/><rect y="8" width="8" height="2"/></g>
@@ -183,12 +259,12 @@
   </defs>
 
   <!-- backdrop -->
-  <rect width="880" height="320" fill="#ffffff"/>
-  <rect width="880" height="282" fill="url(#stripes)"/>
-  <rect y="282" width="880" height="4" fill="#111"/>
+  <rect width="880" height="356" fill="#ffffff"/>
+  <rect width="880" height="318" fill="url(#stripes)"/>
+  <rect y="318" width="880" height="4" fill="#111"/>
 
   <!-- wall sign above the clock and calendar: DEMOVERSE HQ — AGENTS AT WORK -->
-  <g transform="translate(254,10)">
+  <g transform="translate(254,24)">
     <rect width="372" height="26" fill="#111"/>
     <rect x="4" y="4" width="364" height="18" fill="#161616"/>
     <g fill="#22c55e" transform="translate(8,8)">
@@ -222,6 +298,9 @@
     </g>
   </g>
 
+  <!-- everything below the sign, shifted down to give the title breathing room -->
+  <g transform="translate(0,36)">
+
   <!-- wall: clock, calendar, whiteboard -->
   <g transform="translate(124,34)">
     <rect width="52" height="52" fill="#111"/>
@@ -232,7 +311,7 @@
     <rect x="6" y="24" width="4" height="4" fill="#111"/>
     <rect x="24" y="18" width="4" height="8" fill="#111" transform="rotate(300 26 26)"/>
     <rect x="24" y="14" width="4" height="12" fill="#111">
-      <animateTransform attributeName="transform" type="rotate" calcMode="discrete" values="0 26 26;90 26 26;180 26 26;270 26 26" keyTimes="0;.25;.5;.75" dur="16s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" calcMode="discrete" values="0 26 26;90 26 26;180 26 26;270 26 26" keyTimes="0;.25;.5;.75" dur="14s" repeatCount="indefinite"/>
     </rect>
   </g>
   <g transform="translate(414,48)">
@@ -290,24 +369,28 @@
   <use href="#station-back"/>
   <g>
     <use href="#a-type" x="236" y="120" fill="#3f7d5a"/>
-    <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.3125;0.6875" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="1;0;1;0;1;0;1" keyTimes="0;0.178571;0.285714;0.321429;0.482143;0.5;0.607143" dur="28s" repeatCount="indefinite"/>
   </g>
   <g opacity="0">
     <use href="#a-phone" x="236" y="120" fill="#3f7d5a"/>
-    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.3125;0.5" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.178571;0.285714" dur="28s" repeatCount="indefinite"/>
   </g>
   <g opacity="0">
     <use href="#a-talk" x="236" y="120" fill="#3f7d5a"/>
-    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.6875" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.607143" dur="28s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#a-cheer" x="236" y="120" fill="#3f7d5a"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.321429;0.482143" dur="28s" repeatCount="indefinite"/>
   </g>
   <use href="#station-front"/>
   <g>
     <use href="#handset-rest" x="298" y="172"/>
-    <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.3125;0.5" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.178571;0.285714" dur="28s" repeatCount="indefinite"/>
   </g>
   <g opacity="0">
     <use href="#ring" x="300" y="148"/>
-    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.28125;0.3125" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.160714;0.178571" dur="28s" repeatCount="indefinite"/>
   </g>
 
   <!-- RIGHT workstation, mirrored: agent B (blue shirt) -->
@@ -315,34 +398,60 @@
     <use href="#station-back"/>
     <g>
       <use href="#a-type" x="236" y="120" fill="#556b8a"/>
-      <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.5;0.875" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" calcMode="discrete" values="1;0;1;0;1;0;1" keyTimes="0;0.5;0.607143;0.625;0.732143;0.767857;0.928571" dur="28s" repeatCount="indefinite"/>
     </g>
     <g opacity="0">
       <use href="#a-phone" x="236" y="120" fill="#556b8a"/>
-      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.6875;0.875" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.625;0.732143" dur="28s" repeatCount="indefinite"/>
     </g>
     <g opacity="0">
       <use href="#a-talk" x="236" y="120" fill="#556b8a"/>
-      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.6875" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.607143" dur="28s" repeatCount="indefinite"/>
+    </g>
+    <g opacity="0">
+      <use href="#a-cheer" x="236" y="120" fill="#556b8a"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.767857;0.928571" dur="28s" repeatCount="indefinite"/>
     </g>
     <use href="#station-front"/>
     <g>
       <use href="#handset-rest" x="298" y="172"/>
-      <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.6875;0.875" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" calcMode="discrete" values="1;0;1" keyTimes="0;0.625;0.732143" dur="28s" repeatCount="indefinite"/>
     </g>
     <g opacity="0">
       <use href="#ring" x="300" y="148"/>
-      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.65625;0.6875" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.607143;0.625" dur="28s" repeatCount="indefinite"/>
     </g>
   </g>
 
   <!-- speech bubbles: A speaks first, B replies -->
   <g opacity="0">
     <use href="#bubble" x="220" y="54"/>
-    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.59375" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.5;0.553571" dur="28s" repeatCount="indefinite"/>
   </g>
   <g opacity="0">
     <use href="#bubble" x="572" y="54"/>
-    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.59375;0.6875" dur="16s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.553571;0.607143" dur="28s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- deal closed, left agent first: their CRT flashes WON, confetti + coins over their desk -->
+  <g opacity="0">
+    <use href="#win-screen" x="120" y="124"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.303571;0.482143" dur="28s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#confetti" x="222" y="56"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.321429;0.482143" dur="28s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- …and the right agent closes their own later in the loop -->
+  <g opacity="0">
+    <use href="#win-screen" x="700" y="124"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.75;0.928571" dur="28s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <use href="#confetti" x="566" y="56"/>
+    <animate attributeName="opacity" calcMode="discrete" values="0;1;0" keyTimes="0;0.767857;0.928571" dur="28s" repeatCount="indefinite"/>
+  </g>
+
   </g>
 </svg>

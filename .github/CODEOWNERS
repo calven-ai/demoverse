@@ -1,2 +1,7 @@
 # Default reviewers for everything.
-* @calven-ai
+#
+# NOTE: a bare organization login (`@calven-ai`) matches no reviewer. GitHub
+# resolves CODEOWNERS entries to a user handle or an org TEAM, so an org name
+# on its own silently assigns nobody and review requests never go out. This
+# team must exist and have write access to the repo.
+* @calven-ai/maintainers

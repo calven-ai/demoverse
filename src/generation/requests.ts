@@ -1,5 +1,5 @@
 /**
- * Generation-request protocol (the key agent<->engine handoff). See DESIGN.md §12.
+ * Generation-request protocol (the key agent<->engine handoff). See docs/architecture.md#the-generation-request-protocol.
  *
  * Each `apply` run computes the next desired world state and emits grounded
  * generation requests, one per prose artifact, carrying the exact ledger facts

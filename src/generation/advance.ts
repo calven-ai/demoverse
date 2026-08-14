@@ -1,5 +1,5 @@
 /**
- * Deterministic world-advance, the core simulation. See DESIGN.md §5–7, §10.
+ * Deterministic world-advance, the core simulation. See docs/architecture.md#clock-periods-and-advance.
  *
  * For each pending period this computes the next desired world state: new
  * accounts/contacts/opportunities sampled from the Tier-1 distributions, open
@@ -19,7 +19,7 @@
  */
 
 import { Rng } from "../util/rng.js";
-import { addDays, addWeeks, daysBetween, isBefore, type ISODate } from "../util/date.js";
+import { addDays, addWeeks, daysBetween, isBefore, DAYS_PER_QUARTER, type ISODate } from "../util/date.js";
 import { CohortIndex } from "../cohort.js";
 import { pickUseCase, opportunityName } from "../use-cases.js";
 import type { Config } from "../config/schema.js";
@@ -30,7 +30,6 @@ import type { Opportunity, World } from "../ledger/schema.js";
 import { icWinModifier } from "../sales-team.js";
 import { createdAtFor } from "./created-at.js";
 
-const DAYS_PER_QUARTER = 91.3125;
 import { buildRealAccountPool } from "./real-accounts.js";
 import { openStages, stageForFraction, stageRank } from "../pipeline/stages.js";
 import {

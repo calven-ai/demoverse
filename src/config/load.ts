@@ -26,33 +26,43 @@ class ConfigError extends Error {
   }
 }
 
-function loadOne<S extends z.ZodTypeAny>(file: string, schema: S): z.infer<S> {
-  const path = repoPath("config", file);
+/** Where an operator's filled config lives. Tests point elsewhere (see below). */
+export const DEFAULT_CONFIG_DIR = "config";
+
+function loadOne<S extends z.ZodTypeAny>(dir: string, file: string, schema: S): z.infer<S> {
+  const path = repoPath(dir, file);
   if (!fileExists(path)) {
     throw new Error(
-      `Missing config file: config/${file}. Copy config/templates/${file} to config/ and fill it in ` +
+      `Missing config file: ${dir}/${file}. Copy config/templates/${file} to config/ and fill it in ` +
         `(the /setup wizard does this interactively; see docs/getting-started.md).`,
     );
   }
   const raw = readYaml(path);
   const result = schema.safeParse(raw);
-  if (!result.success) throw new ConfigError(`config/${file}`, result.error.issues);
+  if (!result.success) throw new ConfigError(`${dir}/${file}`, result.error.issues);
   return result.data;
 }
 
-/** Load and validate the full Tier-1 config bundle. Throws on any error. */
-export function loadConfig(): Config {
-  const world = loadOne("world.yaml", WorldConfigSchema);
-  const competitors = loadOne("competitors.yaml", CompetitorsConfigSchema);
-  const surveys = loadOne("surveys.yaml", SurveysConfigSchema);
-  const slackPersonas = loadOne("slack-personas.yaml", SlackPersonasConfigSchema);
-  const icp = loadOne("icp.yaml", IcpConfigSchema);
-  const personas = loadOne("personas.yaml", PersonasConfigSchema);
-  const salesTeam = loadOne("sales-team.yaml", SalesTeamConfigSchema);
-  const product = loadOne("product.yaml", ProductConfigSchema);
-  const useCases = loadOne("use-cases.yaml", UseCasesConfigSchema);
-  const prose = loadOne("prose.yaml", ProseConfigSchema);
-  const connectors = loadOne("connectors.yaml", ConnectorsConfigSchema);
+/**
+ * Load and validate the full Tier-1 config bundle. Throws on any error.
+ *
+ * `dir` is repo-relative and defaults to the operator's `config/`. The test
+ * suite passes `config/templates` instead, so a contributor can run `npm test`
+ * on a fresh clone (where `config/` holds only templates), and so an operator's
+ * own world can never make the shipped tests fail.
+ */
+export function loadConfig(dir: string = DEFAULT_CONFIG_DIR): Config {
+  const world = loadOne(dir, "world.yaml", WorldConfigSchema);
+  const competitors = loadOne(dir, "competitors.yaml", CompetitorsConfigSchema);
+  const surveys = loadOne(dir, "surveys.yaml", SurveysConfigSchema);
+  const slackPersonas = loadOne(dir, "slack-personas.yaml", SlackPersonasConfigSchema);
+  const icp = loadOne(dir, "icp.yaml", IcpConfigSchema);
+  const personas = loadOne(dir, "personas.yaml", PersonasConfigSchema);
+  const salesTeam = loadOne(dir, "sales-team.yaml", SalesTeamConfigSchema);
+  const product = loadOne(dir, "product.yaml", ProductConfigSchema);
+  const useCases = loadOne(dir, "use-cases.yaml", UseCasesConfigSchema);
+  const prose = loadOne(dir, "prose.yaml", ProseConfigSchema);
+  const connectors = loadOne(dir, "connectors.yaml", ConnectorsConfigSchema);
 
   const cfg = {
     world,

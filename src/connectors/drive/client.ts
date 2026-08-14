@@ -1,5 +1,5 @@
 /**
- * Google Drive client (service account). See DESIGN.md §3, §14.
+ * Google Drive client (service account). See docs/architecture.md#connectors.
  *
  * Markdown artifacts live in a structured folder tree under a dedicated demo
  * folder shared with the service-account email. Upserts are idempotent: the

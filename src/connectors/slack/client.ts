@@ -1,5 +1,5 @@
 /**
- * Slack controller-app client. See DESIGN.md §9.
+ * Slack controller-app client. See docs/architecture.md#connectors.
  *
  * ONE controller app posts every message under a per-message username + avatar
  * via chat:write.customize, rendering an unlimited roster of "people" from one
@@ -52,7 +52,9 @@ export class SlackClient {
       cursor = res.response_metadata?.next_cursor || undefined;
     } while (cursor);
 
-    throw new Error(`Slack channel #${clean} not found. Create it in the workspace (RUNBOOK §Setup).`);
+    throw new Error(
+      `Slack channel #${clean} not found. Create it in the workspace (docs/connectors/slack.md).`,
+    );
   }
 
   private iconFields(avatar?: string): { icon_emoji?: string; icon_url?: string } {

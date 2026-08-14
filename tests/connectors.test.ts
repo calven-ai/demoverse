@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { allConnectors } from "../src/connectors/registry.js";
 import { reconcileAll } from "../src/reconcile.js";
@@ -15,7 +15,7 @@ import { DRIVE_FILE_KINDS, SLACK_KINDS } from "../src/connectors/kinds.js";
 import { disabledStats } from "../src/connectors/types.js";
 import type { Config } from "../src/config/schema.js";
 
-const cfg = loadConfig();
+const cfg = testConfig();
 
 function withConnectors(overrides: Partial<Config["connectors"]>): Config {
   return { ...cfg, connectors: { ...cfg.connectors, ...overrides } };

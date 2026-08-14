@@ -123,7 +123,7 @@ export async function reconcileSalesforce(
     try {
       // NOTE: we deliberately do NOT push the derived ICP fit (acct.icpScore/
       // icpTier). The downstream product re-derives it from the raw firmographics below
-      // (DESIGN §16 guardrail). Only raw inputs are reconciled.
+      // (ICP guardrail). Only raw inputs are reconciled.
       const id = await client.upsert(
         "Account",
         {

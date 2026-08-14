@@ -1,5 +1,5 @@
 /**
- * KPI computation + run-report rendering. See DESIGN.md §13, §15 (KPI curve check).
+ * KPI computation + run-report rendering. See docs/architecture.md#verification-the-coherence-linter.
  *
  * Realized win-rate / volume curves are computed from the closed-deal population
  * and diffed against the configured/trend targets so the report can flag drift.

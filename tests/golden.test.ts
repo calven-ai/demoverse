@@ -14,7 +14,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig } from "../src/trends.js";
@@ -31,7 +31,7 @@ const WEEKS = 30;
 const EMPTY_COHORT: Cohort = { version: 1, targetSize: 0, members: [] };
 
 function goldenConfig(): Config {
-  const cfg = loadConfig();
+  const cfg = testConfig();
   // Snapshot must not depend on external prospect CSVs (nor bake their company
   // names into a committed fixture); the synthetic path has identical rng order.
   return { ...cfg, world: { ...cfg.world, prospects: undefined } };

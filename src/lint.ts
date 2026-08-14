@@ -1,5 +1,5 @@
 /**
- * Coherence linter, a first-class, tested feature. See DESIGN.md §7.1, §15.
+ * Coherence linter, a first-class, tested feature. See docs/architecture.md#verification-the-coherence-linter.
  *
  * Two layers:
  *  1. Structural integrity over the whole ledger (every opp references a real

@@ -1,5 +1,5 @@
 /**
- * Seeded prose-variety axes. See DESIGN.md §7.1 (grounded prompts).
+ * Seeded prose-variety axes. See docs/architecture.md#the-generation-request-protocol.
  *
  * The structural facts of a deal (competitors, reason, amounts) are grounded by
  * the ledger; but when one LLM writes hundreds of deals it converges on the same

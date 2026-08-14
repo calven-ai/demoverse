@@ -1,5 +1,5 @@
 /**
- * Grounded prompt builders. See DESIGN.md §7.1–7.2.
+ * Grounded prompt builders. See docs/architecture.md#the-generation-request-protocol.
  *
  * The deterministic generator owns structure + referential integrity; the LLM
  * owns ONLY the prose, and every prompt is grounded in the EXACT ledger facts
@@ -358,7 +358,7 @@ function collateralPrompt(ctx: Ctx, artifact: Artifact): string {
   return [
     `Write a pre-existing internal ${companyName(ctx)} PMM document: "${docType}", dated ${artifact.date}.`,
     DETAIL_GUIDANCE[artifact.detailLevel],
-    `This is collateral a real customer would already have on file (DESIGN §16). It is not tied to a specific deal.`,
+    `This is collateral a real customer would already have on file (it is standing collateral, not deal-specific). It is not tied to a specific deal.`,
     `Company: ${ctx.config.world.company.name} (${ctx.config.world.company.domain}).`,
     `Where relevant, reference the real competitor set: ${ctx.config.competitors.competitors.map((c) => c.name).join(", ")}.`,
     "",
@@ -521,7 +521,7 @@ function competitiveQPrompt(ctx: Ctx, artifact: Artifact): string {
   return [
     `Write a #competitive channel question about the competitor "${competitor}", dated ${artifact.date}.`,
     `This is the HUMAN side only. An internal teammate asks a real competitive question that ${companyShort(ctx)}'s`,
-    `own bot (installed separately, out of scope) will later answer. Do NOT write the answer (DESIGN §9 boundary).`,
+    `own bot (installed separately, out of scope) will later answer. Do NOT write the answer (see the grounding rules in AGENTS.md).`,
     DETAIL_GUIDANCE.low,
     "",
     `Ask as ONE of these internal personas. Set personaHandle to their exact @handle, and pick a role`,

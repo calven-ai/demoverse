@@ -12,7 +12,7 @@ each command's output, act on it exactly as instructed, and don't improvise.
 
 ## Preconditions
 
-- `HUBSPOT_ACCESS_TOKEN` must be set in `.env` or `.env.local`. That is a
+- `HUBSPOT_ACCESS_TOKEN` must be set in `.env`. That is a
   HubSpot Service Key. See `docs/connectors/hubspot.md` for the required scopes. If
   it's missing, every command below fails fast with a clear message. Report
   that and stop. Do not invent a token or guess scopes.

@@ -53,6 +53,8 @@
     "lint": "tsx scripts/lint.ts",
     "lint:prose": "tsx scripts/lint-prose.ts",
     "lint:code": "eslint .",
+    "secrets:check": "tsx scripts/check-secrets.ts",
+    "secrets:hook": "git config core.hooksPath .githooks && echo \"pre-commit secret guard installed\"",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
     "test": "node --test --import tsx tests/*.test.ts"

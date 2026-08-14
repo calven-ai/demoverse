@@ -11,7 +11,7 @@
  * empty the caller falls back to the synthetic name banks (names.ts), so
  * generation never fails and the planted industry distribution is honored.
  *
- * Guardrail (DESIGN §18): only the account/logo is real. Contacts are fabricated
+ * Guardrail (DISCLAIMER.md): only the account/logo is real. Contacts are fabricated
  * (see names.ts demoEmailDomain). No real person or real contact info is used.
  */
 

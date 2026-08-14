@@ -170,7 +170,7 @@ export function makeBuyingGroup(
 
   // Market-intelligence, no-PMM motion: a non-PMM persona drives, and NO product
   // marketing role is in the room. The recorded buying group is what lets the product
-  // surface "deals without a PMM persona lose more" (DESIGN §16; we never state
+  // surface "deals without a PMM persona lose more" (the ICP guardrail; we never state
   // it, only the raw contacts).
   const mi = cfg.world.market_intelligence;
   if (opts?.pmmAbsent && mi) {

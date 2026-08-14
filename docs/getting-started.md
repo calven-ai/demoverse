@@ -18,7 +18,12 @@ Demoverse is a GitHub template repository. You clone it and own the copy. Your c
 git clone <your-copy-of-the-template> my-demo-world
 cd my-demo-world
 npm ci
+npm run secrets:hook   # recommended, see below
 ```
+
+That last line installs a pre-commit hook that refuses any commit carrying a credential. You own this clone and you commit to it constantly (your config, your world state), so a connector token is only ever one stray `git add .` away from your remote. The hook is the only guard that runs *before* a push. CI runs the same check, but by the time CI is red the secret is already on GitHub and the only real fix is to rotate it. Skip a single commit with `git commit --no-verify`; uninstall with `git config --unset core.hooksPath`.
+
+Credentials go in `.env` and nowhere else. `.gitignore` excludes every `.env*` variant, so `.env.local` or `.env.prod` are equally safe if you prefer those names, but `.env` is the one the docs use. The one file you must **not** type a token into is `.env.example`, which is tracked on purpose so it can serve as the template. Copy it, don't fill it in.
 
 At this point `state/` contains only a README, and `config/` contains only the `templates/` folder. No active YAML exists until you copy or generate it. The engine won't run without it, so that's next.
 

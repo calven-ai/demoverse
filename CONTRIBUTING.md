@@ -12,8 +12,29 @@ npm ci
 npm run typecheck && npm test    # should be green before you start
 ```
 
+That is the whole setup. You do **not** need to configure a world to work on
+the engine: the suite loads `config/templates/*.yaml` directly (see
+`tests/fixture.ts`), and CI runs exactly what a fresh clone runs. Treat the
+templates as the spec the tests assert against, and keep the Zod defaults in
+`src/config/schema.ts` in agreement with them.
+
 The engine runs entirely locally, with no credentials. See
 [docs/getting-started.md](docs/getting-started.md).
+
+## Never commit a world to this repo
+
+Demoverse is both a tool and, for its users, a template they fill in. Those two
+uses share a directory layout, so be deliberate about which one you are in:
+
+- Contributing to the engine: your clone should keep `config/` at templates
+  only and `state/` empty. Nothing else belongs in a PR here.
+- Running a world of your own: use your own copy of the template repository,
+  where committing `config/*.yaml` and `state/world.json` is the point.
+
+If you built a world first and want to send a fix upstream, make the PR from a
+branch that carries no `config/*.yaml`, no `state/world.json`, and no
+`state/content/`. Those files hold account names, buying-group contacts and
+connector record ids from whatever systems you pointed at.
 
 ## Development guardrails
 
@@ -27,7 +48,13 @@ The engine runs entirely locally, with no credentials. See
   (`|variety|`, `|shape|`, …), so never reorder existing draws. Add new
   streams instead.
 - `npm run lint` is the *domain* coherence linter (cross-system story
-  consistency), separate from code lint. Keep both clean.
+  consistency), separate from code lint. It needs a configured world, so it is
+  deliberately **not** in CI. Don't "fix" CI by adding it.
+- `npm run secrets:check` runs first in CI and refuses a credential in tracked
+  files. `npm run secrets:hook` installs the same check as a local pre-commit
+  hook. It is optional and repo-local (it sets `core.hooksPath` to `.githooks`,
+  replacing any other hook path in this clone). Uninstall with
+  `git config --unset core.hooksPath`.
 - `npm run lint:prose` enforces one house style rule on the repo's own text: no
   em dashes, in docs, comments or output strings. They are the loudest tell that
   a paragraph came out of a language model, and this project's whole job is

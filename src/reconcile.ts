@@ -1,5 +1,5 @@
 /**
- * Reconcile orchestrator. See DESIGN.md §5.
+ * Reconcile orchestrator. See docs/architecture.md#connectors.
  *
  * Pushes the desired ledger state into the external systems via idempotent
  * upserts, running the registered connectors in registry order (CRMs first, so

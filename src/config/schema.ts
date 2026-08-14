@@ -1,5 +1,5 @@
 /**
- * Zod schemas for the Tier-1 standing config (config/*.yaml). See DESIGN.md §11.
+ * Zod schemas for the Tier-1 standing config (config/*.yaml). See docs/architecture.md#steering-three-tiers-of-instruction.
  *
  * These validate the human-authored seed files with friendly errors and supply
  * sensible defaults, so a minimal config still yields a good world.
@@ -39,25 +39,29 @@ export const WorldConfigSchema = z.object({
     /** The company's product modules. Options for the win-loss `product_modules` question. */
     product_modules: z.array(z.string()).default([]),
   }),
+  // Every default below MUST match config/templates/world.yaml. The templates
+  // are the spec: they are what the docs describe, what the tests assert
+  // against, and what an omitted key should silently resolve to. A default that
+  // disagrees with the template hands anyone who trims a key the inverse world.
   generate: z
     .object({
       transcripts: z.boolean().default(true),
       winloss: z.boolean().default(true),
       slack: z.boolean().default(true),
-      internal_collateral: z.boolean().default(true),
+      internal_collateral: z.boolean().default(false),
       // Touch-point kinds for the live weekly engine (advanceWorld). The
       // retroactive backfill planner does NOT consult these. It plants the full
       // touch-point set on demand, gated only by the per-deal cadence below.
-      ae_notes: z.boolean().default(false),
-      emails: z.boolean().default(false),
+      ae_notes: z.boolean().default(true),
+      emails: z.boolean().default(true),
     })
     .default({}),
   detail: z
     .object({
-      call_transcripts: DetailLevel.default("medium"),
+      call_transcripts: DetailLevel.default("high"),
       phone_interviews: DetailLevel.default("high"),
-      surveys: DetailLevel.default("low"),
-      slack: DetailLevel.default("medium"),
+      surveys: DetailLevel.default("medium"),
+      slack: DetailLevel.default("low"),
       ae_notes: DetailLevel.default("low"),
       emails: DetailLevel.default("medium"),
     })

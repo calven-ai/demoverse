@@ -1,5 +1,5 @@
 /**
- * ICP fit scoring (config/icp.yaml). See DESIGN.md §16 and the plan.
+ * ICP fit scoring (config/icp.yaml). See docs/architecture.md#entity-model.
  *
  * Mirrors the downstream product's ICP scorecard model:
  * the generator runs this over an account's RAW firmographics to derive an

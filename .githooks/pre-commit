@@ -1,0 +1,9 @@
+#!/bin/sh
+# Demoverse pre-commit guard: block credentials before they reach git history.
+#
+# Installed by `npm run secrets:hook`, which points core.hooksPath at this
+# directory. Remove with `git config --unset core.hooksPath`.
+#
+# Skip once, if you are certain: git commit --no-verify
+
+npm run --silent secrets:check -- --staged

@@ -128,6 +128,64 @@ npm run init -- --force        # regenerate state/ from config; the old ledger i
 
 Order matters when destinations are connected. Purge the external systems *first* (`sf:purge -- --all`, `hubspot:purge`), because the new ledger carries no external ids and cannot clean up after the old one. Drive is the sharpest edge. After any `init --force`, run `npm run drive:audit` and purge the orphans. Otherwise a watched-folder integration will happily ingest ghosts of the previous world ([details](connectors/google-drive.md#driveaudit-and-the-orphan-hazard)).
 
+## Real target-account names (optional, advanced)
+
+By default every account is invented: names come from the engine's own name
+banks and nothing in the world corresponds to a real company. That is the
+recommended setup, and it is what you get if you do nothing.
+
+If you have curated lists of real *logos* you are allowed to demo with, the
+`prospects` block in `config/world.yaml` points the generator at them. The
+engine then draws each account's **name, domain, industry and firmographics**
+from your CSVs. Everything else stays synthetic: contacts, the buying group,
+the pipeline, the outcomes, the prose.
+
+```yaml
+prospects:
+  enabled: true
+  dir: data/prospects          # relative to the repo root, and yours to gitignore
+  files:
+    - { file: fintech.csv, industry: Financial Services }
+    - { file: mixed-emea.csv, region: EMEA }
+```
+
+Each CSV needs a header row. Columns are matched by name, first hit wins, and
+everything except the first two is optional:
+
+| Field | Accepted headers |
+| --- | --- |
+| Company name (required) | `Company`, `Name` |
+| Domain (required) | `Website`, `Domain`, `Domains` |
+| Industry | `Sub-Category`, `Industry/Vertical`, `Vertical`, `Industry` |
+| Employee count | `Est. Employees`, `Employees` |
+| Headquarters | `Headquarters (City; Country)`, `Location`, `HQ`, `Headquarters` |
+| Funding status | `Funding/Acquisition Status`, `Acquisition Status`, `Funding` |
+
+Rows without a usable name and domain are dropped. So are rows whose industry
+resolves outside `segments.industries`, because letting them in would skew the
+planted industry mix. A per-file `industry:` maps a single-vertical list
+wholesale; leave it off for mixed lists and let `segments.industry_keywords`
+route each row. Lists are merged and deduplicated by domain, and the pool falls
+back to synthetic names whenever a bucket runs dry, so generation never fails
+because a list was short.
+
+Three things worth being deliberate about:
+
+- **The CSVs live outside the ledger.** Nothing is copied into `state/`. Keep
+  the source lists wherever you keep them and gitignore `dir` if it sits in
+  the repo.
+- **Real logos, never real people.** Contacts keep fabricated names on
+  non-resolving `.example` domains. Do not "improve" this by importing
+  contact rows.
+- **The outcomes are fabricated.** A real company name now sits on an invented
+  won/lost deal with invented pricing feedback and invented quotes. That
+  belongs in your private demo systems and nowhere else. See
+  [DISCLAIMER.md](../DISCLAIMER.md).
+
+Set `enabled: false` (or delete the block) to go back to fully synthetic. The
+golden snapshot runs with the pool disabled, so the synthetic path stays the
+tested default.
+
 ## Command reference
 
 | Command | What |
@@ -147,4 +205,6 @@ Order matters when destinations are connected. Purge the external systems *first
 | `npm run preflight` | Verify planted trends are statistically visible; export CSVs |
 | `npm run test` / `typecheck` / `lint:code` / `format` | Engine development checks |
 
-Everything supports `--dry-run`; everything destructive defaults to it.
+Everything supports `--dry-run`; everything destructive defaults to it. The
+three main entrypoints document themselves: `npm run apply -- --help`,
+`npm run init -- --help`, `npm run lint -- --help`.

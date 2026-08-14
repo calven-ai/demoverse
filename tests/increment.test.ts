@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig } from "../src/trends.js";
@@ -27,7 +27,7 @@ function clockAt(simNow: string, periodIndex = 10): Clock {
 }
 
 function freshWorld() {
-  const cfg = loadConfig();
+  const cfg = testConfig();
   const world = emptyWorld("increment-test");
   world.reps = buildReps(cfg.salesTeam);
   return { cfg, world, trends: seedTrendsFromConfig(cfg, START) };

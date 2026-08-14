@@ -1,8 +1,10 @@
 /**
- * Engine tests. The coherence linter is a first-class, tested feature (DESIGN §7.1);
- * determinism (replayability) is the core property of the ledger model (§5).
- * Batch 1 adds: enum fidelity to the reference CRM vocabulary, firmographic coherence,
- * and ICP-fit scoring sanity.
+ * Engine tests. The coherence linter is a first-class, tested feature, and
+ * determinism (replayability) is the core property of the ledger model. See
+ * docs/architecture.md. Also covered here: enum fidelity to the reference CRM
+ * vocabulary, firmographic coherence, and ICP-fit scoring sanity.
+ *
+ * Config comes from the shipped templates (tests/fixture.ts), never `config/`.
  *
  * Run: `npm test`
  */
@@ -12,7 +14,7 @@ import assert from "node:assert/strict";
 
 import { rmSync } from "node:fs";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld, Ledger } from "../src/ledger/ledger.js";
 import { World, type Artifact } from "../src/ledger/schema.js";
 import { buildReps } from "../src/sales-team.js";
@@ -27,12 +29,12 @@ import { Rng } from "../src/util/rng.js";
 import { repoPath, ensureDir, writeJson, readText, fileExists } from "../src/util/fs.js";
 import type { Period } from "../src/clock.js";
 
-const cfg = loadConfig();
+const cfg = testConfig();
 
 // --- The reference CRM vocabulary is the fidelity oracle. Every value the
-// generator emits for these fields MUST be a member of the matching set (kept
-// in lockstep with the shipped config; the private deployment mirrors its CRM
-// enums through the same sets).
+// generator emits for these fields MUST be a member of the matching set. These
+// are the engine's fixed enums, not operator-tunable vocabulary, so they stay
+// in lockstep with config/templates/ rather than with any one world.
 const CRM_VOCAB = {
   SIZE: ["Enterprise", "Mid-market", "SMB"],
   REGION: ["NA", "EMEA", "APAC"],

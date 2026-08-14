@@ -4,7 +4,7 @@
  * Why this exists: downstream CRM ingestion treats `NumberOfEmployees`,
  * `AnnualRevenue` and `BillingCountry` as always-imported, and enrichment derives `size`,
  * `employee_band`, `revenue_band` and `region` from those raw numbers. The
- * engine's own vocabulary is the BAND (crm-shared.ts enums), so we pick a
+ * engine's own vocabulary is the BAND (config/icp.yaml enums), so we pick a
  * representative point INSIDE each band rather than leaving the standard
  * fields null and hoping enrichment finds our custom band fields.
  *

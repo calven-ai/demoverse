@@ -1,5 +1,5 @@
 /**
- * Simulation clock (state/clock.json). See DESIGN.md §10.
+ * Simulation clock (state/clock.json). See docs/architecture.md#clock-periods-and-advance.
  *
  * The world advances in periods (default: one week). Each run advances "now" to
  * the real current date, generating the missing period(s). The first run does a

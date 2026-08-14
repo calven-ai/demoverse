@@ -1,5 +1,5 @@
 /**
- * Running KPI trajectories (state/trends.json). See DESIGN.md §10–11 + the plan.
+ * Running KPI trajectories (state/trends.json). See docs/architecture.md#steering-three-tiers-of-instruction.
  *
  * Trends carry trajectories so curves are intentional, not random. Standing
  * config seeds the baselines; Tier-2 directives reshape them going forward (the
@@ -22,11 +22,10 @@
 
 import { z } from "zod";
 import { repoPath, readJson, writeJson, fileExists } from "./util/fs.js";
-import { daysBetween, type ISODate } from "./util/date.js";
+import { daysBetween, DAYS_PER_QUARTER, type ISODate } from "./util/date.js";
 import type { Config } from "./config/schema.js";
 
 const TRENDS_PATH = repoPath("state", "trends.json");
-const DAYS_PER_QUARTER = 91.3125;
 
 /** A gaussian perturbation centered on a date: amplitude·exp(−((t−center)/width)²). */
 const Bump = z.object({

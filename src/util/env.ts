@@ -6,8 +6,11 @@ let loaded = false;
 
 /**
  * Load env files into process.env once (does not override already-set vars).
- * `.env.local` is read first so it takes precedence over `.env`; both are
- * gitignored and either may be absent.
+ *
+ * `.env` is the documented location and the only one the docs mention.
+ * `.env.local` is read first, and wins where both define a key, purely as a
+ * courtesy to anyone arriving with the Next.js/Vite habit. Both are gitignored
+ * (as is every other `.env*` variant) and either may be absent.
  */
 export function loadEnv(): void {
   if (loaded) return;
@@ -35,7 +38,7 @@ export function env(key: string, required = false): string | undefined {
   loadEnv();
   const v = process.env[key];
   if (required && (v === undefined || v === "")) {
-    throw new Error(`Missing required env var ${key}. See .env.example / RUNBOOK.md.`);
+    throw new Error(`Missing required env var ${key}. Copy .env.example to .env; see docs/connectors/.`);
   }
   return v || undefined;
 }

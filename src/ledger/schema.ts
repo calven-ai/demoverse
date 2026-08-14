@@ -1,11 +1,11 @@
 /**
- * Zod schemas for the world-state ledger (state/world.json). See DESIGN.md §5–6.
+ * Zod schemas for the world-state ledger (state/world.json). See docs/architecture.md#entity-model.
  *
  * The ledger is the single source of truth. The deterministic generator owns
  * structure + referential integrity (stable ids); every entity records its
  * external ids (Salesforce Id / Drive fileId / Slack ts) after first creation so
  * re-runs UPDATE rather than duplicate. Schema-validating every emitted record
- * (and re-generating on failure) is a core robustness pillar (§7.2).
+ * (and re-generating on failure) is a core robustness pillar.
  */
 
 import { z } from "zod";
@@ -145,20 +145,20 @@ export const Opportunity = z.object({
    * existed; `npm run assign-use-cases` backfills them.
    */
   useCase: z.string().optional(),
-  /** Set only when status is lost. See crm-shared.ts LOSS_REASON_OPTIONS. */
+  /** Set only when status is lost. A key of world.yaml winloss.loss_reasons. */
   winLossReason: z.string().optional(),
   /**
    * The AE-believed loss reason (what the opportunity OWNER thinks lost the deal),
    * set only when lost. Usually matches `winLossReason` (the prospect/win-loss
    * truth) but diverges on a minority of deals, which is the belief-vs-reality
-   * gap analytics surfaces. Also a LOSS_REASON_OPTIONS value.
+   * gap analytics surfaces. Also a winloss.loss_reasons key.
    */
   repLossReason: z.string().optional(),
   /** Price feedback vs the competition (set on close, won or lost). */
   priceFeedback: z.string().optional(),
   /** Product-feedback areas (prose.yaml vocab.product_feedback; multi). */
   productFeedback: z.array(z.string()).default([]),
-  /** crm-shared.ts TECH_STACK_OPTIONS named as requirements on the deal. */
+  /** world.yaml segments.tech_stack tools named as requirements on the deal. */
   techStackRequirements: z.array(z.string()).default([]),
   winLossMode: WinLossMode,
   /** Buying-group contact ids involved in this deal. */

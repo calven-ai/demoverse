@@ -157,7 +157,7 @@ export function contactProperties(contact: Contact): Record<string, string> {
     firstname: first || "Demo",
     lastname: rest.join(" ") || "Contact",
     // Contacts are synthetic people even on a real-account company record.
-    // Never emit a source-lookalike or deliverable address (DESIGN §18).
+    // Never emit a source-lookalike or deliverable address (see DISCLAIMER.md).
     email: `${contact.id}@example.com`,
     jobtitle: contact.title,
     demo_world_notice: fabricatedNotice,
