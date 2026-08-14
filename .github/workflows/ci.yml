@@ -23,4 +23,5 @@ jobs:
       - run: npm run typecheck
       - run: npx eslint .
       - run: npm run format:check
+      - run: npm run lint:prose
       - run: npm test

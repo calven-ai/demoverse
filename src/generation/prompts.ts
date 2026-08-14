@@ -18,20 +18,20 @@ import { useCaseBrief } from "../use-cases.js";
 interface Ctx {
   config: Config;
   ledger: Ledger;
-  /** world.seed — drives the deterministic variety axes (variety.ts). */
+  /** world.seed. Drives the deterministic variety axes (variety.ts). */
   seed: string;
 }
 
 const DETAIL_GUIDANCE: Record<"low" | "medium" | "high", string> = {
-  low: "Keep it terse — a few short sentences or structured one-liners. No filler.",
-  medium: "Moderate length — a realistic but focused artifact; a few short paragraphs.",
-  high: "Rich and long-form — conversational, with follow-ups, tangents, and verbatim color.",
+  low: "Keep it terse. A few short sentences or structured one-liners. No filler.",
+  medium: "Moderate length. A realistic but focused artifact; a few short paragraphs.",
+  high: "Rich and long-form. Conversational, with follow-ups, tangents, and verbatim color.",
 };
 
 /**
  * Render the grounded fact block. Static structure (account, contacts,
  * competitors) comes from the live ledger, but the VOLATILE fields (stage,
- * outcome, win/loss reason) come from the artifact's grounding SNAPSHOT — so an
+ * outcome, win/loss reason) come from the artifact's grounding SNAPSHOT. An
  * early-stage transcript reflects the world as it was at the call date and does
  * not leak the eventual outcome, while a win-loss artifact shows the close.
  */
@@ -48,7 +48,7 @@ function dealFactBlock(ctx: Ctx, deal: Opportunity, grounding: Record<string, un
   const reason = grounding.winLossReason as string | undefined;
   return [
     `Deal: "${deal.name}" (${stage}, ${outcome}, $${deal.amount.toLocaleString()})`,
-    `Account: ${acct.name} — ${acct.industry}, ${acct.size}, ${acct.region} (${acct.employeeBand} emp, ${acct.fundingStage})`,
+    `Account: ${acct.name} (${acct.industry}, ${acct.size}, ${acct.region}, ${acct.employeeBand} emp, ${acct.fundingStage})`,
     `${companyShort(ctx)} rep (owner): ${rep.name}`,
     contacts.length
       ? `Buying group:\n${contacts.map((c) => `  - ${c.name}, ${c.title} (${c.buyingRole})`).join("\n")}`
@@ -78,10 +78,13 @@ function commonRules(ctx: Ctx): string {
     `- This is clearly-fabricated demo data for an internal demo of ${companyName(ctx)}. Keep it realistic but never reference real people.`,
     "- Stay consistent with the recorded facts: the same competitor(s) and the same win/loss reason must appear across this deal's transcript, win-loss artifact, and Slack thread.",
     bannedPhrasesRule(ctx.config.prose),
-    "- Do NOT template this artifact on other deals' stories. The VARIETY block (where present) is THIS deal's specific texture — write from it.",
+    // Punctuation is the cheapest tell there is. Reps and buyers type commas and
+    // periods; a corpus full of em dashes reads as machine-written on sight.
+    "- Do NOT use em dashes (—) anywhere in the artifact. Rewrite the sentence, or split it in two. `npm run lint` warns on every one.", // prose-lint: allow-emdash (the rule must show the character)
+    "- Do NOT template this artifact on other deals' stories. The VARIETY block (where present) is THIS deal's specific texture. Write from it.",
     // The use case is what makes one deal's prose distinguishable from another's.
     // Without this rule every transcript drifts back to a generic product pitch.
-    `- The deal's PRIMARY USE CASE is the dominant theme: it is what the buyer came for, what discovery digs into, what gets demoed, and what the objections are about. Other ${companyShort(ctx)} capabilities may come up in passing — buyers rarely want exactly one thing — but they must stay secondary, and on some deals the primary use case is genuinely the only thing discussed. Never open on a capability the buyer did not ask about.`,
+    `- The deal's PRIMARY USE CASE is the dominant theme: it is what the buyer came for, what discovery digs into, what gets demoed, and what the objections are about. Other ${companyShort(ctx)} capabilities may come up in passing (buyers rarely want exactly one thing), but they must stay secondary, and on some deals the primary use case is genuinely the only thing discussed. Never open on a capability the buyer did not ask about.`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -133,8 +136,8 @@ function withDeal(ctx: Ctx, artifact: Artifact): { deal: Opportunity; facts: str
 }
 
 /**
- * Who is actually in the room for a call at this stage — a SUBSET of the deal's
- * full buying group. The deal's contacts accumulate over its life, but an early
+ * The SUBSET of the deal's full buying group actually in the room for a call at
+ * this stage. The deal's contacts accumulate over its life, but an early
  * call is small (a first discovery call is 1–2 people, never IT). Always keeps
  * the primary contact (covers PMM-absent market-intel deals where the driver
  * isn't a Champion); a missing/empty stage entry → primary contact only.
@@ -166,18 +169,18 @@ function productBlock(ctx: Ctx): string {
       const agents = d.agents
         .map((a) => `    • ${a.name}: ${a.value_prop.trim()} (solves: ${a.solves.trim()})`)
         .join("\n");
-      return `  ${d.name} — ${d.summary.trim()}\n${agents}`;
+      return `  ${d.name}: ${d.summary.trim()}\n${agents}`;
     })
     .join("\n");
   const pains = p.pain_to_module
     .map(
       (m) =>
-        `  - ${m.persona}: pain — ${m.pain.trim()} → lead with ${m.lead_with.trim()} (driver: ${m.decision_driver})`,
+        `  - ${m.persona} pain: ${m.pain.trim()} → lead with ${m.lead_with.trim()} (driver: ${m.decision_driver})`,
     )
     .join("\n");
   const guards = p.brand_guardrails.map((g) => `  - ${g.trim()}`).join("\n");
   return [
-    `${companyShort(ctx).toUpperCase()} PRODUCT (for the rep to position and demo — pick what maps to the buyer's pain; don't fire-hose the whole catalog):`,
+    `${companyShort(ctx).toUpperCase()} PRODUCT (for the rep to position and demo; pick what maps to the buyer's pain, and don't fire-hose the whole catalog):`,
     p.positioning.one_liner.trim(),
     `Category: ${p.positioning.category.trim()}`,
     `The Universe: ${p.positioning.universe.trim()}`,
@@ -195,7 +198,7 @@ function callTranscriptPrompt(ctx: Ctx, artifact: Artifact): string {
   const stage = (artifact.grounding.stage as string) ?? deal.stage;
   const { rep, contacts } = callAttendees(ctx, deal, stage);
   const roster = [
-    `  - ${rep.name} — ${companyShort(ctx)} rep (deal owner)`,
+    `  - ${rep.name}, ${companyShort(ctx)} rep (deal owner)`,
     ...contacts.map((c) => `  - ${c.name}, ${c.title} (${c.buyingRole})`),
   ].join("\n");
   return [
@@ -205,8 +208,8 @@ function callTranscriptPrompt(ctx: Ctx, artifact: Artifact): string {
     "",
     `Sales motion for this call: ${stageTranscriptFocus(ctx, stage)}`,
     "",
-    `Attendees on THIS call (use ONLY these people — a subset of the full buying group; earlier-stage calls have`,
-    `fewer stakeholders, and IT/Security only joins the late security review):`,
+    `Attendees on THIS call (use ONLY these people, a subset of the full buying group). Earlier-stage calls`,
+    `have fewer stakeholders, and IT/Security only joins the late security review:`,
     roster,
     "",
     facts,
@@ -244,7 +247,7 @@ function questionOptions(q: SurveyQuestion, company: string, modules: string[]):
   return null;
 }
 
-/** Render one question as a "- (type) prompt — how to answer" line. */
+/** Render one question as a "- (type) prompt (answer: how)" line. */
 function renderQuestion(q: SurveyQuestion, company: string, modules: string[]): string {
   const prompt = subCompany(q.prompt, company);
   const opt = q.required === false ? " (optional)" : "";
@@ -263,7 +266,7 @@ function renderQuestion(q: SurveyQuestion, company: string, modules: string[]): 
       break;
     }
     case "vendor_select":
-      how = "name the vendors evaluated — use the competitor(s) on this deal";
+      how = "name the vendors evaluated, using the competitor(s) on this deal";
       break;
     case "single_select":
       if (q.options_from) {
@@ -284,7 +287,7 @@ function renderQuestion(q: SurveyQuestion, company: string, modules: string[]): 
       break;
     }
   }
-  return `- (${q.type}) ${prompt}${opt} — ${how}`;
+  return `- (${q.type}) ${prompt}${opt} (answer: ${how})`;
 }
 
 /** Render a questionnaire as grouped, answerable question lines. */
@@ -307,7 +310,7 @@ function surveyPrompt(ctx: Ctx, artifact: Artifact): string {
     facts,
     "",
     varietySection(ctx, artifact),
-    `The free-text answers must reflect this deal's VARIETY backstory and objections — not a generic evaluation story.`,
+    `The free-text answers must reflect this deal's VARIETY backstory and objections. Do not write a generic evaluation story.`,
     "",
     `Questionnaire: ${survey.meta.title}`,
     renderSurvey(survey, company, modules),
@@ -355,7 +358,7 @@ function collateralPrompt(ctx: Ctx, artifact: Artifact): string {
   return [
     `Write a pre-existing internal ${companyName(ctx)} PMM document: "${docType}", dated ${artifact.date}.`,
     DETAIL_GUIDANCE[artifact.detailLevel],
-    `This is collateral a real customer would already have on file (DESIGN §16) — not tied to a specific deal.`,
+    `This is collateral a real customer would already have on file (DESIGN §16). It is not tied to a specific deal.`,
     `Company: ${ctx.config.world.company.name} (${ctx.config.world.company.domain}).`,
     `Where relevant, reference the real competitor set: ${ctx.config.competitors.competitors.map((c) => c.name).join(", ")}.`,
     "",
@@ -381,14 +384,14 @@ function aeNotePrompt(ctx: Ctx, artifact: Artifact): string {
     isClose
       ? `This deal has CLOSED ${outcome}. Jot the rep's quick wrap-up: what THEY believe drove the ${outcome} and the competitor(s) involved. The rep's read may be their own interpretation, and can be thin.`
       : [
-          `Write the rep's working note the way a REAL busy AE actually logs it — mostly logistics`,
+          `Write the rep's working note the way a REAL busy AE actually logs it. Mostly logistics`,
           `("Demo done, sending pricing.", "Champion OOO, following up next wk.", "Pushed to next month, budget not approved yet.").`,
-          `A real field note is sparse and frequently captures NO real insight — often just what happened and the next step.`,
+          `A real field note is sparse and frequently captures NO real insight. Often it is just what happened and the next step.`,
           `Do NOT dutifully fill in competitor, pricing, sentiment, and blockers. Usually omit most of that; mention a`,
           `competitor or a pricing/product reaction only if it would naturally land in a one-line jot, and often not at all.`,
         ].join("\n"),
     `This note's shape (write it exactly this way, not as a fixed bullet template): ${shape}.`,
-    `First person, no headers. Do NOT state derived conclusions (no ICP score/tier, no "we always lose when X") — only the raw observations.`,
+    `First person, no headers. Do NOT state derived conclusions (no ICP score/tier, no "we always lose when X"). Write only the raw observations.`,
     "",
     commonRules(ctx),
   ].join("\n");
@@ -416,8 +419,8 @@ function emailExchangePrompt(ctx: Ctx, artifact: Artifact): string {
   const stage = (artifact.grounding.stage as string) ?? deal.stage;
   const contacts = deal.contactIds.map((id) => ctx.ledger.contact(id));
   const roster = [
-    `  - ${rep.name} <${rep.email}> — ${companyShort(ctx)} rep (deal owner)`,
-    ...contacts.map((c) => `  - ${c.name} <${c.email}> — ${c.title} (${c.buyingRole})`),
+    `  - ${rep.name} <${rep.email}>, ${companyShort(ctx)} rep (deal owner)`,
+    ...contacts.map((c) => `  - ${c.name} <${c.email}>, ${c.title} (${c.buyingRole})`),
   ].join("\n");
   return [
     `Write a realistic email thread (3–6 messages) between the ${companyShort(ctx)} rep and the buying group for this ${stage} deal, around ${artifact.date}.`,
@@ -443,10 +446,10 @@ function emailExchangePrompt(ctx: Ctx, artifact: Artifact): string {
 }
 
 function personaLine(display: string, handle: string, role: string, voice?: string): string {
-  return `  - ${display} (@${handle}, ${role})${voice ? ` — voice: ${voice}` : ""}`;
+  return `  - ${display} (@${handle}, ${role})${voice ? `, voice: ${voice}` : ""}`;
 }
 
-/** The standing internal personas as a "- Display (@handle, role) — voice: …" roster. */
+/** The standing internal personas as a "- Display (@handle, role), voice: …" roster. */
 function internalRoster(ctx: Ctx): string[] {
   return ctx.config.slackPersonas.internal_personas.map((p) =>
     personaLine(p.display, p.handle, p.role, p.voice),
@@ -455,8 +458,8 @@ function internalRoster(ctx: Ctx): string[] {
 
 /**
  * The allowed cast for a deal thread: the deal owner plus a seeded 2–3-persona
- * SUBSET of the standing internal roster, rotated per artifact — so the same
- * three voices don't show up on every deal, and nobody plays a fixed reflex role.
+ * SUBSET of the standing internal roster, rotated per artifact. The same three
+ * voices then don't show up on every deal, and nobody plays a fixed reflex role.
  */
 function personaRoster(ctx: Ctx, deal: Opportunity, artifact: Artifact): string {
   const rep = ctx.ledger.rep(deal.ownerRepId);
@@ -464,11 +467,11 @@ function personaRoster(ctx: Ctx, deal: Opportunity, artifact: Artifact): string 
   const repVoice = ctx.config.slackPersonas.rep_personas.find((p) => p.handle === repHandle)?.voice;
   const cast = castSubset(ctx.seed, artifact.id, ctx.config.slackPersonas.internal_personas, 2, 3);
   return [
-    `Allowed Slack personas (post ONLY as these — this thread's cast, a rotating subset of the team):`,
+    `Allowed Slack personas (post ONLY as these; this thread's cast is a rotating subset of the team):`,
     personaLine(rep.name, repHandle, "deal owner", repVoice),
     ...cast.map((p) => personaLine(p.display, p.handle, p.role, p.voice)),
     `Write each persona in their own voice (above). Not everyone must post; replies may disagree, ask a`,
-    `blunt question, or just react — do NOT write an obligatory praise round.`,
+    `blunt question, or just react. Do NOT write an obligatory praise round.`,
   ].join("\n");
 }
 
@@ -496,8 +499,8 @@ function winlossPostPrompt(ctx: Ctx, artifact: Artifact): string {
   const { deal, facts } = withDeal(ctx, artifact);
   return [
     `Write a Slack #win-loss post-mortem for this CLOSED deal, dated ${artifact.date}.`,
-    `IMPORTANT: this deal has win-loss mode = "none", so this post is the SOLE win/loss signal —`,
-    `there is no survey or interview. It must fully carry the win/loss story.`,
+    `IMPORTANT: this deal has win-loss mode = "none", so this post is the SOLE win/loss signal.`,
+    `There is no survey or interview. It must fully carry the win/loss story.`,
     DETAIL_GUIDANCE.medium,
     "",
     facts,
@@ -517,11 +520,11 @@ function competitiveQPrompt(ctx: Ctx, artifact: Artifact): string {
   const competitor = (artifact.grounding.competitor as string) ?? ctx.config.competitors.competitors[0]!.name;
   return [
     `Write a #competitive channel question about the competitor "${competitor}", dated ${artifact.date}.`,
-    `This is the HUMAN side only — an internal teammate asking a real competitive question that ${companyShort(ctx)}'s`,
+    `This is the HUMAN side only. An internal teammate asks a real competitive question that ${companyShort(ctx)}'s`,
     `own bot (installed separately, out of scope) will later answer. Do NOT write the answer (DESIGN §9 boundary).`,
     DETAIL_GUIDANCE.low,
     "",
-    `Ask as ONE of these internal personas — set personaHandle to their exact @handle, and pick a role`,
+    `Ask as ONE of these internal personas. Set personaHandle to their exact @handle, and pick a role`,
     `whose vantage fits the question (e.g. a Sales Engineer hitting a POC objection, a CSM hearing churn risk):`,
     ...internalRoster(ctx),
     "",
