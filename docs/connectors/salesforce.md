@@ -1,6 +1,6 @@
 # Salesforce connector
 
-Salesforce receives the CRM half of the world: Accounts, Contacts, Opportunities, contact roles, and an activity timeline (emails and notes as Tasks). This guide takes you from nothing to a provisioned free Developer Edition org that the engine reconciles into. It also covers how to verify the push, purge records, and stay safe while you do it.
+Salesforce receives the CRM half of the world: Accounts, Contacts, Opportunities, contact roles, and an activity timeline (emails and notes as Tasks). This guide takes you from nothing to a provisioned free Developer Edition org, then covers verifying the push and purging records.
 
 > **Dedicated orgs only.** The engine writes to whatever org the credentials point at. Use a fresh Developer Edition org that exists solely for this. Never a sandbox of a real org, and never production.
 
@@ -53,9 +53,9 @@ npm run sf:stage-fields          # the per-stage date fields + field-level secur
 
 It also extends the standard `Account.Industry` picklist with your configured ICP verticals. Without this, the reconciler's `Industry` writes are rejected.
 
-**What `sf:stage-fields` creates and why.** One Date field per pipeline stage, named `Stage_<Stage>_At__c` and **derived directly from `config/world.yaml` `pipeline.stages`**. With the default five stages that's `Stage_Discovery_At__c` through `Stage_Closed_At__c`. They record when each deal *entered* each stage on the simulated calendar, which Salesforce's own `OpportunityHistory` cannot carry (it stamps real push time, not simulated time). The script also grants field-level security on the new fields, then verifies each one is writable. A freshly created custom field is invisible even to admins until FLS is set. Because the field list derives from your config, the script and the reconciler can never disagree about a field's name.
+**What `sf:stage-fields` creates and why.** One Date field per pipeline stage, named `Stage_<Stage>_At__c` and **derived directly from `config/world.yaml` `pipeline.stages`**, so the script and the reconciler can never disagree about a field's name. With the default five stages that's `Stage_Discovery_At__c` through `Stage_Closed_At__c`. They record when each deal *entered* each stage on the simulated calendar, which Salesforce's own `OpportunityHistory` cannot carry (it stamps real push time, not simulated time). The script also grants field-level security and verifies each field is writable, because a freshly created custom field is invisible even to admins until FLS is set.
 
-The reconciler describes the Opportunity object before writing and silently omits any stage field the org doesn't define. Running reconcile before this step is safe. It starts populating the fields the moment they exist.
+The reconciler describes the Opportunity object before writing and silently omits any stage field the org doesn't define, so running reconcile before this step is safe. It starts populating the fields the moment they exist.
 
 ## 5. Enable the connector
 
@@ -75,7 +75,7 @@ The `stage_map` translates your world's stage names onto whatever `StageName` pi
 
 ## 6. Verify with a scoped reconcile
 
-Don't push the whole world first. Push one deal, look at it, then open the tap:
+Push one deal, look at it, then open the tap:
 
 ```bash
 npm run apply -- --reconcile --opp=<oppId> --dry-run   # what WOULD be written
@@ -93,7 +93,7 @@ Reconcile records every Salesforce Id back into the ledger, so re-runs update in
 
 ## The cohort gate
 
-Only deals listed in `state/cohort.json` are ever pushed. That's the curated ~50-deal window a visitor browses. The full ledger (typically hundreds of deals) stays local, grounding the win rates and statistics without bloating the org or the demo. This gate applies to every connector, not just Salesforce. See [operations.md](../operations.md#the-cohort) for managing membership.
+Only deals listed in `state/cohort.json` are ever pushed: the curated ~50-deal window a visitor browses. The full ledger (typically hundreds of deals) stays local, grounding the win rates and statistics without bloating the org. This gate applies to every connector, not just Salesforce. See [operations.md](../operations.md#the-cohort) for managing membership.
 
 ## Purging: `sf:purge`
 
@@ -108,8 +108,6 @@ npm run sf:purge -- --all [--confirm]           # delete every demo-world record
 
 The safety model: `--noncohort`, `--activities`, and `--all` only touch rows where `Demo_World_Id__c` is set. `--sample` touches only the rows where it is NULL (the "Edge Communications"-style records a fresh org ships with). Nothing is ever matched by name, so hand-created records are never at risk. After `--noncohort` and `--all`, the purged records' stored Salesforce ids are cleared from the ledger so the next reconcile treats them as never-pushed.
 
-## The dry-run culture
-
-Everything that touches this org supports `--dry-run`, and the destructive tooling *defaults* to it. Make it a habit: dry-run first, read the report, then run for real. The engine is idempotent enough that mistakes are recoverable. But reading a plan takes ten seconds and reversing a push does not.
+Make dry-running a habit generally: everything that touches this org supports `--dry-run`. Reading a plan takes ten seconds. Reversing a push does not.
 
 Back to [getting started](../getting-started.md) · other connectors: [Drive](google-drive.md) · [Slack](slack.md) · [HubSpot](hubspot.md)

@@ -1,11 +1,11 @@
 # Getting started
 
-This guide takes you from a fresh clone to a living synthetic sales world. Deals open, progress, and close, and each one arrives with grounded prompts ready for prose. All of it runs **without a single credential**. Connecting real systems (Salesforce, Google Drive, Slack, HubSpot) comes later, one at a time, whenever you're ready.
+This guide takes you from a fresh clone to a living synthetic sales world: deals that open, progress and close, each arriving with grounded prompts ready for prose. All of it runs **without a single credential**. Connecting real systems (Salesforce, Google Drive, Slack, HubSpot) comes later, one at a time.
 
 ## Prerequisites
 
 - **Node.js ≥ 20** (`node --version`)
-- **A coding agent.** Claude Code, Codex, Cursor, or anything that can read and write files. This is a real requirement, not a nicety: the engine emits fully-grounded prompt files, and the agent's model is what generates the transcripts, emails and Slack threads from them. Demoverse ships no model client and no model key of its own, so that generation runs on your agent's existing subscription rather than a separate API bill.
+- **A coding agent.** Claude Code, Codex, Cursor, or anything that can read and write files. This is a real requirement, not a nicety: the engine emits fully-grounded prompt files, and the agent's model is what generates the transcripts, emails and Slack threads from them.
 - **Git.** Your clone *is* your world: the ledger, config, and generated prose are all committed to it.
 
 If your npm setup blocks lifecycle scripts ("allow-scripts" warnings at install time), ignore the warning. The engine runs via `tsx` and needs no postinstall scripts.
@@ -21,11 +21,11 @@ npm ci
 npm run secrets:hook   # recommended, see below
 ```
 
-That last line installs a pre-commit hook that refuses any commit carrying a credential. You own this clone and you commit to it constantly (your config, your world state), so a connector token is only ever one stray `git add .` away from your remote. The hook is the only guard that runs *before* a push. CI runs the same check, but by the time CI is red the secret is already on GitHub and the only real fix is to rotate it. Skip a single commit with `git commit --no-verify`; uninstall with `git config --unset core.hooksPath`.
+That last line installs a pre-commit hook that refuses any commit carrying a credential. You commit to this clone constantly, so a connector token is only ever one stray `git add .` away from your remote, and the hook is the only guard that runs *before* a push. CI runs the same check, but by then the secret is already on GitHub and the only real fix is to rotate it. Skip a single commit with `git commit --no-verify`; uninstall with `git config --unset core.hooksPath`.
 
-Credentials go in `.env` and nowhere else. `.gitignore` excludes every `.env*` variant, so `.env.local` or `.env.prod` are equally safe if you prefer those names, but `.env` is the one the docs use. The one file you must **not** type a token into is `.env.example`, which is tracked on purpose so it can serve as the template. Copy it, don't fill it in.
+Credentials go in `.env` and nowhere else. `.gitignore` excludes every `.env*` variant, so `.env.local` works equally well, but `.env` is the one the docs use. Never type a token into `.env.example`, which is tracked on purpose as the template. Copy it, don't fill it in.
 
-At this point `state/` contains only a README, and `config/` contains only the `templates/` folder. No active YAML exists until you copy or generate it. The engine won't run without it, so that's next.
+At this point `state/` contains only a README, and `config/` contains only the `templates/` folder. No active YAML exists until you copy or generate it, and the engine won't run without it. That's next.
 
 ## Configure your fictional company
 
@@ -81,10 +81,10 @@ git add -A && git commit -m "world zero"
 
 ### The clock starts in the past, so pick your first-run path
 
-`npm run init` set the simulation clock back by `window.history_quarters` quarters (default 4, in `world.yaml`). That's deliberate. A fresh world's first increments carry **historical dates**, and that history is what makes the demo believable. A CRM born last Tuesday convinces no one. From here there are three ways to run, and `init`'s own closing output prints the same fork:
+`npm run init` set the simulation clock back by `window.history_quarters` quarters (default 4, in `world.yaml`). That's deliberate: a fresh world's first increments carry **historical dates**, and a CRM born last Tuesday convinces no one. From here there are three ways to run, and `init`'s own closing output prints the same fork:
 
 - **`npm run pipeline`** advances one week per run. It's the recommended first step and the routine motion forever after. The clock catches up toward today as you run more weeks.
-- **`npm run apply -- --backfill`** plans the entire historical back-catalog in one shot. That's a large one-time fill job of hundreds of prompts, usually driven by an agent loop rather than written by hand. Read [operations.md](operations.md) before reaching for it.
+- **`npm run apply -- --backfill`** plans the entire historical back-catalog in one shot: a large one-time fill job of hundreds of prompts, usually driven by an agent loop. Read [operations.md](operations.md) before reaching for it.
 - **Plain `npm run apply`** generates *every* pending period up to today at once. On a fresh four-quarter world that's dozens of periods and hundreds of artifacts. Don't run it casually.
 
 Tip: if you want less history, lower `window.history_quarters` in `world.yaml` *before* running `npm run init`.
@@ -127,9 +127,9 @@ Do a couple by hand first, to feel the protocol. Then hand the batch to your age
   { "emails": [{ "from": "Jordan Reyes <jordan@aurora-analytics.example>", "to": ["mia.chen@northwind.example"], "subject": "Following up from today", "body": "Mia, great talking today. ...", "date": "2026-03-04", "contactRef": "mia.chen@northwind.example" }] }
   ```
 
-  The emitted prompts require `contactRef` on every message. It's always the **buyer's** email, even when the rep is the sender, and it's what links the thread to the right CRM contact.
+  `contactRef` is required on every message. It's always the **buyer's** email, even when the rep is the sender, and it links the thread to the right CRM contact.
 
-**Via your agent.** Point it at the manifest and let it fill everything. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) plus a `/pipeline-update` command that runs the whole weekly loop for you. The full spec of prompts, result formats, and validation lives in [request-protocol.md](request-protocol.md).
+**Via your agent.** Point it at the manifest and let it fill everything. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) plus a `/pipeline-update` command that runs the whole weekly loop. The full spec of prompts, result formats, and validation lives in [request-protocol.md](request-protocol.md).
 
 ## Ingest and lint
 
@@ -142,9 +142,9 @@ npm run lint
 
 `--reconcile` pushes eligible records to external systems. Right now it does nothing, because every connector ships disabled and each destination reports a clean `[skipped]` note. Run it anyway. It's the same command you'll use once systems are connected, so make it the habit.
 
-The run also writes a report to `runs/<date>-report.md`. That file is gitignored, named by the real date, and overwritten if you run again the same day. Its **Simulation now** date is the sim clock rather than the file's real date, so on a fresh world the two will disagree. By design.
+The run also writes a report to `runs/<date>-report.md`, gitignored, named by the real date, and overwritten if you run again the same day. Its **Simulation now** date is the sim clock rather than the file's real date, so on a fresh world the two will disagree. By design.
 
-`lint` runs structural and cross-system coherence checks. Does the transcript name the deal's actual competitors? Does the win-loss artifact cite the recorded loss reason? Errors exit non-zero. Fix the offending result and re-ingest. The cross-system prose checks run over **closed** deals, so a brand-new world makes `lint` report "0 closed deals checked". That's expected. The checks get teeth as deals start to close.
+`lint` runs structural and cross-system coherence checks. Does the transcript name the deal's actual competitors? Does the win-loss artifact cite the recorded loss reason? Errors exit non-zero. Fix the offending result and re-ingest. The cross-system prose checks run over **closed** deals, so a brand-new world reports "0 closed deals checked". Expected. The checks get teeth as deals start to close.
 
 Commit the increment:
 
@@ -156,7 +156,7 @@ That's the whole loop. Run `npm run pipeline` again next week and the world keep
 
 ## Connect systems later
 
-Everything above ran credential-free, and it stays useful that way. The ledger, prose, and lint are the product. External systems are projections of it. When you want the world to exist somewhere people can click around:
+Everything above ran credential-free, and it stays useful that way: the ledger, prose and lint are the product, and external systems are projections of it. When you want the world to exist somewhere people can click around:
 
 - [Salesforce](connectors/salesforce.md) puts CRM structure and an activity timeline in a free Developer Edition org
 - [Google Drive](connectors/google-drive.md) holds the transcripts, notes, and win-loss documents
@@ -164,6 +164,6 @@ Everything above ran credential-free, and it stays useful that way. The ledger, 
 - [HubSpot](connectors/hubspot.md) is the structure-only CRM alternative
 - [Build your own](connectors/build-your-own.md) documents the connector contract
 
-Connect them one at a time. A connector runs only when it's enabled in `config/connectors.yaml` **and** its credentials are present in `.env`. Reconcile is idempotent, so re-running picks up whatever became reachable. Only deals in the curated cohort (`state/cohort.json`) ever leave the repo. See [operations.md](operations.md#the-cohort) for why.
+Connect them one at a time. A connector runs only when it's enabled in `config/connectors.yaml` **and** its credentials are present in `.env`, and reconcile is idempotent, so re-running picks up whatever became reachable. Only deals in the curated cohort (`state/cohort.json`) ever leave the repo ([why](operations.md#the-cohort)).
 
 The ledger model, determinism, and the two-phase generation loop are covered in [architecture.md](architecture.md). Questions and troubleshooting: [faq.md](faq.md).

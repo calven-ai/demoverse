@@ -1,10 +1,8 @@
 # The request protocol
 
-The content in a Demoverse world is AI-generated. Every call transcript, email thread, Slack message and win-loss interview is written by a language model. What the engine does *not* do is call that model: it ships no model client, holds no model API key, and opens no network connection to a model provider. The generation happens one layer out, in the coding agent session that drives the repo, which is also where the token cost lands.
+The content in a Demoverse world is AI-generated, but the engine never calls a model itself ([why](faq.md#is-the-prose-ai-generated-does-demoverse-call-an-llm)). Instead, every `apply` run emits **generation requests**, one per prose artifact: a self-contained prompt file grounded in the exact ledger facts. The engine accepts a filled result from any source (Claude Code, Codex, Cursor, a script of your own against whichever model API you prefer) and validates it the same way regardless of what produced it.
 
-That separation is what this protocol exists for. Every `apply` run emits **generation requests** instead of calling a model, one per prose artifact. Each is a self-contained prompt file grounded in the exact ledger facts, and the engine will accept a filled result from any source: Claude Code, Codex, Cursor, another agent, or a script you write yourself against whichever model API you prefer. The engine only ever sees the result files, and validates them the same way regardless of what produced them.
-
-The interface is files, so a human can write a result too, and doing a couple by hand is the fastest way to understand this document. That is where the manual path ends, though. A living world runs to hundreds of transcripts, threads and Slack posts, and it grows every week. Filling it is a model's job. What follows is the precise spec of the handoff: the manifest, the prompt anatomy, the three result formats, validation, statuses, and refills.
+Because the interface is files, a human can write a result too, and doing a couple by hand is the fastest way to understand this document. That is also where the manual path ends: a living world runs to hundreds of transcripts and grows every week. What follows is the spec of the handoff: the manifest, the prompt anatomy, the three result formats, validation, statuses, and refills.
 
 ## Layout
 
@@ -62,9 +60,9 @@ Every `.prompt.md` is fully self-contained. The filler needs no other context an
 
 **Task line + detail level.** What to write, dated when, and how long: `low` (terse, no filler), `medium` (a few focused paragraphs), `high` (long-form, conversational, with tangents).
 
-**The fact block.** The deal in full: name, stage, status, amount; the account with firmographics; the owning rep; the buying group with titles and roles; the competitors on the deal with their positioning; and the primary use case. Close artifacts carry one more field, the recorded win/loss reason. Volatile fields (stage, outcome, reason) come from a snapshot taken at planning time, so an early-stage artifact reflects the world as of its date and cannot leak the eventual outcome. Call prompts additionally carry the **attendee subset** for that stage (a first discovery call is one or two people, never the whole buying group) and a product block for the rep to position from.
+**The fact block.** The deal in full: name, stage, status, amount; the account with firmographics; the owning rep; the buying group with titles and roles; the competitors on the deal with their positioning; and the primary use case. Close artifacts add the recorded win/loss reason. Volatile fields (stage, outcome, reason) come from a snapshot taken at planning time, so an early-stage artifact reflects the world as of its date and cannot leak the eventual outcome. Call prompts additionally carry the **attendee subset** for that stage (a first discovery call is one or two people, never the whole buying group) and a product block for the rep to position from.
 
-**The VARIETY block.** This deal's seeded texture: narrative angle (why this buyer is looking), buyer tone, objection themes, timeline pressure. Then this artifact's structural shape. It is part of the grounding contract, not a suggestion. It's what keeps hundreds of deals from telling one story.
+**The VARIETY block.** This deal's seeded texture (narrative angle, buyer tone, objection themes, timeline pressure) plus this artifact's structural shape. It is part of the grounding contract, not a suggestion, and it's what keeps hundreds of deals from telling one story.
 
 **GROUNDING RULES.** The strict contract, verbatim in every prompt:
 
@@ -120,7 +118,7 @@ Kind-specific rules ride along where they matter. A `winloss_post` for a "none"-
 - **slack_messages** results are schema-validated (zod): at least one message, each with non-empty `personaHandle` and `text`. Messages are attached to the artifact in the ledger, so there is no separate content file.
 - **email_thread** results are schema-validated too: at least one email, each with non-empty `from`, `subject`, `body`, `date`. `to` defaults to `[]`, and `contactRef` resolves to a contact id.
 
-The report buckets every artifact as `filled`, `pending` (no result yet), or `invalid` (with a reason). **Invalid and pending artifacts stay `planned`** and their requests reappear. Fix the result file and re-ingest. The engine never files data that failed validation, and after every ingest the whole ledger is re-validated before being persisted. Ingest is idempotent: already-`generated` artifacts are skipped, so filling and ingesting in batches is fine.
+The report buckets every artifact as `filled`, `pending` (no result yet), or `invalid` (with a reason). **Invalid and pending artifacts stay `planned`** and their requests reappear, so fix the result file and re-ingest. The engine never files data that failed validation, and the whole ledger is re-validated before being persisted. Ingest is idempotent: already-`generated` artifacts are skipped, so filling and ingesting in batches is fine.
 
 ## Statuses
 
@@ -134,10 +132,10 @@ planned  ──ingest (valid result)──►  generated  ──reconcile──�
 
 ## Refilling a bad result
 
-`npm run apply -- --refill=<artifactId>` is the sanctioned do-over. It resets one `generated` artifact back to `planned` and re-emits its prompt. It **refuses once the artifact has external records**, because the file or message already exists in the outside world and regenerating would duplicate it. If you truly must, purge the external record first with the per-connector purge tooling. You never hand-edit the ledger to "fix" an artifact.
+`npm run apply -- --refill=<artifactId>` is the sanctioned do-over: it resets one `generated` artifact back to `planned` and re-emits its prompt. It **refuses once the artifact has external records**, because the file or message already exists in the outside world and regenerating would duplicate it. If you truly must, purge the external record first with the per-connector purge tooling. You never hand-edit the ledger to "fix" an artifact.
 
 ## Why the grounding rules matter
 
-Cross-system coherence is the product. A demo reads as real because the deal's transcript, its win-loss interview, its Slack post-mortem, and its CRM record all agree: same competitors, same reason, same people. One invented competitor name in one transcript poisons whatever analytics are pointed at the corpus. So the rules are enforced twice. The prompts enforce them at generation time, and the [coherence linter](architecture.md#verification-the-coherence-linter) catches the rest afterward, cross-checking prose against the recorded facts and failing the build on finalized drift. Honor the prompt exactly and the linter stays quiet.
+Cross-system coherence is the product. A demo reads as real because the deal's transcript, its win-loss interview, its Slack post-mortem, and its CRM record all agree: same competitors, same reason, same people. One invented competitor name in one transcript poisons whatever analytics are pointed at the corpus. So the rules are enforced twice: by the prompts at generation time, and by the [coherence linter](architecture.md#verification-the-coherence-linter) afterward, which cross-checks prose against the recorded facts and fails the build on finalized drift. Honor the prompt exactly and the linter stays quiet.
 
 Next: [operations.md](operations.md) for the weekly loop this protocol lives inside · [getting-started.md](getting-started.md) to run it once by hand

@@ -29,21 +29,16 @@
 Every B2B product demo dies the same death. The environment is **empty**,
 **half-populated**, or **obviously fake**. Ten accounts and no contacts. Uniform
 CRM notes. Every deal neatly debriefed. The same three phrases in every call
-transcript. An audience smells generated data in seconds, and your product has
-nothing real to show off.
+transcript. An audience smells generated data in seconds.
 
 The deeper problem is that demo data is built **once**. Somebody seeds it before
 a launch, and from that moment it is a photograph: every deal frozen at the
-stage it was born in, nothing opened, nothing closed, no history behind it and
-no next week ahead of it. It also ages badly, drifting further out of date with
-every month that passes.
-
-That quietly kills the demos worth giving. **Anything interesting about a
-sales org is a trend**, not a snapshot: pipeline building over a quarter, win
-rate recovering, a competitor showing up in more deals than it did in March,
-one segment pulling ahead of another. A dataset with no past cannot show a
-trajectory, so the charts stay flat, the dashboards have nothing to say, and
-you end up narrating what the product *would* show if the data were real.
+stage it was born in, no history behind it and no next week ahead of it. But
+**anything interesting about a sales org is a trend**, not a snapshot: pipeline
+building over a quarter, win rate recovering, a competitor showing up in more
+deals than it did in March. A dataset with no past cannot show a trajectory, so
+the charts stay flat and you end up narrating what the product *would* show if
+the data were real.
 
 Demoverse builds the alternative. You define a **fictional company**. The engine
 keeps a **deterministic ledger** of accounts, buying committees, deals and
@@ -53,9 +48,8 @@ the trends bend with it. On top of that ledger, **your coding agent generates
 the content**: call transcripts, AE notes, email threads, Slack chatter,
 win-loss interviews, each written from a prompt the engine grounds in the facts
 it just recorded. Every artifact tells the same story as the CRM record it
-belongs to. A curated cohort of deals gets pushed into
-Salesforce, HubSpot, Google Drive and Slack, where your product ingests it like
-production data.
+belongs to. A curated cohort of deals gets pushed into Salesforce, HubSpot,
+Google Drive and Slack, where your product ingests it like production data.
 
 ### Works with
 
@@ -99,38 +93,35 @@ never invent one.
 2. **A target list seeds the accounts.** Point it at a CSV of real ICP companies
    you want to see in the demo, or let the engine draw from its synthetic banks.
 3. **The ledger holds the world.** `state/world.json` is the single source of
-   truth for accounts, contacts, deals, outcomes and external ids. It is
-   versioned JSON committed to git, so the git log doubles as an audit trail.
-   Nothing hand-edits it.
+   truth for accounts, contacts, deals, outcomes and external ids: versioned
+   JSON committed to git, so the git log doubles as an audit trail. Nothing
+   hand-edits it.
 4. **The weekly advance moves the pipeline.** It opens a couple of new deals,
-   progresses open ones a stage, and closes the ones whose cycle is up.
-   Everything is seeded and deterministic. Outcomes correlate with ICP fit,
-   competitor strength and multi-threading, so dashboards built on it show real
-   patterns.
+   progresses open ones a stage, and closes the ones whose cycle is up, all
+   seeded and deterministic. Outcomes correlate with ICP fit, competitor
+   strength and multi-threading, so dashboards built on it show real patterns.
 5. **It emits grounded prompts**, one per touch point a deal actually earned.
-   Each one carries the exact facts (people, competitors, recorded outcome) plus
-   a per-deal variety texture, so no two deals read alike.
+   Each carries the exact facts (people, competitors, recorded outcome) plus a
+   per-deal variety texture, so no two deals read alike.
 6. **Your agent writes the prose** into result files: transcripts, emails, AE
    notes, Slack posts, win-loss interviews. One subagent per deal keeps them
    from blurring together.
-7. **Ingest and lint check the work.** A validating ingest step files each
-   result, and a coherence linter proves the transcript, the CRM record and the
-   Slack thread never contradict each other. Anything that fails stays unfiled
-   and is simply re-requested.
+7. **Ingest and lint check the work.** Ingest validates and files each result; a
+   coherence linter proves the transcript, the CRM record and the Slack thread
+   never contradict each other. Anything that fails stays unfiled and is simply
+   re-requested.
 8. **Reconcile pushes it out** to Salesforce, HubSpot, Drive and Slack through
    idempotent upserts, recording each external id back on the ledger. Re-runs
    update. They never duplicate.
 
 ### One deal, one week at a time
 
-The engine never dumps a finished history. Each run generates only the touch
-points a deal actually earned that period, so a deal opened this week has one
+The engine never dumps a finished history. A deal opened this week gets one
 discovery call, not a full paper trail. Run it again next week and the same deal
 moves a stage and earns another one or two. That is what gives the dataset a
-past to chart and a direction to steer.
-
-The six weeks below are one deal's story, not the template. Another closes in a
-week, another sits in Evaluation for a month without a word.
+past to chart and a direction to steer. The six weeks below are one deal's
+story, not the template. Another closes in a week; another sits in Evaluation
+for a month without a word.
 
 <p align="center">
   <img src="docs/assets/living-week-8bit.svg" alt="One deal accumulating history week by week, from a discovery call through to a win-loss debrief" width="640">
@@ -149,13 +140,12 @@ week, another sits in Evaluation for a month without a word.
   three touch points a week. Win-loss debriefs are deliberately scarce (~1 in 3
   closed deals) and AE notes are terse and imperfect. Uniform diligence is what
   makes synthetic data read as synthetic.
-- **No two deals the same shape.** Cycle length is drawn per deal, peaking
-  around five weeks, and the tails are real: a few warm inbound deals close in a
-  week with barely two touch points to their name, a few grind through a
-  quarter of procurement, and a few go dark for a month before dying of "No
-  decision". Short deals skip stages outright. So your demo has the edge cases a
-  real pipeline has, not one archetype repeated three hundred times. Tune or
-  disable each one in `config/world.yaml`.
+- **No two deals the same shape.** Cycle length is drawn per deal, and the tails
+  are real: warm inbound deals close in a week with barely two touch points,
+  others grind through a quarter of procurement, others go dark for a month
+  before dying of "No decision". Short deals skip stages outright. Your demo
+  gets the edge cases a real pipeline has, not one archetype repeated three
+  hundred times. Tune or disable each in `config/world.yaml`.
 - **Cohort-gated pushes.** The ledger holds hundreds of deals so the statistics
   are real. Only a curated ~50 ever reach external systems, each one fully
   populated. Nothing leaves the repo by accident.
@@ -168,9 +158,8 @@ week, another sits in Evaluation for a month without a word.
 - **Not for real people or production systems.** Dedicated orgs and fictional
   humans only. See [DISCLAIMER.md](DISCLAIMER.md).
 - **Not a model wrapper.** The content *is* AI-generated, just not by Demoverse.
-  The engine holds no model key and makes no model API call. It grounds the
-  prompts, validates the results, and leaves the generating to the coding agent
-  you already run.
+  The engine grounds the prompts and validates the results, and leaves the
+  generating to the coding agent you already run.
 
 |  | faker-style generators | static demo-org snapshot | **Demoverse** |
 | --- | :-: | :-: | :-: |
@@ -223,41 +212,28 @@ Full walkthrough: [docs/getting-started.md](docs/getting-started.md).
 
 **Do I need Claude Code?** No, but you do need a coding agent. Any one that
 reads [AGENTS.md](AGENTS.md) works (Codex, Cursor, Copilot, …). The agent is
-what actually generates the transcripts, emails and Slack threads, so it isn't
-an optional convenience. The prompts are self-contained briefs, which means you
-can hand-write a result or two to see how the contract works. A world's worth of
-them is agent work.
+what generates the transcripts, emails and Slack threads, so it isn't an
+optional convenience.
 
-**Is the prose AI-generated? What does it cost?** Yes. Transcripts, emails,
-Slack threads and win-loss interviews are all written by a language model. What
-Demoverse doesn't do is call one: no model key, no API call, no metered token
-bill. Your coding agent does the writing in its own session, on the subscription
-you already have. That keeps the engine's facts deterministic while the prose
-stays model-written, and it means any writer can fill a request, including a
-script of your own against whatever model API you prefer.
+**Is the prose AI-generated? What does it cost?** Yes, and nothing extra.
+Transcripts, emails, Slack threads and win-loss interviews are written by a
+language model, but Demoverse never calls one: no model key, no API call, no
+metered token bill. Your coding agent does the writing on the subscription you
+already have, which also means any writer can fill a request, including a script
+of your own against whatever model API you prefer.
 
 **Will it touch my production CRM?** Only systems you explicitly configure, and
 it's designed for isolated ones (free Salesforce Developer Edition, throwaway
 Slack workspace). Destructive commands are dry-run by default and require
 `--confirm`. See [DISCLAIMER.md](DISCLAIMER.md).
 
-**Why do so few deals have win-loss interviews? Why are the AE notes sloppy?**
-Because that's what real CRMs look like. Uniform diligence is the tell that
-kills demo data. The scarcity and the mess are deliberate, and both are tunable.
-
-**Can I use a different CRM?** HubSpot ships in the box (structure-only), and
-the [connector contract](docs/connectors/build-your-own.md) is ~60 lines to
-implement for anything else.
-
 **Is it reproducible?** The structural world is fully deterministic from a seed.
 Prose varies with whichever agent writes it. Grounding and lint keep it
 consistent with the facts either way.
 
-**Why templates instead of a bundled example company?** A canned company would
-look identical in every install, and the first Demoverse demo you saw would
-spoil every other one. The wizard makes yours yours in minutes.
-
-More in [docs/faq.md](docs/faq.md).
+More in [docs/faq.md](docs/faq.md), including why win-loss interviews are
+scarce, why the AE notes are deliberately sloppy, and how to point it at a CRM
+other than Salesforce.
 
 ## Project status
 
@@ -265,18 +241,16 @@ More in [docs/faq.md](docs/faq.md).
 deterministic world simulation, the grounded-prompt protocol, the coherence
 linter, the `/setup` wizard and tool-neutral onboarding, and connectors for
 Salesforce, Google Drive, Slack and HubSpot. There is no feature backlog waiting
-to land, because the scope was small on purpose.
-
-Maintained means dependency updates, bug fixes, and repairs when a connector's
-vendor API changes underneath it. Issues get answered.
+to land, because the scope was small on purpose. Maintained means dependency
+updates, bug fixes, and repairs when a connector's vendor API changes underneath
+it. Issues get answered.
 
 New capability is meant to arrive through the two documented seams rather than
 through this repo growing: the
 [connector contract](docs/connectors/build-your-own.md) for a new system, and
 the [request protocol](docs/request-protocol.md) for a new way of filling
 prompts. Both are stable, both are roughly an afternoon of work, and neither
-needs a fork. If you build something on either one, an issue pointing at it is
-welcome. Ideas we would happily merge are listed in
+needs a fork. Ideas we would happily merge are listed in
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing

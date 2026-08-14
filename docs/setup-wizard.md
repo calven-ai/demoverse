@@ -1,6 +1,6 @@
 # The setup wizard
 
-`/setup` is a slash command for your coding agent that turns a conversation into a complete, coherent world configuration. It interviews you about the fictional company you want to demo, drafts every `config/*.yaml` file, and shows you a summary to confirm before writing anything. It exists because a good world needs a dozen config files that all agree with each other. An agent is much better at keeping them consistent than a human filling in templates one by one.
+`/setup` is a slash command for your coding agent that turns a conversation into a complete, coherent world configuration. It interviews you about the fictional company you want to demo, drafts every `config/*.yaml` file, and shows you a summary to confirm before writing anything. It exists because a good world needs a dozen config files that all agree with each other, and an agent is far better at keeping them consistent than a human filling in templates one by one.
 
 ## Running it
 
@@ -14,9 +14,9 @@ The wizard works in phases. Answer in as much or as little detail as you like. A
 
 ## What it asks
 
-**1. Company.** The fictional vendor's name, domain, one-line pitch, and rough size. Say as much or as little as you want. "A mid-market data-quality platform called Aurora Analytics" is enough to seed everything else. This becomes `world.yaml`'s `company` block and the identity every artifact writes under.
+**1. Company.** The fictional vendor's name, domain, one-line pitch, and rough size. "A mid-market data-quality platform called Aurora Analytics" is enough to seed everything else. This becomes `world.yaml`'s `company` block and the identity every artifact writes under.
 
-**2. Product surface.** What the product actually does, broken into domains and capabilities the reps can position and demo. This becomes `product.yaml`, and it matters more than it looks. Call transcripts quote reps demoing *specific* capabilities against *specific* pains, so a thin product surface produces thin calls.
+**2. Product surface.** What the product does, broken into domains and capabilities the reps can position and demo. This becomes `product.yaml`, and it matters more than it looks: call transcripts quote reps demoing *specific* capabilities against *specific* pains, so a thin product surface produces thin calls.
 
 **3. Market and competitors.** Who the fictional company loses to, each competitor's category, positioning, and relative strength. Also the buyer-facing **use cases**, meaning what a buyer walks in asking for. Every deal is named for and themed around one. Writes `competitors.yaml` and `use-cases.yaml`.
 
@@ -34,13 +34,13 @@ Before writing a single file, the wizard echoes back a resolved summary: the com
 
 ## Re-running and amending
 
-The wizard is safe to re-run, with one big caveat: config is **load-bearing history** once the world has data. Changing distributions mid-world (win rate, segment mix, volume) only affects *future* periods. That's fine and normal, and the better tool for it is a Tier-2 directive (see [operations.md](operations.md#changing-the-story)). Changing *identity* (company name, pipeline stages, competitor roster) after deals exist makes existing prose incoherent, so the wizard will warn you and suggest a fresh start. That means `npm run init -- --force`, which regenerates the world from scratch. If you've already pushed to external systems, read the [reset notes](operations.md#purge-and-reset) first.
+The wizard is safe to re-run, with one caveat: config is **load-bearing history** once the world has data. Changing distributions mid-world (win rate, segment mix, volume) only affects *future* periods, which is normal, and the better tool for it is a Tier-2 directive (see [operations.md](operations.md#changing-the-story)). Changing *identity* (company name, pipeline stages, competitor roster) after deals exist makes existing prose incoherent, so the wizard warns you and suggests a fresh start via `npm run init -- --force`. If you've already pushed to external systems, read the [reset notes](operations.md#purge-and-reset) first.
 
 For small amendments you don't need the wizard at all. Every config file is commented YAML, and your agent can edit any knob from a plain description of the change.
 
 ## The fully-manual fallback
 
-No agent, no problem. The wizard is convenience, not machinery. Everything it does reduces to:
+The wizard is convenience, not machinery. Everything it does reduces to:
 
 ```bash
 cp config/templates/*.yaml config/

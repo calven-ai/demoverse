@@ -70,8 +70,6 @@ HubSpot is wired two ways, and the difference matters:
 - **Standalone scripts** (`hubspot:setup` / `import` / `verify` / `purge`) are the primary path. They run on demand, regardless of `config/connectors.yaml`, against whatever scope you pass. Routine weekly runs never touch HubSpot this way, so nothing lands there by accident.
 - **Registered connector.** Set `hubspot: { enabled: true }` in `config/connectors.yaml` and HubSpot joins the normal `apply -- --reconcile` chain alongside the other destinations, with the same [cohort gate](../operations.md#the-cohort), `--dry-run`, and `--opp=` scoping. Use this when HubSpot *is* your demo CRM and you want the weekly loop to keep it current.
 
-It ships disabled because most operators run one CRM. Either way it remains structure-only: transcripts and documents belong to [Drive](google-drive.md), chatter to [Slack](slack.md).
-
-The connector is also the reference implementation for writing your own destination. See [build-your-own.md](build-your-own.md).
+It ships disabled because most operators run one CRM. Either way it remains structure-only: transcripts and documents belong to [Drive](google-drive.md), chatter to [Slack](slack.md). It is also the reference implementation for writing your own destination ([build-your-own.md](build-your-own.md)).
 
 Back to [getting started](../getting-started.md) · other connectors: [Salesforce](salesforce.md) · [Drive](google-drive.md) · [Slack](slack.md)

@@ -1,6 +1,6 @@
 # Build your own connector
 
-A connector pushes the desired ledger state into one external system. The contract is small: one interface, one registration, one config block. The *requirements* are the strict part. Every guarantee the engine makes (idempotent re-runs, cohort gating, credential-free operation, dry-run everywhere) is only as good as its weakest connector. What follows is the contract verbatim, the rules, and the shipped HubSpot connector as a worked example.
+A connector pushes the desired ledger state into one external system. The contract is small (one interface, one registration, one config block) but the *requirements* are strict, because every guarantee the engine makes (idempotent re-runs, cohort gating, credential-free operation, dry-run everywhere) is only as good as its weakest connector. What follows is the contract verbatim, the rules, and the shipped HubSpot connector as a worked example.
 
 ## The contract
 
@@ -97,7 +97,7 @@ Credentials never go in YAML. They live in `.env`, and their *absence* must be a
 
 **3. Dry-run support.** When `opts.dryRun` is set, compute the full plan: counts, creates vs updates. Log it. Write nothing. Dry-run output is how operators learn to trust a new connector, so make it honest.
 
-**4. Distinct no-ops for "disabled" vs "no credentials".** Switched off in `config/connectors.yaml` → return `disabledStats(name)` (note: "disabled in config…"). Enabled but credentials absent from the env → return stats with `disabled: true` and a note like `"credentials absent (.env), skipped"`, with `skipped` set to the record count that would have gone. The two notes are deliberately different. One says "you chose this". The other says "you forgot something". Never throw on missing credentials. The credential-free path is a core feature, not an error.
+**4. Distinct no-ops for "disabled" vs "no credentials".** Switched off in `config/connectors.yaml` → return `disabledStats(name)` (note: "disabled in config…"). Enabled but credentials absent from the env → return stats with `disabled: true` and a note like `"credentials absent (.env), skipped"`, with `skipped` set to the record count that would have gone. The two notes differ deliberately: one says "you chose this", the other "you forgot something". Never throw on missing credentials. The credential-free path is a core feature, not an error.
 
 **5. Respect `oppId` and `limit`.** Single-opportunity scoping is how every connector gets smoke-tested before its first bulk push.
 
@@ -108,11 +108,11 @@ Credentials never go in YAML. They live in `.env`, and their *absence* must be a
 - **Disabled check first:** `if (!cfg.connectors.hubspot.enabled) return disabledStats("hubspot");`
 - **Cohort gate:** builds a `CohortIndex` from `opts.cohort`, filters opportunities through `cohort.has(o.id)`, then narrows accounts and contacts to those the surviving deals reference. Copy that pattern for deriving scope from deals.
 - **Credential no-op:** `if (!hasEnv("HUBSPOT_ACCESS_TOKEN"))` → `disabled: true`, note `"HubSpot credentials absent (.env), skipped"`, `skipped` = the would-have-been count.
-- **Delegation to a deterministic core:** the actual work lives in `src/connectors/hubspot/import.ts` (`selectHubSpotDataset` / `importHubSpotDataset`), which batches to the API's per-call limits, retries rate limits, and upserts everything by a `demo_world_id` property. That core is *also* drivable standalone via `npm run hubspot:import`. A useful shape, because it makes the connector testable without the orchestrator.
+- **Delegation to a deterministic core:** the actual work lives in `src/connectors/hubspot/import.ts` (`selectHubSpotDataset` / `importHubSpotDataset`), which batches to the API's per-call limits, retries rate limits, and upserts everything by a `demo_world_id` property. That core is *also* drivable standalone via `npm run hubspot:import`, which makes the connector testable without the orchestrator.
 - **Client:** `src/connectors/hubspot/client.ts` wraps auth + fetch; `schema.ts` owns property provisioning; `verify.ts` re-reads and diffs.
 
 For a document-store destination, mirror `src/connectors/drive/reconcile.ts` instead: folder trees, per-artifact file ids. For a chat destination, read `src/connectors/slack/reconcile.ts` (channel routing, per-message ids, persona rendering).
 
-One more rule of taste: keep judgment out. A connector translates ledger facts into API calls. It never decides *what* the world contains. If you find yourself sampling, randomizing, or writing prose in a connector, that logic belongs in the engine.
+One rule of taste: keep judgment out. A connector translates ledger facts into API calls and never decides *what* the world contains. If you find yourself sampling, randomizing, or writing prose in a connector, that logic belongs in the engine.
 
 Back to [getting started](../getting-started.md) · [architecture](../architecture.md) · shipped connectors: [Salesforce](salesforce.md) · [Drive](google-drive.md) · [Slack](slack.md) · [HubSpot](hubspot.md)

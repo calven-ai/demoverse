@@ -71,7 +71,7 @@ The channel names here must match what you created in step 2. Then reconcile as 
 
 ## How personas work
 
-The free plan caps installed apps at 10 per workspace, so "one app per fake employee" can't scale. Instead, the single controller app holds `chat:write.customize` and posts **each message under a per-message display name and avatar**. The persona roster lives in `config/slack-personas.yaml` and reuses the same identities as the CRM: the rep who owns a deal in the CRM is the same name discussing it in `#deals`. Display names carry the persona's role in parentheses, as in "Jordan Reyes (Account Executive)", so a reader always knows who's speaking. The one visible tradeoff: messages carry a small "APP" badge. That's fine for data an analytics tool scans and acceptable for human demos.
+The free plan caps installed apps at 10 per workspace, so "one app per fake employee" can't scale. Instead, the single controller app holds `chat:write.customize` and posts **each message under a per-message display name and avatar**. The persona roster lives in `config/slack-personas.yaml` and reuses the same identities as the CRM: the rep who owns a deal is the same name discussing it in `#deals`. Display names carry the role in parentheses, as in "Jordan Reyes (Account Executive)". The one visible tradeoff is a small "APP" badge on every message, which is fine for data an analytics tool scans and acceptable for human demos.
 
 Two content rules the engine enforces at generation time:
 

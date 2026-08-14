@@ -1,14 +1,14 @@
 # AGENTS.md: how a coding agent drives Demoverse
 
 Demoverse is **operated by a coding agent, not just a human**. The deterministic
-TypeScript engine does all the mechanical, error-prone work. The agent does the
+TypeScript engine does all the mechanical, error-prone work; the agent does the
 judgment and the prose. This file is the contract for that handoff, readable by
-any agent tool (Claude Code, Codex, Cursor, Copilot, …). It has three parts:
+any agent tool (Claude Code, Codex, Cursor, Copilot, …). Three parts:
 
 1. **The engine contract.** The split of responsibilities, and the
    generation-request protocol that is the core loop.
-2. **The onboarding playbook.** How to walk a brand-new user from a fresh clone
-   to a living world. `/setup` in Claude Code runs this. Other agents follow it
+2. **The onboarding playbook.** Walking a new user from a fresh clone to a
+   living world. `/setup` in Claude Code runs this; other agents follow it
    directly.
 3. **Per-tool notes.**
 
@@ -32,15 +32,15 @@ any agent tool (Claude Code, Codex, Cursor, Copilot, …). It has three parts:
 
 ### The generation-request protocol (the core loop)
 
-1. **Plan.** Run `npm run pipeline` for one living increment on demand. It
-   equals `npm run apply -- --weeks=1`. Plain `npm run apply` generates only the
+1. **Plan.** Run `npm run pipeline` for one living increment on demand (it
+   equals `npm run apply -- --weeks=1`). Plain `npm run apply` generates only the
    periods the real calendar has produced, and `-- --backfill` covers the first
    big run. The engine advances the world: a couple of new deals, each open deal
    moved along its own cycle (usually one stage, more for a short deal, none at
    all for one that has gone quiet), closes for the deals whose cycle is up.
    Then it writes a request bundle holding **only the touch points those events
-   earned**, 1–3 per deal. Never a deal's whole history. Filling that is what
-   `--backfill-touchpoints` does:
+   earned**, 1–3 per deal. Never a deal's whole history; that is what
+   `--backfill-touchpoints` is for.
    ```
    state/requests/<periodIndex>/manifest.json        # index of all requests
    state/requests/<periodIndex>/<artifactId>.prompt.md
@@ -81,13 +81,13 @@ The prompt carries `GROUNDING RULES`. Honor them exactly. In short:
 - **Detail levels** come from the prompt (`low`/`medium`/`high`): interviews are
   long and conversational, surveys are terse, transcripts are medium.
 - **The VARIETY block is part of the grounding contract.** Deal prompts carry a
-  seeded per-deal texture (backstory, buyer tone, objections, timeline) plus a
-  per-artifact shape, and a banned-phrase list. Write from them. They are what
+  seeded per-deal texture (backstory, buyer tone, objections, timeline), a
+  per-artifact shape, and a banned-phrase list. Write from them; they are what
   keeps hundreds of deals from telling the same story. (Story banks live in
   `config/prose.yaml`; Slack persona voice cards in `config/slack-personas.yaml`.)
 - **No em dashes in the artifact body.** Rewrite the sentence instead. They are
   the loudest tell that a corpus was machine-written, and `npm run lint` warns
-  on every one it finds.
+  on every one it finds. Fix with `--refill=<artifactId>` and a rewritten line.
 - All output is **clearly-fabricated demo data**. Never reference real people.
 
 ### Detail-layer backfill contract (bulk filling of existing deals)
@@ -125,10 +125,12 @@ because regenerating would duplicate them.
 
 ### Ergonomics you can rely on
 
-- Every command is **idempotent** and supports `--dry-run`.
-- Output is machine-readable enough to branch on (counts, `filled/pending/invalid`).
+- Every command is **idempotent** and supports `--dry-run`. Output is
+  machine-readable enough to branch on (counts, `filled/pending/invalid`).
 - `npm run lint` exits non-zero on coherence errors, so it is safe to gate a
-  commit on.
+  commit on. Scope it with `lint -- --opp=<id>`. `lint -- --repetition` is a
+  warn-only repeated-phrase detector; promote persistent offenders into
+  `banned_phrases` in `config/prose.yaml`.
 - Nothing external is touched unless a connector is enabled in
   `config/connectors.yaml` **and** its credentials are present. Otherwise you
   get a clean, labeled skip.
@@ -136,14 +138,6 @@ because regenerating would duplicate them.
   curated deals). Never widen the cohort to "push everything".
 - `apply -- --next=N` prints a read-only queue of opps still needing a detail
   layer.
-- `apply -- --refill=<artifactId>` resets one artifact to `planned` and re-emits
-  its prompt. It refuses if external records exist.
-- `lint -- --opp=<id>` scopes cross-system checks to one deal.
-- `npm run lint` also warns, per artifact, on any em dash in generated prose.
-  Real reps don't type them, so they read as machine-written. Fix with
-  `--refill=<artifactId>` and a rewritten sentence.
-- `lint -- --repetition` is a warn-only repeated-phrase detector. Promote
-  persistent offenders into `banned_phrases` in `config/prose.yaml`.
 - Fills parallelize freely, since they write distinct result files. `apply`/`lint`
   runs must stay **serial**, because `state/world.json` is written whole
   (last-writer-wins).
@@ -161,7 +155,7 @@ checking off what already exists (every step is resumable).
 silently overwrite a configured world.
 
 **Step 1 · Interview the user.** Demoverse ships templates, not a canned
-company. The user's fictional company is invented here. Ask one topic at a
+company, so the user's fictional company is invented here. Ask one topic at a
 time, and offer to invent plausible details from a one-line seed idea
 ("a devtools SaaS selling error monitoring") whenever the user shrugs:
 
@@ -196,7 +190,7 @@ the user the plan ("would create N opps, plan K artifacts"). Then run
 `npm run pipeline` for real, open one generated
 `state/requests/<n>/<artifactId>.prompt.md`, and fill it as the hello-world.
 Ingest with `npm run apply -- --ingest`, run `npm run lint`, and show the
-result. The world now exists. Entirely locally, zero credentials.
+result. The world now exists, entirely locally, with zero credentials.
 
 **Step 5 · Connectors (optional, one at a time).** For each system the user
 wants (Salesforce / Google Drive / Slack / HubSpot): follow the matching guide
@@ -229,10 +223,9 @@ weekly loop. Mirror the context-hygiene rule by hand: fill **one opportunity
 per session/task**, keep `apply`/`lint` serial, and commit per opportunity
 during backfills.
 
-**No agent at all**: the engine itself runs fine without one, but nothing in the
-repo generates the prose for you, so the artifacts stay empty until a model
-writes them. The prompts in `state/requests/` are self-contained briefs a human
-can fill by hand, which is useful for a handful of artifacts and hopeless for a
-world of them. The realistic no-agent path is scripting your own filler:
-`docs/request-protocol.md` specifies the result formats for any generator you
-point at a model API of your choosing.
+**No agent at all**: the engine runs fine without one, but nothing in the repo
+generates the prose, so artifacts stay empty until a model writes them. The
+prompts in `state/requests/` are self-contained briefs a human can fill by hand,
+which works for a handful of artifacts and not for a world of them. The
+realistic no-agent path is scripting your own filler: `docs/request-protocol.md`
+specifies the result formats for any generator you point at a model API.

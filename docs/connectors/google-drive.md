@@ -73,7 +73,7 @@ As everywhere, only [cohort](../operations.md#the-cohort) deals reach Drive.
 
 Drive is the one destination a downstream tool typically ingests *blind*: a watched-folder connector reads whatever is in the folder, with no CRM join to cross-check against. So a stale file doesn't sit there harmlessly. It gets ingested, and the tool derives accounts and deals for a company that exists nowhere else.
 
-That's exactly what a world reset produces. After `npm run init -- --force`, the new ledger carries no Drive file ids, so the next reconcile re-uploads everything. The *old* generation's files stay behind as orphans. The audit finds them by walking the tree and matching every file id against the ledger:
+That's exactly what a world reset produces. After `npm run init -- --force`, the new ledger carries no Drive file ids, so the next reconcile re-uploads everything and the *old* generation's files stay behind as orphans. The audit finds them by walking the tree and matching every file id against the ledger:
 
 ```bash
 npm run drive:audit                              # report orphans

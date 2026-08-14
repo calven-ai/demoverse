@@ -16,9 +16,7 @@ That is the whole setup. You do **not** need to configure a world to work on
 the engine: the suite loads `config/templates/*.yaml` directly (see
 `tests/fixture.ts`), and CI runs exactly what a fresh clone runs. Treat the
 templates as the spec the tests assert against, and keep the Zod defaults in
-`src/config/schema.ts` in agreement with them.
-
-The engine runs entirely locally, with no credentials. See
+`src/config/schema.ts` in agreement with them. See
 [docs/getting-started.md](docs/getting-started.md).
 
 ## Never commit a world to this repo
@@ -32,7 +30,7 @@ uses share a directory layout, so be deliberate about which one you are in:
   where committing `config/*.yaml` and `state/world.json` is the point.
 
 If you built a world first and want to send a fix upstream, make the PR from a
-branch that carries no `config/*.yaml`, no `state/world.json`, and no
+branch carrying no `config/*.yaml`, no `state/world.json`, and no
 `state/content/`. Those files hold account names, buying-group contacts and
 connector record ids from whatever systems you pointed at.
 
@@ -58,7 +56,7 @@ connector record ids from whatever systems you pointed at.
 - `npm run lint:prose` enforces one house style rule on the repo's own text: no
   em dashes, in docs, comments or output strings. They are the loudest tell that
   a paragraph came out of a language model, and this project's whole job is
-  producing text that doesn't read that way. Rewrite the sentence. A period
+  producing text that doesn't read that way. Rewrite the sentence; a period
   usually does it. A line that genuinely needs one (an external record name)
   opts out with a `prose-lint: allow-emdash` comment.
 
@@ -72,9 +70,9 @@ no-op cleanly, and that behavior needs tests.
 ## Ideas we'd merge
 
 The engine is feature-complete for its own scope, so there is no backlog to pick
-from. These are the additions that would fit it well if someone wants to build
-one. None is claimed, and none is promised by the maintainers. Open an issue
-first so nobody duplicates your work.
+from. These would fit it well if someone wants to build one. None is claimed,
+and none is promised by the maintainers. Open an issue first so nobody
+duplicates your work.
 
 - **More connectors.** Pipedrive, Notion and Gmail are the ones people ask
   about. Each is an implementation of the existing `Connector` interface, so it

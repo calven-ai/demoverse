@@ -1,6 +1,6 @@
 # Operations
 
-This is the runbook for a world that's already alive: the weekly routine, the two motions and why they must never be confused, cohort curation, steering the story, triaging lint findings, and the reset paths. If you're setting up for the first time, start with [getting-started.md](getting-started.md).
+The runbook for a world that's already alive: the weekly routine, the two motions and why they must never be confused, cohort curation, steering the story, triaging lint findings, and the reset paths. Setting up for the first time? Start with [getting-started.md](getting-started.md).
 
 ## The weekly routine
 
@@ -14,7 +14,7 @@ npm run lint                            # 4. verify coherence, fix errors, re-in
 git add -A && git commit -m "pipeline increment $(date +%F)"
 ```
 
-The repo ships a `/pipeline-update` command for coding agents that encodes the whole loop, including dispatching one fill subagent per touched deal. Useful per-run knobs:
+The repo ships a `/pipeline-update` command for coding agents that encodes the whole loop, including one fill subagent per touched deal. Useful per-run knobs:
 
 ```bash
 npm run apply -- --weeks=4              # jump a month in one go
@@ -25,9 +25,9 @@ npm run apply -- --nudge="close one big enterprise win this week"   # Tier-3 twi
 
 If intake should *stay* higher, that's not a flag. That's a Tier-2 change (below).
 
-After each advance, `apply` prints a touch-point table grouped by deal. Some rows are labeled `(workspace)`, meaning "workspace-level (not tied to one deal)". Those are expected, not an error. The weekly `#competitive` questions belong to the world as a whole, not to any one opportunity.
+After each advance, `apply` prints a touch-point table grouped by deal. Rows labeled `(workspace)` are not tied to one deal and are expected, not an error: the weekly `#competitive` questions belong to the world as a whole.
 
-Three commands advance the world, so a note on run modes. `npm run pipeline` forces exactly one week. Plain `npm run apply` generates every period the real calendar has produced. On a fresh world whose clock starts quarters in the past, that's the *entire* back-catalog at once. `npm run apply -- --backfill` is the same catch-up run under its intent flag: the one-time historical seed, a large fill job best driven by an agent loop. The first-run fork is laid out in [getting-started.md](getting-started.md#the-clock-starts-in-the-past-so-pick-your-first-run-path).
+Three commands advance the world. `npm run pipeline` forces exactly one week. Plain `npm run apply` generates every period the real calendar has produced, which on a fresh world whose clock starts quarters in the past is the *entire* back-catalog at once. `npm run apply -- --backfill` is that same catch-up run under its intent flag: the one-time historical seed, a large fill job best driven by an agent loop. The first-run fork is laid out in [getting-started.md](getting-started.md#the-clock-starts-in-the-past-so-pick-your-first-run-path).
 
 ## The two motions
 
@@ -38,7 +38,7 @@ Three commands advance the world, so a note on run modes. `npm run pipeline` for
 | Per deal | 0–3 touch points, this stage only | every stage the deal actually reached |
 | When | the routine run, forever | once, to seed history |
 
-The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email. Its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts to its name. The backfill exists to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, and a deal born with a complete history reads as fake on sight.
+The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email; its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts. The backfill exists only to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, which reads as fake on sight.
 
 The backfill loop, per opportunity (resume-safe, one deal at a time):
 
@@ -52,11 +52,11 @@ npm run apply -- --ingest --reconcile --opp=<id>
 git add -A && git commit -m "detail layer: <id>"
 ```
 
-Stop when `--next=1` prints nothing. Got a bad result mid-loop? `npm run apply -- --refill=<artifactId>` resets it to `planned` and re-emits the prompt. It refuses once external records exist (see [request-protocol.md](request-protocol.md#refilling-a-bad-result)).
+Stop when `--next=1` prints nothing. For a bad result mid-loop, `npm run apply -- --refill=<artifactId>` resets it to `planned` and re-emits the prompt; it refuses once external records exist ([details](request-protocol.md#refilling-a-bad-result)).
 
 ## The cohort
 
-Only deals in `state/cohort.json` ever reach external systems. It's a curated ~50-deal window over a ledger that holds hundreds. The ledger's depth is what makes the statistics real. The cohort's smallness is what keeps the demo browsable and the destinations under their caps. Never widen the cohort to "just push everything". Add deals via selection, or let weekly runs auto-enroll the ones they create.
+Only deals in `state/cohort.json` ever reach external systems: a curated ~50-deal window over a ledger that holds hundreds. The ledger's depth makes the statistics real; the cohort's smallness keeps the demo browsable and the destinations under their caps. Never widen the cohort to "just push everything". Add deals via selection, or let weekly runs auto-enroll the ones they create.
 
 ```bash
 npm run cohort                          # status table + regenerate the summary
@@ -67,14 +67,14 @@ npm run cohort:prune-winloss            # report win-loss coverage across the co
 npm run sf:purge -- --noncohort         # shrink the CRM org to the cohort (dry-run by default)
 ```
 
-Two mix rules are worth checking after any bulk generation. Config is not self-evidently correct, and the mix it produces is the check:
+Two mix rules are worth checking after any bulk generation, because config is not self-evidently correct and the mix it produces is the check:
 
-- **Win-loss scarcity.** Roughly one closed deal in three carries a survey or interview (`world.yaml` `winloss.mode_mix`, `none` ≈ 0.67). If most of your cohort's closed deals have one, reconcile the config before generating prose. A world where every close gets a debrief reads as generated, and absence stops meaning anything.
+- **Win-loss scarcity.** Roughly one closed deal in three carries a survey or interview (`world.yaml` `winloss.mode_mix`, `none` ≈ 0.67). If most of your cohort's closed deals have one, fix the config before generating prose. A world where every close gets a debrief reads as generated, and absence stops meaning anything.
 - **Slack is weekly-members-only.** Seed-sourced cohort members never get Slack artifacts ([why](connectors/slack.md#the-weekly-members-only-rule)).
 
 ## Changing the story
 
-Some direction changes durably. "From now on, win rate climbs." That's a **Tier-2 directive**: recorded in `state/directives.md`, materialized in `state/trends.json`, applied automatically every run until amended. Worked example, "ramp win rate over the next two quarters":
+Some direction changes durably: "from now on, win rate climbs". That's a **Tier-2 directive**, recorded in `state/directives.md`, materialized in `state/trends.json`, and applied automatically every run until amended. Worked example, "ramp win rate over the next two quarters":
 
 1. Append under `## Active` in `state/directives.md`:
 
@@ -89,24 +89,24 @@ Some direction changes durably. "From now on, win rate climbs." That's a **Tier-
    "winRate": { "baseline": 0.48, "trendPerQuarter": 0.04 }
    ```
 
-The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward. Data already written stays. Only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
+The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward: data already written stays, only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
 
 ## Lint triage
 
 `npm run lint` exits non-zero on errors. Safe to gate commits on.
 
-- **`error`**. Must fix. Structural breakage (dangling references, a lost deal with no loss reason), or finalized prose that contradicts the record (wrong competitor, wrong reason on an artifact that can no longer be refilled). Fix structure by rerunning the engine step that owns it. Fix prose via `--refill` + re-fill + re-ingest.
+- **`error`**. Must fix. Structural breakage (dangling references, a lost deal with no loss reason), or finalized prose contradicting the record (wrong competitor or reason on an artifact that can no longer be refilled). Fix structure by rerunning the engine step that owns it; fix prose via `--refill` + re-fill + re-ingest.
 - **`warn`**. Judgment. Prose drift on a still-fillable artifact, thin coverage, mix skews. Batch these up and fix opportunistically.
 
 Scope with `--opp=<id>` while iterating on one deal, `--sample=N` to bound the cross-system pass on big ledgers.
 
-**The em-dash check** (part of every `npm run lint`, warn-only) flags any artifact whose prose contains an em dash. Nobody types one into a CRM note, so a corpus full of them reads as generated on sight. The prompts already prohibit them; a warning means one slipped through. Fix it with `apply -- --refill=<artifactId>` and a re-fill, not a hand-edit.
+**The em-dash check** (part of every `npm run lint`, warn-only) flags any artifact whose prose contains an em dash. Nobody types one into a CRM note, so a corpus full of them reads as generated on sight. The prompts already prohibit them, so a warning means one slipped through. Fix it with `apply -- --refill=<artifactId>` and a re-fill, not a hand-edit.
 
-**The repetition detector** (`npm run lint -- --repetition`, warn-only) flags distinctive phrases recurring across deals. That's the tell of an agent-generated corpus. Promote persistent offenders into `config/prose.yaml` `banned_phrases`, and every future prompt then prohibits them. Run it after any bulk fill.
+**The repetition detector** (`npm run lint -- --repetition`, warn-only) flags distinctive phrases recurring across deals, the tell of an agent-generated corpus. Promote persistent offenders into `config/prose.yaml` `banned_phrases`, and every future prompt prohibits them. Run it after any bulk fill.
 
 ## When simNow runs ahead of real time
 
-`npm run pipeline` *forces* a period, so records land a few days in the future and the engine warns how far ahead the world sits. That's the accepted cost of a world that moves on demand. Plain `npm run apply` (no flags) generates only what the real calendar has produced, and prints "world already current" when there's nothing to do. The gap self-heals as real time catches up. Don't force weeks faster than you want the demo's "today" to drift.
+`npm run pipeline` *forces* a period, so records land a few days in the future and the engine warns how far ahead the world sits. That's the accepted cost of a world that moves on demand, and the gap self-heals as real time catches up. Plain `npm run apply` generates only what the real calendar has produced, and prints "world already current" when there's nothing to do. Don't force weeks faster than you want the demo's "today" to drift.
 
 ## Purge and reset
 
@@ -126,13 +126,12 @@ Slack posts age out on their own on the free plan's 90-day window.
 npm run init -- --force        # regenerate state/ from config; the old ledger is gone
 ```
 
-Order matters when destinations are connected. Purge the external systems *first* (`sf:purge -- --all`, `hubspot:purge`), because the new ledger carries no external ids and cannot clean up after the old one. Drive is the sharpest edge. After any `init --force`, run `npm run drive:audit` and purge the orphans. Otherwise a watched-folder integration will happily ingest ghosts of the previous world ([details](connectors/google-drive.md#driveaudit-and-the-orphan-hazard)).
+Order matters when destinations are connected. Purge the external systems *first* (`sf:purge -- --all`, `hubspot:purge`), because the new ledger carries no external ids and cannot clean up after the old one. Drive is the sharpest edge: after any `init --force`, run `npm run drive:audit` and purge the orphans, or a watched-folder integration will happily ingest ghosts of the previous world ([details](connectors/google-drive.md#driveaudit-and-the-orphan-hazard)).
 
 ## Real target-account names (optional, advanced)
 
-By default every account is invented: names come from the engine's own name
-banks and nothing in the world corresponds to a real company. That is the
-recommended setup, and it is what you get if you do nothing.
+By default every account is invented, drawn from the engine's own name banks.
+That is the recommended setup, and what you get if you do nothing.
 
 If you have curated lists of real *logos* you are allowed to demo with, the
 `prospects` block in `config/world.yaml` points the generator at them. The
@@ -161,25 +160,24 @@ everything except the first two is optional:
 | Headquarters | `Headquarters (City; Country)`, `Location`, `HQ`, `Headquarters` |
 | Funding status | `Funding/Acquisition Status`, `Acquisition Status`, `Funding` |
 
-Rows without a usable name and domain are dropped. So are rows whose industry
-resolves outside `segments.industries`, because letting them in would skew the
-planted industry mix. A per-file `industry:` maps a single-vertical list
-wholesale; leave it off for mixed lists and let `segments.industry_keywords`
-route each row. Lists are merged and deduplicated by domain, and the pool falls
-back to synthetic names whenever a bucket runs dry, so generation never fails
-because a list was short.
+Rows without a usable name and domain are dropped, as are rows whose industry
+resolves outside `segments.industries` (letting them in would skew the planted
+industry mix). A per-file `industry:` maps a single-vertical list wholesale;
+leave it off for mixed lists and let `segments.industry_keywords` route each
+row. Lists are merged and deduplicated by domain, and the pool falls back to
+synthetic names whenever a bucket runs dry, so generation never fails because a
+list was short.
 
 Three things worth being deliberate about:
 
 - **The CSVs live outside the ledger.** Nothing is copied into `state/`. Keep
-  the source lists wherever you keep them and gitignore `dir` if it sits in
-  the repo.
+  the source lists where they are and gitignore `dir` if it sits in the repo.
 - **Real logos, never real people.** Contacts keep fabricated names on
   non-resolving `.example` domains. Do not "improve" this by importing
   contact rows.
 - **The outcomes are fabricated.** A real company name now sits on an invented
-  won/lost deal with invented pricing feedback and invented quotes. That
-  belongs in your private demo systems and nowhere else. See
+  won/lost deal with invented pricing feedback and quotes. That belongs in your
+  private demo systems and nowhere else. See
   [DISCLAIMER.md](../DISCLAIMER.md).
 
 Set `enabled: false` (or delete the block) to go back to fully synthetic. The
