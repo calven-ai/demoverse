@@ -15,7 +15,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const EM_DASH = "—";
+const EM_DASH = "—"; // prose-lint: allow-emdash (the needle itself)
 const ALLOW = "prose-lint: allow-emdash";
 
 const EXTENSIONS = [".md", ".ts", ".js", ".mjs", ".yaml", ".yml", ".json"];
