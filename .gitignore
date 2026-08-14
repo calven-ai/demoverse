@@ -4,7 +4,7 @@ node_modules/
 # Build output
 dist/
 
-# Credentials — never commit
+# Credentials: never commit
 .env
 .env.local
 *.pem

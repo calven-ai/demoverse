@@ -1,12 +1,12 @@
 ---
 name: backfill-opps
-description: Autonomously generate the detail layer for the next N opportunities of the demo world — plant touch points, fill prose via opp-filler subagents (one per opportunity), ingest, lint, fix, reconcile, and commit per opp. Use for the detail-layer backfill or whenever multiple opportunities need their artifacts generated. Args - N (number of opps, default 5).
+description: Autonomously generate the detail layer for the next N opportunities of the demo world. Plant touch points, fill prose via opp-filler subagents (one per opportunity), ingest, lint, fix, reconcile, and commit per opp. Use for the detail-layer backfill or whenever multiple opportunities need their artifacts generated. Args - N (number of opps, default 5).
 ---
 
 # /backfill-opps [N]
 
 Processes the next N opportunities (default 5) end-to-end with zero operator
-input. The main context runs ONLY shell commands and subagent dispatch — all
+input. The main context runs ONLY shell commands and subagent dispatch. All
 prose is written by `opp-filler` subagents (model: sonnet, one per opportunity).
 **Never fill result files inline in the main context.**
 
@@ -19,7 +19,7 @@ npm run apply -- --next=N
 ```
 
 Output is one opp per line: `oppId<TAB>status<TAB>accountName<TAB>untouched|planned:K`.
-`planned:K` rows are planted-but-unfilled deals from an interrupted run — they
+`planned:K` rows are planted-but-unfilled deals from an interrupted run. They
 resume identically (replanting is an idempotent no-op that re-emits prompts).
 If the list is empty, report "all opportunities filled" and stop.
 
@@ -27,19 +27,19 @@ If the list is empty, report "all opportunities filled" and stop.
 
 For each wave of up to 3 opportunities:
 
-**a. Plant (serial — the ledger is last-writer-wins, never parallelize apply):**
+**a. Plant (serial). The ledger is last-writer-wins, so never parallelize apply:**
 
 For each opp in the wave:
 ```bash
 npm run apply -- --backfill-touchpoints --opp=<oppId>
 ```
 Then IMMEDIATELY read `state/requests/<periodIndex>/manifest.json` (the period
-index is printed by the command) and record this opp's request list —
+index is printed by the command) and record this opp's request list, one
 `{artifactId, kind, output, promptFile, resultFile}` per entry. The manifest is
 OVERWRITTEN by the next plant, so capture it before planting the next opp.
 
 **b. Fill (parallel):** launch the wave's `opp-filler` subagents **in ONE
-message** — one subagent per opportunity, each given the absolute request dir
+message**. Give one subagent per opportunity, each with the absolute request dir
 and only ITS opp's request list. Result files are distinct, so parallel fills
 never conflict.
 
@@ -81,13 +81,13 @@ needed, reconcile errors, and any repetition warnings (candidates for
 
 ## Rules
 
-- **One `opp-filler` subagent per opportunity, never batched** — a subagent that
+- **One `opp-filler` subagent per opportunity, never batched.** A subagent that
   runs out of context mid-deal gets re-launched for that same deal's remaining
   artifacts only.
 - All `npm run apply` / `npm run lint` / `git` commands run serially in the main
   context (`state/world.json` writes are last-writer-wins).
-- `--refill` refuses artifacts that already have external records — that is
-  correct; it means the artifact was already pushed and must not be regenerated.
+- `--refill` refuses artifacts that already have external records. That is
+  correct. It means the artifact was already pushed and must not be regenerated.
 - Never hand-edit `state/world.json`; never pre-fill the product's derived outputs.
 
 ## Overnight operation

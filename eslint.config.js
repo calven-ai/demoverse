@@ -1,5 +1,5 @@
-// Flat ESLint config: typescript-eslint recommended, correctness only — no
-// style rules (Prettier owns formatting).
+// Flat ESLint config: typescript-eslint recommended, correctness only. No
+// style rules, because Prettier owns formatting.
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 

@@ -1,6 +1,6 @@
 # HubSpot connector
 
-HubSpot is the structure-only CRM destination: companies, contacts, deals, and their associations — no activity timeline, no files. It exists for teams whose demo target is HubSpot rather than Salesforce, and as a worked, deterministic importer you can verify record-by-record. This guide sets up a dedicated test portal, a private-app token, and walks the import/verify/purge cycle.
+HubSpot is the structure-only CRM destination: companies, contacts, deals, and their associations. No activity timeline, no files. It exists for teams whose demo target is HubSpot rather than Salesforce, and as a worked, deterministic importer you can verify record-by-record. This guide sets up a dedicated test portal and a private-app token, then walks the import/verify/purge cycle.
 
 > **Dedicated test portal only.** Create a HubSpot account that exists solely for this. Never point the token at a production portal.
 
@@ -16,7 +16,7 @@ HubSpot is the structure-only CRM destination: companies, contacts, deals, and t
    - `crm.schemas.contacts.read` / `crm.schemas.contacts.write`
    - `crm.schemas.deals.read` / `crm.schemas.deals.write`
 
-   The `schemas` scopes exist so `hubspot:setup` can create custom properties; the `objects` scopes cover the records themselves.
+   The `schemas` scopes exist so `hubspot:setup` can create custom properties. The `objects` scopes cover the records themselves.
 4. Copy the access token into `.env`:
 
 ```bash
@@ -30,11 +30,11 @@ npm run hubspot:setup -- --dry-run
 npm run hubspot:setup
 ```
 
-Idempotent; safe to re-run. The key property is `demo_world_id` — the ledger id, verbatim, on every record. It's the upsert key (re-runs update, never duplicate) and the purge safety rail. Records also carry a provenance property marking them as fabricated demo data; contact emails are rewritten to non-deliverable addresses. Names — company, contact, deal — mirror the ledger exactly, so a CRM integration reads the same deal identity from HubSpot as it would from Salesforce.
+Idempotent, so it's safe to re-run. The key property is `demo_world_id`. That's the ledger id, verbatim, on every record. It's the upsert key (re-runs update, never duplicate) and the purge safety rail. Records also carry a provenance property marking them as fabricated demo data, and contact emails are rewritten to non-deliverable addresses. Company, contact and deal names mirror the ledger exactly, so a CRM integration reads the same deal identity from HubSpot as it would from Salesforce.
 
 ## 3. Import, scoped and dry-run first
 
-Three scopes; never mix flags across them:
+Three scopes. Never mix flags across them:
 
 | Scope | Command | Use for |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ npm run hubspot:verify -- --all
 
 The importer streams per-phase progress (companies → contacts → deals → associations, batched to HubSpot's 100-records-per-call limit with automatic retry on rate limits), prints the destination portal link, writes a machine-readable run report under `runs/`, and exits non-zero if any record failed.
 
-`hubspot:verify` re-derives the same mapping, batch-reads every `demo_world_id` in scope, diffs the properties, and confirms the contact→company / deal→company / deal→contact associations exist (skip association checks with `--no-associations`). Non-zero exit on any mismatch — safe to script.
+`hubspot:verify` re-derives the same mapping, batch-reads every `demo_world_id` in scope, diffs the properties, and confirms the contact→company / deal→company / deal→contact associations exist (skip association checks with `--no-associations`). It exits non-zero on any mismatch. Safe to script.
 
 ## 4. Undo: `hubspot:purge`
 
@@ -67,11 +67,11 @@ Only records carrying `demo_world_id` are ever touched.
 
 HubSpot is wired two ways, and the difference matters:
 
-- **Standalone scripts** (`hubspot:setup` / `import` / `verify` / `purge`) — the primary path. They run on demand, regardless of `config/connectors.yaml`, against whatever scope you pass. Routine weekly runs never touch HubSpot this way, so nothing lands there by accident.
-- **Registered connector** — set `hubspot: { enabled: true }` in `config/connectors.yaml` and HubSpot joins the normal `apply -- --reconcile` chain alongside the other destinations, with the same [cohort gate](../operations.md#the-cohort), `--dry-run`, and `--opp=` scoping. Use this when HubSpot *is* your demo CRM and you want the weekly loop to keep it current.
+- **Standalone scripts** (`hubspot:setup` / `import` / `verify` / `purge`) are the primary path. They run on demand, regardless of `config/connectors.yaml`, against whatever scope you pass. Routine weekly runs never touch HubSpot this way, so nothing lands there by accident.
+- **Registered connector.** Set `hubspot: { enabled: true }` in `config/connectors.yaml` and HubSpot joins the normal `apply -- --reconcile` chain alongside the other destinations, with the same [cohort gate](../operations.md#the-cohort), `--dry-run`, and `--opp=` scoping. Use this when HubSpot *is* your demo CRM and you want the weekly loop to keep it current.
 
 It ships disabled because most operators run one CRM. Either way it remains structure-only: transcripts and documents belong to [Drive](google-drive.md), chatter to [Slack](slack.md).
 
-The connector is also the reference implementation for writing your own destination — see [build-your-own.md](build-your-own.md).
+The connector is also the reference implementation for writing your own destination. See [build-your-own.md](build-your-own.md).
 
 Back to [getting started](../getting-started.md) · other connectors: [Salesforce](salesforce.md) · [Drive](google-drive.md) · [Slack](slack.md)
