@@ -5,7 +5,7 @@ This guide takes you from a fresh clone to a living synthetic sales world. Deals
 ## Prerequisites
 
 - **Node.js ≥ 20** (`node --version`)
-- **A coding agent.** Claude Code, Codex, Cursor, or anything that can read and write files. The engine emits fully-grounded prompt files. Your agent writes the prose from them, or you do, by hand. Demoverse never calls an LLM API itself.
+- **A coding agent.** Claude Code, Codex, Cursor, or anything that can read and write files. This is a real requirement, not a nicety: the engine emits fully-grounded prompt files, and the agent's model is what generates the transcripts, emails and Slack threads from them. Demoverse ships no model client and no model key of its own, so that generation runs on your agent's existing subscription rather than a separate API bill.
 - **Git.** Your clone *is* your world: the ledger, config, and generated prose are all committed to it.
 
 If your npm setup blocks lifecycle scripts ("allow-scripts" warnings at install time), ignore the warning. The engine runs via `tsx` and needs no postinstall scripts.
@@ -110,7 +110,7 @@ Open one of the `.prompt.md` files. It contains everything the prose needs: the 
 
 ## Fill two or three requests
 
-Do a couple by hand first, to feel the protocol. Or hand the whole batch to your agent.
+Do a couple by hand first, to feel the protocol. Then hand the batch to your agent, which is how every run after this one works.
 
 **By hand.** Pick a request from `manifest.json`, read its prompt, and write the result:
 

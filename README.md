@@ -5,7 +5,7 @@
 <h1 align="center">Demoverse</h1>
 
 <p align="center">
-  <b>Grow a fake company's entire sales history across CRM, calls, email and Slack. Then keep it moving, week after week.</b>
+  <b>Grow a fake company's entire sales history across CRM, calls, email and Slack.<br> Then keep it moving, week after week.</b>
 </p>
 
 <p align="center">
@@ -21,61 +21,116 @@
   <a href="docs/getting-started.md">Docs</a> ·
   <a href="docs/connectors/build-your-own.md">Connectors</a> ·
   <a href="docs/faq.md">FAQ</a> ·
-  <a href="#roadmap">Roadmap</a>
+  <a href="#project-status">Status</a>
 </p>
 
 ---
 
-Every B2B product demo dies the same death. The environment is either **empty**
-or **obviously fake**. Uniform CRM notes. Every deal neatly debriefed. The same
-three phrases in every call transcript. An audience smells generated data in
-seconds, and your product has nothing real to show off.
+Every B2B product demo dies the same death. The environment is **empty**,
+**half-populated**, or **obviously fake**. Ten accounts and no contacts. Uniform
+CRM notes. Every deal neatly debriefed. The same three phrases in every call
+transcript. An audience smells generated data in seconds, and your product has
+nothing real to show off.
+
+The deeper problem is that demo data is built **once**. Somebody seeds it before
+a launch, and from that moment it is a photograph: every deal frozen at the
+stage it was born in, nothing opened, nothing closed, no history behind it and
+no next week ahead of it. It also ages badly, drifting further out of date with
+every month that passes.
+
+That quietly kills the demos worth giving. **Anything interesting about a
+sales org is a trend**, not a snapshot: pipeline building over a quarter, win
+rate recovering, a competitor showing up in more deals than it did in March,
+one segment pulling ahead of another. A dataset with no past cannot show a
+trajectory, so the charts stay flat, the dashboards have nothing to say, and
+you end up narrating what the product *would* show if the data were real.
 
 Demoverse builds the alternative. You define a **fictional company**. The engine
 keeps a **deterministic ledger** of accounts, buying committees, deals and
-correlated win/loss outcomes, and **advances it one week at a time**. On top of
-that sits a prose layer written by **your coding agent** from fully grounded
-prompts: call transcripts, AE notes, email threads, Slack chatter, win-loss
-interviews. Every artifact tells the same story as the CRM record it belongs to.
-A curated cohort of deals gets pushed into Salesforce, HubSpot, Google Drive and
-Slack, where your product ingests it like production data.
+correlated win/loss outcomes, and **advances it one week at a time**, so history
+accumulates the way it does in a real company. Steer the direction as you go and
+the trends bend with it. On top of that ledger, **your coding agent generates
+the content**: call transcripts, AE notes, email threads, Slack chatter,
+win-loss interviews, each written from a prompt the engine grounds in the facts
+it just recorded. Every artifact tells the same story as the CRM record it
+belongs to. A curated cohort of deals gets pushed into
+Salesforce, HubSpot, Google Drive and Slack, where your product ingests it like
+production data.
 
 ### Works with
 
-| Agents (write the prose) | Destinations (receive the world) |
-| --- | --- |
-| Claude Code · Codex · Cursor · any [AGENTS.md](AGENTS.md)-aware tool, or no agent at all | Salesforce · HubSpot · Google Drive · Slack · [your own connector](docs/connectors/build-your-own.md) |
+<p align="center">
+  <a href="CLAUDE.md"><img src="docs/assets/logos/claude-code.svg" width="26" height="26" alt="Claude Code"></a>
+  <a href="AGENTS.md"><img src="docs/assets/logos/codex.svg" width="26" height="26" alt="Codex"></a>
+  <a href="AGENTS.md"><img src="docs/assets/logos/cursor.svg" width="26" height="26" alt="Cursor"></a>
+  <a href="AGENTS.md"><img src="docs/assets/logos/agents-md.svg" width="26" height="26" alt="Any AGENTS.md-aware tool"></a>
+</p>
 
-No API keys for generation. The prose is written inside the agent session you
-already pay for. The core engine needs no credentials at all, and connectors
-no-op until you enable them.
+<p align="center">
+  <b><a href="CLAUDE.md">Claude Code</a> · <a href="AGENTS.md">Codex</a> · <a href="AGENTS.md">Cursor</a> · <a href="AGENTS.md">any AGENTS.md-aware tool</a></b><br>
+  <sub>the agent you already run is what generates the content: call transcripts, email threads, Slack messages, win-loss interviews</sub>
+</p>
+
+Pushes into [Salesforce](docs/connectors/salesforce.md),
+[HubSpot](docs/connectors/hubspot.md),
+[Google Drive](docs/connectors/google-drive.md),
+[Slack](docs/connectors/slack.md), or
+[a connector you write yourself](docs/connectors/build-your-own.md).
+
+**And there is nothing extra to pay for.** Demoverse asks for no model API key.
+Generation runs in the coding agent you already subscribe to, and everything
+else runs locally. Connectors stay switched off until you hand them credentials,
+and even then they only touch the sandbox org or workspace you point them at.
 
 ## How it works
 
+One split runs through the whole system: a **deterministic engine owns every
+fact**, and your **coding agent owns only the words**. The engine decides what
+happened; the agent writes it up from prompts that carry those facts, so it can
+never invent one.
+
 <p align="center">
-  <img src="docs/assets/living-week.svg" alt="One weekly increment of the living world" width="820">
+  <img src="docs/assets/architecture-8bit.svg" alt="Demoverse architecture" width="560">
 </p>
 
 1. **You define a fictional company** in plain YAML (`config/`): product,
    competitors, personas, sales team, market segments. The `/setup` wizard
    interviews you and writes it for you.
-2. **The engine advances the world one week.** It opens a couple of new deals,
-   moves open ones a stage, and closes the ones whose cycle is up. Everything is
-   seeded and deterministic. Outcomes correlate with ICP fit, competitor
-   strength and multi-threading, so dashboards built on it show real patterns.
-3. **It emits grounded prompts**, one per touch point a deal actually earned
-   that week. Each one carries the exact facts (people, competitors, recorded
-   outcome) plus a per-deal variety texture, so no two deals read alike.
-4. **Your agent writes the prose** into result files. A validating ingest step
-   files it. A coherence linter proves the transcript, the CRM record and the
-   Slack thread never contradict each other.
-5. **Connectors push a curated cohort** into your Salesforce, HubSpot, Drive and
-   Slack through idempotent upserts. Re-runs update. They never duplicate.
-6. **Next week, it moves again.** Deals accumulate history the way real ones do.
-   A deal opened this week has one discovery call, not a full paper trail.
+2. **A target list seeds the accounts.** Point it at a CSV of real ICP companies
+   you want to see in the demo, or let the engine draw from its synthetic banks.
+3. **The ledger holds the world.** `state/world.json` is the single source of
+   truth for accounts, contacts, deals, outcomes and external ids. It is
+   versioned JSON committed to git, so the git log doubles as an audit trail.
+   Nothing hand-edits it.
+4. **The weekly advance moves the pipeline.** It opens a couple of new deals,
+   progresses open ones a stage, and closes the ones whose cycle is up.
+   Everything is seeded and deterministic. Outcomes correlate with ICP fit,
+   competitor strength and multi-threading, so dashboards built on it show real
+   patterns.
+5. **It emits grounded prompts**, one per touch point a deal actually earned.
+   Each one carries the exact facts (people, competitors, recorded outcome) plus
+   a per-deal variety texture, so no two deals read alike.
+6. **Your agent writes the prose** into result files: transcripts, emails, AE
+   notes, Slack posts, win-loss interviews. One subagent per deal keeps them
+   from blurring together.
+7. **Ingest and lint check the work.** A validating ingest step files each
+   result, and a coherence linter proves the transcript, the CRM record and the
+   Slack thread never contradict each other. Anything that fails stays unfiled
+   and is simply re-requested.
+8. **Reconcile pushes it out** to Salesforce, HubSpot, Drive and Slack through
+   idempotent upserts, recording each external id back on the ledger. Re-runs
+   update. They never duplicate.
+
+### One deal, one week at a time
+
+The engine never dumps a finished history. Each run generates only the touch
+points a deal actually earned that period, so a deal opened this week has one
+discovery call, not a full paper trail. Run it again next week and the same deal
+moves a stage and earns another one or two. That is what gives the dataset a
+past to chart and a direction to steer.
 
 <p align="center">
-  <img src="docs/assets/architecture.svg" alt="Demoverse architecture" width="820">
+  <img src="docs/assets/living-week-8bit.svg" alt="One deal accumulating history across six weekly runs" width="640">
 </p>
 
 ## What makes it believable
@@ -102,8 +157,10 @@ no-op until you enable them.
 - **Not a load-testing dataset.** Volume is intentionally demo-sized.
 - **Not for real people or production systems.** Dedicated orgs and fictional
   humans only. See [DISCLAIMER.md](DISCLAIMER.md).
-- **Not an LLM app.** It never calls a model API. It emits prompts and validates
-  results. Your agent does the writing, or you do.
+- **Not a model wrapper.** The content *is* AI-generated, just not by Demoverse.
+  The engine holds no model key and makes no model API call. It grounds the
+  prompts, validates the results, and leaves the generating to the coding agent
+  you already run.
 
 |  | faker-style generators | static demo-org snapshot | **Demoverse** |
 | --- | :-: | :-: | :-: |
@@ -111,7 +168,7 @@ no-op until you enable them.
 | Long-form prose artifacts | ✗ | ✓ | ✓ |
 | Moves forward every week | ✗ | ✗ | ✓ |
 | Steerable story ("competitor X gets tougher") | ✗ | ✗ | ✓ |
-| Deterministic / reproducible | ✓ | ✗ | ✓ |
+| Deterministic / reproducible structure | ✓ | ✗ | ✓ |
 | Pushes into real SaaS orgs | ✗ | ✗ | ✓ |
 
 ## Quick start
@@ -154,13 +211,20 @@ Full walkthrough: [docs/getting-started.md](docs/getting-started.md).
 
 ## FAQ
 
-**Do I need Claude Code?** No. Any coding agent that reads
-[AGENTS.md](AGENTS.md) works (Codex, Cursor, Copilot, …), and everything can be
-driven by hand. The emitted prompts are self-contained briefs.
+**Do I need Claude Code?** No, but you do need a coding agent. Any one that
+reads [AGENTS.md](AGENTS.md) works (Codex, Cursor, Copilot, …). The agent is
+what actually generates the transcripts, emails and Slack threads, so it isn't
+an optional convenience. The prompts are self-contained briefs, which means you
+can hand-write a result or two to see how the contract works. A world's worth of
+them is agent work.
 
-**Does it call an LLM API? What does it cost?** The engine never calls a model.
-Prose is written inside your agent session, so on subscription plans there is no
-per-token bill. A standalone API-based filler is on the roadmap.
+**Is the prose AI-generated? What does it cost?** Yes. Transcripts, emails,
+Slack threads and win-loss interviews are all written by a language model. What
+Demoverse doesn't do is call one: no model key, no API call, no metered token
+bill. Your coding agent does the writing in its own session, on the subscription
+you already have. That keeps the engine's facts deterministic while the prose
+stays model-written, and it means any writer can fill a request, including a
+script of your own against whatever model API you prefer.
 
 **Will it touch my production CRM?** Only systems you explicitly configure, and
 it's designed for isolated ones (free Salesforce Developer Edition, throwaway
@@ -185,16 +249,25 @@ spoil every other one. The wizard makes yours yours in minutes.
 
 More in [docs/faq.md](docs/faq.md).
 
-## Roadmap
+## Project status
 
-- ✅ Deterministic world engine, grounded-prompt protocol, coherence linter
-- ✅ Salesforce, Google Drive, Slack connectors + structure-only HubSpot
-- ✅ `/setup` wizard + tool-neutral AGENTS.md onboarding
-- 🔜 API-based prose filler (`npm run fill` with your own model key)
-- 🔜 npm packaging, so `npx demoverse init` works outside a clone
-- 🗺️ More connectors: Pipedrive, Notion, Gmail
-- 🗺️ Marketing-artifact pack (campaigns, web analytics, ad performance)
-- 🗺️ Multi-company worlds (partner/reseller ecosystems)
+**Complete and maintained.** The engine does what it set out to do: a
+deterministic world simulation, the grounded-prompt protocol, the coherence
+linter, the `/setup` wizard and tool-neutral onboarding, and connectors for
+Salesforce, Google Drive, Slack and HubSpot. There is no feature backlog waiting
+to land, because the scope was small on purpose.
+
+Maintained means dependency updates, bug fixes, and repairs when a connector's
+vendor API changes underneath it. Issues get answered.
+
+New capability is meant to arrive through the two documented seams rather than
+through this repo growing: the
+[connector contract](docs/connectors/build-your-own.md) for a new system, and
+the [request protocol](docs/request-protocol.md) for a new way of filling
+prompts. Both are stable, both are roughly an afternoon of work, and neither
+needs a fork. If you build something on either one, an issue pointing at it is
+welcome. Ideas we would happily merge are listed in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing
 

@@ -2,7 +2,7 @@
 
 Demoverse is built on one split, applied everywhere. A **deterministic TypeScript engine owns every fact**: accounts, contacts, deals, outcomes, dates, competitors, ids. The **coding agent owns only the prose**, and writes it from prompts that carry the exact facts, so it can never invent one. This document covers the engine side of that line: the ledger, the clock, the generation protocol, the cohort, the steering model, and the verification layer that holds it all coherent.
 
-![The Demoverse loop: config and state feed the deterministic engine; the engine advances the pipeline and emits grounded generation requests; an agent fills the prose; the engine ingests, lints, and reconciles into the external systems, recording external ids back into the ledger.](assets/architecture.svg)
+![The Demoverse loop: config and state feed the deterministic engine; the engine advances the pipeline and emits grounded generation requests; an agent fills the prose; the engine ingests, lints, and reconciles into the external systems, recording external ids back into the ledger.](assets/architecture-8bit.svg)
 
 ## The ledger is the source of truth
 
@@ -42,7 +42,7 @@ Each advanced period, the engine:
 3. **Closes** deals whose cycle is up, sampling outcome from the current win-rate trajectory (biased by ICP fit and competitor strength) and a loss reason from the configured weights; assigns the win-loss mode.
 4. **Plans touch points**, meaning only the artifacts these events earned *this period*: a discovery call and maybe an intro email for a new deal, an evaluation call for a deal that just reached Evaluation, a win-loss artifact and post-mortem for a close. Grounding for each artifact is snapshotted at planning time, so an early-stage transcript reflects the world as it was at the call date and never leaks the eventual outcome.
 
-![A single deal accumulating history across six weekly runs: discovery call and intro email in week 1, demo call and Slack thread during Evaluation, an AE note, a proposal email, and finally a win-loss interview and post-mortem when it closes in week 6.](assets/living-week.svg)
+![A single deal accumulating history across six weekly runs: discovery call and intro email in week 1, demo call and Slack thread during Evaluation, an AE note, a proposal email, and finally a win-loss interview and post-mortem when it closes in week 6.](assets/living-week-8bit.svg)
 
 This is the **living increment**, and it's the core motion: a deal accumulates its history across many runs, exactly as a real one does. Its complement is the **detail-layer backfill** (`apply -- --backfill-touchpoints --opp=`), which plants the *whole* cycle of *one* deal at once and exists solely for seeding history. The failure mode the split prevents is a freshly-opened deal with a complete past. See [operations.md](operations.md#the-two-motions) for when to use which.
 
@@ -55,7 +55,7 @@ Prose is produced through a two-phase handoff, specified fully in [request-proto
 3. **Ingest.** `apply -- --ingest` schema-validates each result, files markdown into `state/content/`, attaches Slack/email structures onto their artifacts, and flips status to `generated`. A failure leaves the artifact `planned`, so it is simply re-requested. Bad data is never filed.
 4. **Reconcile.** `apply -- --reconcile` pushes generated artifacts and CRM structure through the connector chain, recording external ids.
 
-The engine never calls an LLM. Generation runs inside whatever agent session drives the repo. That buys a cost model (subscription tokens, not metered API) and a portability guarantee at once: any agent can fill requests, and so can `vi`.
+Step 2 is the only model-written step, and it happens outside the engine. Demoverse ships no model client and no model key; the language model that writes the prose is the one already running your agent session. That buys a cost model (subscription tokens, not a metered API bill) and a portability guarantee at once: any agent can fill requests, a script of your own against any model API can fill them, and so can `vi`.
 
 ## Connectors
 

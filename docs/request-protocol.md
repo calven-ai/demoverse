@@ -1,6 +1,10 @@
 # The request protocol
 
-Demoverse never calls an LLM. Every `apply` run emits **generation requests** instead, one per prose artifact. Each one is a self-contained prompt file grounded in the exact ledger facts, and *anything* that can read and write files can fill it: Claude Code, Codex, Cursor, a different agent, or a human with an editor. This document is the precise spec of that handoff: the manifest, the prompt anatomy, the three result formats, validation, statuses, and refills.
+The content in a Demoverse world is AI-generated. Every call transcript, email thread, Slack message and win-loss interview is written by a language model. What the engine does *not* do is call that model: it ships no model client, holds no model API key, and opens no network connection to a model provider. The generation happens one layer out, in the coding agent session that drives the repo, which is also where the token cost lands.
+
+That separation is what this protocol exists for. Every `apply` run emits **generation requests** instead of calling a model, one per prose artifact. Each is a self-contained prompt file grounded in the exact ledger facts, and the engine will accept a filled result from any source: Claude Code, Codex, Cursor, another agent, or a script you write yourself against whichever model API you prefer. The engine only ever sees the result files, and validates them the same way regardless of what produced them.
+
+The interface is files, so a human can write a result too, and doing a couple by hand is the fastest way to understand this document. That is where the manual path ends, though. A living world runs to hundreds of transcripts, threads and Slack posts, and it grows every week. Filling it is a model's job. What follows is the precise spec of the handoff: the manifest, the prompt anatomy, the three result formats, validation, statuses, and refills.
 
 ## Layout
 

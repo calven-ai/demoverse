@@ -4,11 +4,15 @@ Answers to the questions that come up when people first meet Demoverse. What it 
 
 ## Do I need Claude Code?
 
-No. The engine's contract is files, not APIs. It emits prompt files, and anything that can read and write files can fill them: Claude Code, Codex, Cursor, another agent entirely, or you with a text editor. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) and slash commands (`/setup`, `/pipeline-update`, `/backfill-opps`), which make Claude Code the smoothest ride. Nothing in the engine knows or cares who wrote the prose. The full spec is [request-protocol.md](request-protocol.md).
+No, though you do need *a* coding agent, because the agent's model is what generates the transcripts, emails and Slack threads. Which one is up to you. The engine's contract is files, not APIs: it emits prompt files, and anything that can read and write files can fill them, whether that's Claude Code, Codex, Cursor, another agent entirely, or a script of your own against a model API. Nothing in the engine knows or cares what produced a result. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) and slash commands (`/setup`, `/pipeline-update`, `/backfill-opps`), which make Claude Code the smoothest ride. You can also fill a request by hand in a text editor, which is worth doing once to see the contract, but a world's worth of prose is not a hand-writing job. The full spec is [request-protocol.md](request-protocol.md).
 
-## Does it call an LLM API?
+## Is the prose AI-generated? Does Demoverse call an LLM?
 
-No. Demoverse itself is deterministic TypeScript. No API keys for language models, no metered token bill. Prose generation happens inside your coding-agent session, on whatever subscription you already have. That's a deliberate design choice rather than a missing feature. It keeps the engine's facts fully deterministic and the cost model flat. An optional API-based filler for unattended runs is on the roadmap, and the request protocol is already the seam it would plug into.
+Yes to the first, no to the second, and the distinction matters. Every transcript, email thread, Slack post and win-loss interview in a Demoverse world is written by a language model. The engine is not the thing calling it. Demoverse is deterministic TypeScript with no model client in its dependencies, no model API key in its config, and no network call to a model provider anywhere in the codebase. It emits grounded prompt files and validates whatever comes back.
+
+The model call happens one layer out, in the coding-agent session that drives the repo, so the tokens come out of the subscription you already have rather than a metered API bill. That's a deliberate design choice rather than a missing feature: it keeps the engine's *facts* deterministic and reproducible while the *prose* stays model-written, and it means any writer can fill a request, including a script of your own against any model API, or a human with a text editor.
+
+If you want unattended runs, that's what the [request protocol](request-protocol.md) is for. It specifies the result formats precisely enough to point your own filler at them: read `manifest.json`, send each `.prompt.md` to the model of your choice, write the result files, then let `npm run apply -- --ingest` validate them exactly as it would validate an agent's work. Demoverse deliberately ships no first-party filler, so that the engine keeps no opinion about which model wrote the prose.
 
 ## Will it touch my production systems?
 

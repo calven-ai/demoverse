@@ -226,7 +226,10 @@ weekly loop. Mirror the context-hygiene rule by hand: fill **one opportunity
 per session/task**, keep `apply`/`lint` serial, and commit per opportunity
 during backfills.
 
-**No agent at all**: everything works manually. The prompts in
-`state/requests/` are self-contained briefs a human can write from, and
-`docs/request-protocol.md` specifies the result formats for any external
-generator you script yourself.
+**No agent at all**: the engine itself runs fine without one, but nothing in the
+repo generates the prose for you, so the artifacts stay empty until a model
+writes them. The prompts in `state/requests/` are self-contained briefs a human
+can fill by hand, which is useful for a handful of artifacts and hopeless for a
+world of them. The realistic no-agent path is scripting your own filler:
+`docs/request-protocol.md` specifies the result formats for any generator you
+point at a model API of your choosing.

@@ -69,6 +69,26 @@ Implement the `Connector` interface, register it, then add its
 `connectors.yaml` block and docs page. Disabled and no-credential runs must
 no-op cleanly, and that behavior needs tests.
 
+## Ideas we'd merge
+
+The engine is feature-complete for its own scope, so there is no backlog to pick
+from. These are the additions that would fit it well if someone wants to build
+one. None is claimed, and none is promised by the maintainers. Open an issue
+first so nobody duplicates your work.
+
+- **More connectors.** Pipedrive, Notion and Gmail are the ones people ask
+  about. Each is an implementation of the existing `Connector` interface, so it
+  lands without touching the engine.
+- **A standalone prose filler.** A script that reads a request bundle, calls a
+  model API of your choosing, and writes the result files, for unattended runs
+  without an agent session. [docs/request-protocol.md](docs/request-protocol.md)
+  is the full spec, and `--ingest` validates its output the same way it
+  validates an agent's.
+- **npm packaging**, so `npx demoverse init` works without cloning.
+- **A marketing-artifact pack**: campaigns, web analytics, ad performance, for
+  worlds that need to demo more than a sales motion.
+- **Multi-company worlds** for partner and reseller ecosystems.
+
 ## Pull requests
 
 - Small, focused PRs review faster.
