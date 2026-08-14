@@ -1,11 +1,11 @@
 /**
- * Zod schemas for the world-state ledger (state/world.json). See DESIGN.md §5–6.
+ * Zod schemas for the world-state ledger (state/world.json). See docs/architecture.md#entity-model.
  *
  * The ledger is the single source of truth. The deterministic generator owns
  * structure + referential integrity (stable ids); every entity records its
  * external ids (Salesforce Id / Drive fileId / Slack ts) after first creation so
  * re-runs UPDATE rather than duplicate. Schema-validating every emitted record
- * (and re-generating on failure) is a core robustness pillar (§7.2).
+ * (and re-generating on failure) is a core robustness pillar.
  */
 
 import { z } from "zod";
@@ -13,13 +13,13 @@ import { z } from "zod";
 export const DealStatus = z.enum(["open", "won", "lost"]);
 export const WinLossMode = z.enum(["survey", "interview", "none"]);
 export const DealTier = z.enum(["professional", "enterprise"]);
-/** Self-service billing term — annual prepay gets two months free. */
+/** Self-service billing term. Annual prepay gets two months free. */
 export const BillingTerm = z.enum(["monthly", "annual"]);
-/** Internal derived ICP fit tier (never reconciled — the downstream product re-derives it). */
+/** Internal derived ICP fit tier (never reconciled; the downstream product re-derives it). */
 export const IcpTier = z.enum(["Tier 1", "Tier 2", "Tier 3"]);
 
 /**
- * Buying-committee role. An open string — the vocabulary is defined by
+ * Buying-committee role. An open string whose vocabulary is defined by
  * `config/personas.yaml` and validated there and by the domain linter, so the
  * ledger schema stays config-agnostic.
  */
@@ -82,7 +82,7 @@ export const Account = z.object({
   /**
    * INTERNAL derived ICP fit (from config/icp.yaml over the raw firmographics).
    * Used to bias outcomes + classify in/out-of-ICP in the pre-flight report.
-   * NEVER reconciled to any external system — the downstream product computes its own.
+   * NEVER reconciled to any external system. The downstream product computes its own.
    */
   icpScore: z.number().min(0).max(100),
   icpTier: IcpTier,
@@ -108,9 +108,9 @@ export const Opportunity = z.object({
   accountId: z.string(),
   ownerRepId: z.string(),
   amount: z.number().nonnegative(),
-  /** Pricing tier (Professional | Enterprise) — fixed price, self-service. */
+  /** Pricing tier (Professional | Enterprise). Fixed price, self-service. */
   tier: DealTier,
-  /** monthly | annual contract — the only thing that varies the base price. */
+  /** monthly | annual contract. The only thing that varies the base price. */
   billingTerm: BillingTerm,
   stage: z.string(),
   status: DealStatus,
@@ -118,7 +118,7 @@ export const Opportunity = z.object({
   complexity: z.string(),
   /** ISO date (YYYY-MM-DD). */
   createdDate: z.string(),
-  /** ISO-8601 datetime — createdDate + a seeded business-hours time. SF push source. */
+  /** ISO-8601 datetime. createdDate + a seeded business-hours time. SF push source. */
   createdAt: z.string().optional(),
   closeDate: z.string().optional(),
   /**
@@ -127,7 +127,7 @@ export const Opportunity = z.object({
    * decided. Stages the deal skipped (a short cycle can jump Evaluation
    * straight to Negotiation) simply do not appear.
    *
-   * This is the raw material for stage-duration / pipeline-velocity analysis —
+   * This is the raw material for stage-duration / pipeline-velocity analysis:
    * how long a deal sat in each stage. Salesforce's own `OpportunityHistory`
    * cannot serve that here: it is system-generated, so every transition would
    * be stamped with the reconcile time rather than the simulated date. The
@@ -137,7 +137,7 @@ export const Opportunity = z.object({
   /** Competitor names present on this deal (must exist in competitors.yaml). */
   competitors: z.array(z.string()).default([]),
   /**
-   * The primary domain use case — what the buyer walked in asking for (a name
+   * The primary domain use case. What the buyer walked in asking for (a name
    * from config/use-cases.yaml). Drives the Opportunity name and is the dominant
    * theme of every artifact on the deal.
    *
@@ -145,25 +145,25 @@ export const Opportunity = z.object({
    * existed; `npm run assign-use-cases` backfills them.
    */
   useCase: z.string().optional(),
-  /** Set only when status is lost — crm-shared.ts LOSS_REASON_OPTIONS. */
+  /** Set only when status is lost. A key of world.yaml winloss.loss_reasons. */
   winLossReason: z.string().optional(),
   /**
    * The AE-believed loss reason (what the opportunity OWNER thinks lost the deal),
    * set only when lost. Usually matches `winLossReason` (the prospect/win-loss
-   * truth) but diverges on a minority of deals — the belief-vs-reality gap analytics
-   * surfaces. Also a LOSS_REASON_OPTIONS value.
+   * truth) but diverges on a minority of deals, which is the belief-vs-reality
+   * gap analytics surfaces. Also a winloss.loss_reasons key.
    */
   repLossReason: z.string().optional(),
   /** Price feedback vs the competition (set on close, won or lost). */
   priceFeedback: z.string().optional(),
   /** Product-feedback areas (prose.yaml vocab.product_feedback; multi). */
   productFeedback: z.array(z.string()).default([]),
-  /** crm-shared.ts TECH_STACK_OPTIONS named as requirements on the deal. */
+  /** world.yaml segments.tech_stack tools named as requirements on the deal. */
   techStackRequirements: z.array(z.string()).default([]),
   winLossMode: WinLossMode,
   /** Buying-group contact ids involved in this deal. */
   contactIds: z.array(z.string()).default([]),
-  /** The primary contact (the champion) — is_primary on opportunity_contacts. */
+  /** The primary contact (the champion). is_primary on opportunity_contacts. */
   primaryContactId: z.string().optional(),
   external: ExternalRefs.default({}),
 });

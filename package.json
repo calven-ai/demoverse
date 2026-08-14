@@ -1,7 +1,9 @@
 {
   "name": "demoverse",
   "version": "0.1.0",
-  "description": "Grow a fictional company's entire sales history \u2014 CRM, calls, email, Slack \u2014 that moves every week. Synthetic demo-data engine for building, testing and demoing B2B products.",
+  "private": true,
+  "author": "Calven AI LLC",
+  "description": "Grow a fictional company's entire sales history across CRM, calls, email and Slack, and keep it moving every week. Synthetic demo-data engine for building, testing and demoing B2B products.",
   "keywords": [
     "synthetic-data",
     "demo-data",
@@ -51,7 +53,10 @@
     "sf:stage-fields": "tsx scripts/sf-ensure-stage-fields.ts",
     "preflight": "tsx scripts/insights-preflight.ts",
     "lint": "tsx scripts/lint.ts",
+    "lint:prose": "tsx scripts/lint-prose.ts",
     "lint:code": "eslint .",
+    "secrets:check": "tsx scripts/check-secrets.ts",
+    "secrets:hook": "git config core.hooksPath .githooks && echo \"pre-commit secret guard installed\"",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\" \"tests/**/*.ts\"",
     "test": "node --test --import tsx tests/*.test.ts"

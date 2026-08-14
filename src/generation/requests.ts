@@ -1,17 +1,19 @@
 /**
- * Generation-request protocol (the key agent<->engine handoff). See DESIGN.md §12.
+ * Generation-request protocol (the key agent<->engine handoff). See docs/architecture.md#the-generation-request-protocol.
  *
  * Each `apply` run computes the next desired world state and emits grounded
- * generation requests — one per prose artifact, carrying the exact ledger facts
- * + the prompt. The driving agent fills them in-session (Claude Max tokens); the
- * deterministic package then validates + files + reconciles each result,
- * re-requesting on validation failure.
+ * generation requests, one per prose artifact, carrying the exact ledger facts
+ * + the prompt. The prose is model-written, but never by this package: the
+ * driving agent fills the requests in-session, on its own subscription tokens,
+ * and nothing here holds a model key or calls a model API. The deterministic
+ * package only validates + files + reconciles each result, re-requesting on
+ * validation failure.
  *
  * Layout (state/requests/ is gitignored scratch):
- *   state/requests/<periodIndex>/manifest.json     — index of all requests
- *   state/requests/<periodIndex>/<id>.prompt.md    — the grounded prompt (agent reads)
- *   state/requests/<periodIndex>/results/<id>.md   — agent writes markdown here
- *   state/requests/<periodIndex>/results/<id>.json — or structured slack messages here
+ *   state/requests/<periodIndex>/manifest.json:      index of all requests
+ *   state/requests/<periodIndex>/<id>.prompt.md:     the grounded prompt (agent reads)
+ *   state/requests/<periodIndex>/results/<id>.md:    agent writes markdown here
+ *   state/requests/<periodIndex>/results/<id>.json:  or structured slack messages here
  */
 
 import { createHash } from "node:crypto";

@@ -1,7 +1,7 @@
 /**
  * Deterministic name banks for synthetic accounts and contacts.
  *
- * All names are clearly fictitious (DESIGN §18 guardrail: no impersonation of
+ * All names are clearly fictitious (DISCLAIMER.md guardrail: no impersonation of
  * real people). Company names are assembled from neutral parts; person names
  * from broad first/last banks. Everything is drawn via the seeded Rng so a given
  * world replays identically.
@@ -122,7 +122,9 @@ export function makeCompanyName(rng: Rng, industry: string): { name: string; dom
   const suffixes = COMPANY_SUFFIXES_BY_INDUSTRY[industry] ?? ["Group", "Co", "Partners"];
   const suffix = rng.pick(suffixes);
   const name = `${prefix} ${suffix}`;
-  const domain = `${prefix.toLowerCase()}${suffix.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`;
+  // Reserved `.example` TLD (RFC 2606): a fabricated company must never point
+  // at a real registered domain someone else owns.
+  const domain = `${prefix.toLowerCase()}${suffix.toLowerCase().replace(/[^a-z0-9]/g, "")}.example`;
   return { name, domain };
 }
 
@@ -141,8 +143,8 @@ export function emailFor(full: string, domain: string): string {
  * A clearly-fake, non-resolving email domain for a synthetic contact, derived
  * from the account's (possibly REAL) domain. Uses the reserved `.example` TLD
  * (RFC 2606) so a fabricated contact at a real logo can never
- * produce a plausible real mailbox — accounts are real, people never are
- * (DESIGN §18). Keeping the account label makes emails unique per account.
+ * produce a plausible real mailbox. Accounts are real, people never are
+ * (see DISCLAIMER.md). Keeping the account label makes emails unique per account.
  */
 export function demoEmailDomain(accountDomain: string, syntheticDomain = "demo.example"): string {
   const label = accountDomain

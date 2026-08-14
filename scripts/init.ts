@@ -1,5 +1,5 @@
 /**
- * `npm run init` — scaffold the world state from config. See DESIGN.md §7.4 (init scaffolder).
+ * `npm run init` scaffolds the world state from config. See docs/architecture.md#the-ledger-is-the-source-of-truth.
  *
  * Validates the Tier-1 config, seeds the reps into the ledger, and writes the
  * clock + trends baselines plus the state/ skeleton (an empty directives file).
@@ -7,13 +7,11 @@
  *
  * `--force` is the reset: besides the ledger/clock/trends it also clears the
  * derived state a previous world left behind (generated prose, cohort files,
- * request scratch, run reports) — leaving any of it would orphan content the
+ * request scratch, run reports). Leaving any of it would orphan content the
  * new ledger knows nothing about. External systems are NOT touched; the purge
  * commands for those are printed at the end.
  *
- * Flags:
- *   --force   reset existing state even if the world already has deals
- *   --seed=X  set the world seed (default: keep existing / "demoverse-v1")
+ * Flags are documented in USAGE below (`npm run init -- --help`).
  */
 
 import { rmSync } from "node:fs";
@@ -25,9 +23,8 @@ import { seedTrendsFromConfig, saveTrends } from "../src/trends.js";
 import { buildReps } from "../src/sales-team.js";
 import { fileExists, repoPath, writeText, ensureDir } from "../src/util/fs.js";
 import { worldPath } from "../src/ledger/ledger.js";
-import { todayISO, addDays } from "../src/util/date.js";
-
-const DAYS_PER_QUARTER = 91;
+import { todayISO, addDays, DAYS_PER_QUARTER } from "../src/util/date.js";
+import { arg, flag, helpIfRequested, type Usage } from "../src/util/cli.js";
 
 /** Derived state a --force reset must clear alongside the ledger. */
 const RESET_PATHS = [
@@ -52,15 +49,38 @@ state/trends.json, and move superseded entries down.
 ## Log
 `;
 
-function arg(name: string): string | undefined {
-  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
-  return hit ? hit.split("=").slice(1).join("=") : undefined;
-}
-function flag(name: string): boolean {
-  return process.argv.includes(`--${name}`);
-}
+const USAGE: Usage = {
+  usage: "npm run init -- [flags]",
+  summary: "Validate config/*.yaml and scaffold the world state (ledger, clock, trends, directives).",
+  flags: [
+    {
+      name: "--force",
+      desc: [
+        "Reset existing state even if the world already has deals. Also clears",
+        "the derived state a previous world left behind: generated prose,",
+        "cohort files, request scratch, run reports. External systems are NOT",
+        "touched; the purge commands for those are printed at the end.",
+      ],
+    },
+    {
+      name: "--seed=X",
+      desc: 'Set the world seed (default: keep existing, else "demoverse-v1").',
+    },
+    { name: "--help, -h", desc: "Show this help." },
+  ],
+  examples: [
+    { cmd: "npm run init", desc: "First run on a freshly configured clone." },
+    { cmd: "npm run init -- --force --seed=v2", desc: "Throw the world away and regrow it from a new seed." },
+  ],
+  notes: [
+    "Needs config/*.yaml. On a fresh clone, copy config/templates/*.yaml into",
+    "config/ and fill them in, or let the /setup wizard do it interactively.",
+    "See docs/getting-started.md.",
+  ],
+};
 
 function main(): void {
+  helpIfRequested(USAGE);
   const cfg = loadConfig();
   const force = flag("force");
 
@@ -95,7 +115,7 @@ function main(): void {
 
   // Clock starts history_quarters back, so the first run backfills up to today.
   const today = todayISO();
-  const startDate = addDays(today, -cfg.world.window.history_quarters * DAYS_PER_QUARTER);
+  const startDate = addDays(today, -Math.round(cfg.world.window.history_quarters * DAYS_PER_QUARTER));
   const clock = ClockSchema.parse({
     simNow: startDate,
     period: cfg.world.window.period,
@@ -126,14 +146,14 @@ function main(): void {
     console.log("    npm run sf:purge -- --all           # Salesforce demo records (dry-run first)");
     console.log("    npm run drive:audit                 # find orphaned Drive files");
     console.log("    npm run hubspot:purge               # HubSpot test portal, if used");
-    console.log("  Slack threads have no purge command — archive the channels or leave them.");
+    console.log("  Slack threads have no purge command. Archive the channels or leave them.");
   }
   console.log("\nThe clock starts in the past so your world can carry believable history.");
   console.log("Two ways to run from here:");
   console.log("  · Week by week:  `npm run pipeline` advances ONE week per run (your first");
   console.log("    increments carry historical dates until the clock catches up to today).");
   console.log("  · Seed history:  `npm run apply -- --backfill` plans the whole back-catalog");
-  console.log("    in one shot — a large one-time fill job (see docs/getting-started.md).");
+  console.log("    in one shot. This is a large one-time fill job (see docs/getting-started.md).");
   console.log("  (Plain `npm run apply` generates EVERY pending period up to today at once.)");
   console.log("Then fill the generation requests and run `npm run apply -- --ingest`.");
 }

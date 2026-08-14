@@ -1,15 +1,15 @@
 /**
- * `npm run cohort:select` — choose the ~50 deals that live in Salesforce.
+ * `npm run cohort:select` chooses the ~50 deals that live in Salesforce.
  *
- * Seeds the cohort with every deal that ALREADY has prose (those are sunk cost —
- * their artifacts exist and must not be stranded), then tops up to `--size` with
+ * Seeds the cohort with every deal that ALREADY has prose (sunk cost whose
+ * artifacts exist and must not be stranded), then tops up to `--size` with
  * deals picked for spread rather than at random.
  *
  * Why spread matters: the downstream product slices its dashboards by segment x competitor x
  * time and suppresses any bucket with too few decided deals. A cohort that is
  * accidentally 80% one competitor, or all Tier 1, or all from Q1, produces dashboards full
  * of "insufficient data". So the picker fills quotas in the scarcest dimension
- * first — competitor, then ICP tier, then account size, then quarter — always
+ * first (competitor, then ICP tier, then account size, then quarter), always
  * taking the candidate that most improves the weakest-covered bucket.
  *
  * Outcome mix is targeted explicitly: the already-filled deals are 13 won / 2
@@ -48,7 +48,7 @@ const rng = new Rng(`${world.seed}|cohort-select|${targetSize}`);
 const accounts = new Map<string, Account>(world.accounts.map((a) => [a.id, a]));
 const acctOf = (o: Opportunity): Account => accounts.get(o.accountId)!;
 
-/** Deals that already carry prose — always in, whatever the mix says. */
+/** Deals that already carry prose. Always in, whatever the mix says. */
 const withProse = new Set(world.artifacts.filter((a) => a.dealId).map((a) => a.dealId!));
 
 /** Bucket keys the picker balances across, scarcest-first. */
@@ -68,8 +68,8 @@ function buckets(o: Opportunity): Record<string, string> {
 
 /**
  * Greedy spread fill. Repeatedly takes the candidate whose bucket values are
- * currently least represented — summed as a coverage deficit, so a deal that is
- * the first of its competitor AND its quarter outranks one that only adds a
+ * currently least represented. Deficits sum across dimensions, so a deal that
+ * is the first of its competitor AND its quarter outranks one that only adds a
  * quarter. Ties resolve through the seeded Rng.
  */
 function fillBySpread(
@@ -112,9 +112,9 @@ for (const o of seeded) {
 }
 
 // --- work out the top-up mix ------------------------------------------------
-// Target the COHORT's closed-deal win rate at the world's CURRENT target —
-// the same trend-evaluated number the run report checks realized win rate
-// against, not the raw config baseline (trends ramp it over the window).
+// Target the COHORT's closed-deal win rate at the world's CURRENT target.
+// That is the same trend-evaluated number the run report checks realized win
+// rate against, not the raw config baseline (trends ramp it over the window).
 // Compensates for whatever the already-filled deals happen to be.
 const clock = loadClock();
 const winRateTarget = evaluateTrends(loadTrends(), cfg, clock.startDate, clock.simNow).winRateTarget;
@@ -148,7 +148,7 @@ const mix = { won: 0, lost: 0, open: 0 } as Record<string, number>;
 for (const o of all) mix[o.status] = (mix[o.status] ?? 0) + 1;
 const closed = (mix.won ?? 0) + (mix.lost ?? 0);
 
-console.log(`Cohort selection — target ${targetSize} (${openTarget} open)\n`);
+console.log(`Cohort selection targeting ${targetSize} (${openTarget} open)\n`);
 console.log(
   `  already filled : ${seeded.length}  (won ${have.won ?? 0} / lost ${have.lost ?? 0} / open ${have.open ?? 0})`,
 );
@@ -189,5 +189,5 @@ const added = enroll(
 );
 saveCohort(cohort);
 
-console.log(`\n✓ state/cohort.json — ${cohort.members.length} members (${added} newly enrolled).`);
+console.log(`\n✓ state/cohort.json now has ${cohort.members.length} members (${added} newly enrolled).`);
 console.log(`  Next: npm run cohort   (status table + state/cohort.md)`);

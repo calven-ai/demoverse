@@ -1,0 +1,17 @@
+#!/bin/sh
+# Demoverse pre-commit guard: block credentials before they reach git history.
+#
+# Installed by `npm run secrets:hook`, which points core.hooksPath at this
+# directory. Remove with `git config --unset core.hooksPath`.
+#
+# Skip once, if you are certain: git commit --no-verify
+
+# GUI git clients often run hooks with a minimal PATH; fail with a pointer
+# instead of a bare "npm: not found".
+if ! command -v npm >/dev/null 2>&1; then
+  echo "pre-commit: npm is not on PATH (GUI git client?). Commit from a terminal," >&2
+  echo "or skip once with: git commit --no-verify" >&2
+  exit 1
+fi
+
+npm run --silent secrets:check -- --staged

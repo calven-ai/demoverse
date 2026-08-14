@@ -2,6 +2,14 @@
 
 export type ISODate = string;
 
+/**
+ * Days in an average quarter (365.25 / 4). One constant, used by the init
+ * scaffolder (how far back the history window starts), the world-advance and
+ * the trend evaluator. They must agree, or the clock's start date and the
+ * quarters-elapsed the trends are evaluated at drift apart over a long history.
+ */
+export const DAYS_PER_QUARTER = 91.3125;
+
 export function toISODate(d: Date): ISODate {
   return d.toISOString().slice(0, 10);
 }

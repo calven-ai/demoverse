@@ -1,5 +1,5 @@
 /**
- * Running KPI trajectories (state/trends.json). See DESIGN.md §10–11 + the plan.
+ * Running KPI trajectories (state/trends.json). See docs/architecture.md#steering-three-tiers-of-instruction.
  *
  * Trends carry trajectories so curves are intentional, not random. Standing
  * config seeds the baselines; Tier-2 directives reshape them going forward (the
@@ -11,22 +11,21 @@
  * This module is the engine's TIME-VARIANCE layer. Beyond the original win-rate
  * + competitor-strength ramps it now models, so the dashboards' over-time charts
  * have intentional shape:
- *   • volume ramp           — newOppsPerWeek grows (the velocity story)
- *   • competitor presence   — a competitor shows up in more deals over time
- *   • localized bumps       — a gaussian spike-then-recover on a competitor's
+ *   • volume ramp:            newOppsPerWeek grows (the velocity story)
+ *   • competitor presence:    a competitor shows up in more deals over time
+ *   • localized bumps:        a gaussian spike-then-recover on a competitor's
  *                             strength (the "we lose more, then recover" dip)
- *   • industry-weight drift — a segment grows its share over the year (the
+ *   • industry-weight drift:  a segment grows its share over the year (the
  *                             "emerging off-ICP segment" story)
- *   • per-segment win delta  — a segment converts above/below baseline
+ *   • per-segment win delta:  a segment converts above/below baseline
  */
 
 import { z } from "zod";
 import { repoPath, readJson, writeJson, fileExists } from "./util/fs.js";
-import { daysBetween, type ISODate } from "./util/date.js";
+import { daysBetween, DAYS_PER_QUARTER, type ISODate } from "./util/date.js";
 import type { Config } from "./config/schema.js";
 
 const TRENDS_PATH = repoPath("state", "trends.json");
-const DAYS_PER_QUARTER = 91.3125;
 
 /** A gaussian perturbation centered on a date: amplitude·exp(−((t−center)/width)²). */
 const Bump = z.object({
@@ -72,7 +71,7 @@ export const TrendsSchema = z.object({
     .default({}),
   /**
    * Market-intelligence cohort trajectory (the "win when PMM is
-   * involved" story). The cohort SHARE of new opps ramps over time — an emerging
+   * involved" story). The cohort SHARE of new opps ramps over time, an emerging
    * expansion opportunity. Seeded from world.yaml market_intelligence; the ramp
    * (shareDriftPerQuarter) is set here. Optional: absent → no MI cohort.
    */

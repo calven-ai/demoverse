@@ -7,7 +7,7 @@
  * realistic per-deal creation instant for records already in the ledger.
  *
  * The time is derived deterministically from each opp's own `createdDate`, seeded
- * per opp id (independent of period/generation order) — so re-running is a no-op
+ * per opp id (independent of period/generation order), so re-running is a no-op
  * and the value is stable across replays.
  *
  *   npx tsx scripts/backfill-created-at.ts            # stamp + save
@@ -24,7 +24,7 @@ function main(): void {
   const world = loadWorld();
   let stamped = 0;
   for (const opp of world.opportunities) {
-    if (opp.createdAt) continue; // already has one — leave it untouched
+    if (opp.createdAt) continue; // already has one, leave it untouched
     const rng = new Rng(`${world.seed}|createdAt|${opp.id}`);
     const createdAt = createdAtFor(opp.createdDate, rng);
     if (dryRun) {

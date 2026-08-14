@@ -1,7 +1,7 @@
 /**
  * Which artifact kinds each destination carries. Shared by the reconcilers,
  * the config cross-validation (every kind here must have a folder/channel
- * mapping in connectors.yaml), and the tests — without dragging the heavy API
+ * mapping in connectors.yaml), and the tests, without dragging the heavy API
  * clients into config loading.
  */
 

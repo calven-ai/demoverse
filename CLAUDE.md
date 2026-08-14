@@ -1,4 +1,4 @@
-# CLAUDE.md — Claude Code operating notes for Demoverse
+# CLAUDE.md: Claude Code operating notes for Demoverse
 
 @AGENTS.md
 
@@ -13,26 +13,28 @@ Claude-Code-specific.
 | `/setup` | The onboarding playbook (AGENTS.md Part 2): interview → config → init → first increment → optional connectors |
 | `/pipeline-update [weeks]` | The routine weekly increment, end to end: advance → fill via `opp-filler` subagents → ingest → lint → fix → reconcile → commit |
 | `/backfill-opps [N]` | The detail-layer loop for N opportunities: plant → fill (one subagent per opp) → ingest → lint → fix → reconcile → commit per opp |
+| `/import-hubspot` | The deterministic HubSpot import: provision the schema → import the CRM structure into the dedicated test account → verify record-by-record |
 
 ## Subagent strategy (critical for context health)
 
 Never write result-file prose inline in the main context. Every fill goes
-through the **`opp-filler`** subagent (`.claude/agents/opp-filler.md` — Read/
+through the **`opp-filler`** subagent (`.claude/agents/opp-filler.md`, Read/
 Write/Glob only), **one subagent per opportunity, never batched**. The main
 context only runs shell commands (`apply`, `lint`, `git`) and dispatches
 subagents. If a subagent hits a session limit, re-launch it for the remaining
 artifacts of that same deal only.
 
-All `apply`/`lint`/`git` commands stay serial in the main context —
-`state/world.json` is written whole (last-writer-wins). Fills parallelize
+All `apply`/`lint`/`git` commands stay serial in the main context.
+`state/world.json` is written whole, last-writer-wins. Fills parallelize
 freely (distinct result files).
 
 ## Overnight backfill
 
 For a bulk detail-layer backfill, run the skill as a self-paced loop:
-`/loop /backfill-opps 5` — each iteration is independently resumable
-(idempotent planting, planned-only ingest, upsert reconcile, per-opp commits).
-Stop when `npm run apply -- --next=1` prints nothing.
+`/loop /backfill-opps 5`. Each iteration is independently resumable, thanks to
+idempotent planting, planned-only ingest, upsert reconcile and per-opp commits.
+Stop when `npm run apply -- --next=1` prints
+`(no opportunities need a detail layer)`.
 
 ## Session hygiene
 

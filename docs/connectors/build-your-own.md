@@ -1,6 +1,6 @@
 # Build your own connector
 
-A connector pushes the desired ledger state into one external system. The contract is small — one interface, one registration, one config block — but the *requirements* are strict, because every guarantee the engine makes (idempotent re-runs, cohort gating, credential-free operation, dry-run everywhere) is only as good as its weakest connector. This guide gives you the contract verbatim, the rules, and the shipped HubSpot connector as a worked example.
+A connector pushes the desired ledger state into one external system. The contract is small (one interface, one registration, one config block) but the *requirements* are strict, because every guarantee the engine makes (idempotent re-runs, cohort gating, credential-free operation, dry-run everywhere) is only as good as its weakest connector. What follows is the contract verbatim, the rules, and the shipped HubSpot connector as a worked example.
 
 ## The contract
 
@@ -14,7 +14,7 @@ From `src/connectors/types.ts`:
  *  - no-op with `disabled: true` when it is switched off in
  *    `config/connectors.yaml` or its credentials are absent from the env;
  *  - honor `opts.dryRun` (compute + report, write nothing);
- *  - honor the cohort gate (`opts.cohort`) — only member deals reach the world;
+ *  - honor the cohort gate (`opts.cohort`), so only member deals reach the world;
  *  - record external ids on the ledger so re-runs update instead of duplicate.
  *
  * Registration lives in `./registry.ts`; the orchestrator (`src/reconcile.ts`)
@@ -36,7 +36,7 @@ export interface ReconcileOptions {
    */
   oppId?: string;
   /**
-   * Cohort gate — the membership list every target filters through (see
+   * Cohort gate. The membership list every target filters through (see
    * src/cohort.ts). Loaded from state/cohort.json when omitted; pass it
    * explicitly to share one index across all connectors, or to override it in
    * tests. An unselected cohort passes everything.
@@ -66,7 +66,7 @@ Two helpers ship alongside: `emptyStats(system)` for a zeroed stats object, and 
 
 ## Registration
 
-`src/connectors/registry.ts` is the single list the orchestrator runs, **in order** — the CRM goes first so accounts exist before file/chat systems group content under them:
+`src/connectors/registry.ts` is the single list the orchestrator runs, **in order**. The CRM goes first so accounts exist before file/chat systems group content under them:
 
 ```ts
 export function allConnectors(): Connector[] {
@@ -87,32 +87,32 @@ Adding a destination is three edits:
 
 3. Append it to `allConnectors()` in the registry.
 
-Credentials never go in YAML — they live in `.env`, and their *absence* must be a supported state (see rule 4).
+Credentials never go in YAML. They live in `.env`, and their *absence* must be a supported state (see rule 4).
 
 ## The rules
 
 **1. Idempotent upserts, external ids recorded.** Every entity you create must get its external id written back onto the ledger (`account.external.<yourSystem>Id`, `artifact.external.…`, etc.), and every subsequent run must use that id to update-in-place. The test: re-running a reconcile immediately produces zero new external records. This is also what makes a wiped destination rebuildable by replay.
 
-**2. Cohort gating.** Filter every deal through `opts.cohort` (defaulting to a loaded `CohortIndex` when absent), and derive your account/contact scope *from the surviving deals*. Only cohort members may reach the outside world — the curated window is the product; the full ledger is its statistical backing.
+**2. Cohort gating.** Filter every deal through `opts.cohort` (defaulting to a loaded `CohortIndex` when absent), and derive your account/contact scope *from the surviving deals*. Only cohort members may reach the outside world. The curated window is the product. The full ledger is its statistical backing.
 
-**3. Dry-run support.** When `opts.dryRun` is set, compute the full plan — counts, creates vs updates — log it, and write nothing. Dry-run output is how operators learn to trust a new connector; make it honest.
+**3. Dry-run support.** When `opts.dryRun` is set, compute the full plan: counts, creates vs updates. Log it. Write nothing. Dry-run output is how operators learn to trust a new connector, so make it honest.
 
-**4. Distinct no-ops for "disabled" vs "no credentials".** Switched off in `config/connectors.yaml` → return `disabledStats(name)` (note: "disabled in config…"). Enabled but credentials absent from the env → return stats with `disabled: true` and a note like `"credentials absent (.env) — skipped"`, with `skipped` set to the record count that would have gone. The two notes are deliberately different: one says "you chose this", the other says "you forgot something". Never throw on missing credentials — the credential-free path is a core feature, not an error.
+**4. Distinct no-ops for "disabled" vs "no credentials".** Switched off in `config/connectors.yaml` → return `disabledStats(name)` (note: "disabled in config…"). Enabled but credentials absent from the env → return stats with `disabled: true` and a note like `"credentials absent (.env), skipped"`, with `skipped` set to the record count that would have gone. The two notes differ deliberately: one says "you chose this", the other "you forgot something". Never throw on missing credentials. The credential-free path is a core feature, not an error.
 
 **5. Respect `oppId` and `limit`.** Single-opportunity scoping is how every connector gets smoke-tested before its first bulk push.
 
 ## Worked example: the HubSpot connector
 
-`src/connectors/hubspot/connector.ts` is a compact, real implementation of all five rules — read it top to bottom:
+`src/connectors/hubspot/connector.ts` is a compact, real implementation of all five rules. Read it top to bottom:
 
 - **Disabled check first:** `if (!cfg.connectors.hubspot.enabled) return disabledStats("hubspot");`
-- **Cohort gate:** builds a `CohortIndex` from `opts.cohort`, filters opportunities through `cohort.has(o.id)`, then narrows accounts and contacts to those the surviving deals reference — the pattern to copy for deriving scope from deals.
-- **Credential no-op:** `if (!hasEnv("HUBSPOT_ACCESS_TOKEN"))` → `disabled: true`, note `"HubSpot credentials absent (.env) — skipped"`, `skipped` = the would-have-been count.
-- **Delegation to a deterministic core:** the actual work lives in `src/connectors/hubspot/import.ts` (`selectHubSpotDataset` / `importHubSpotDataset`), which batches to the API's per-call limits, retries rate limits, and upserts everything by a `demo_world_id` property. That core is *also* drivable standalone via `npm run hubspot:import` — a useful shape, since it makes the connector testable without the orchestrator.
+- **Cohort gate:** builds a `CohortIndex` from `opts.cohort`, filters opportunities through `cohort.has(o.id)`, then narrows accounts and contacts to those the surviving deals reference. Copy that pattern for deriving scope from deals.
+- **Credential no-op:** `if (!hasEnv("HUBSPOT_ACCESS_TOKEN"))` → `disabled: true`, note `"HubSpot credentials absent (.env), skipped"`, `skipped` = the would-have-been count.
+- **Delegation to a deterministic core:** the actual work lives in `src/connectors/hubspot/import.ts` (`selectHubSpotDataset` / `importHubSpotDataset`), which batches to the API's per-call limits, retries rate limits, and upserts everything by a `demo_world_id` property. That core is *also* drivable standalone via `npm run hubspot:import`, which makes the connector testable without the orchestrator.
 - **Client:** `src/connectors/hubspot/client.ts` wraps auth + fetch; `schema.ts` owns property provisioning; `verify.ts` re-reads and diffs.
 
-For a document-store destination, mirror `src/connectors/drive/reconcile.ts` instead (folder trees, per-artifact file ids); for a chat destination, `src/connectors/slack/reconcile.ts` (channel routing, per-message ids, persona rendering).
+For a document-store destination, mirror `src/connectors/drive/reconcile.ts` instead: folder trees, per-artifact file ids. For a chat destination, read `src/connectors/slack/reconcile.ts` (channel routing, per-message ids, persona rendering).
 
-One more rule of taste: keep judgment out. A connector translates ledger facts into API calls — it never decides *what* the world contains. If you find yourself sampling, randomizing, or writing prose in a connector, that logic belongs in the engine.
+One rule of taste: keep judgment out. A connector translates ledger facts into API calls and never decides *what* the world contains. If you find yourself sampling, randomizing, or writing prose in a connector, that logic belongs in the engine.
 
 Back to [getting started](../getting-started.md) · [architecture](../architecture.md) · shipped connectors: [Salesforce](salesforce.md) · [Drive](google-drive.md) · [Slack](slack.md) · [HubSpot](hubspot.md)

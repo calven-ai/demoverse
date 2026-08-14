@@ -1,5 +1,5 @@
 /**
- * Zod schemas for the Tier-1 standing config (config/*.yaml). See DESIGN.md §11.
+ * Zod schemas for the Tier-1 standing config (config/*.yaml). See docs/architecture.md#steering-three-tiers-of-instruction.
  *
  * These validate the human-authored seed files with friendly errors and supply
  * sensible defaults, so a minimal config still yields a good world.
@@ -36,28 +36,32 @@ export const WorldConfigSchema = z.object({
      * under the reserved .example TLD so a synthetic mailbox can never resolve.
      */
     synthetic_email_domain: z.string().default("demo.example"),
-    /** The company's product modules — options for the win-loss `product_modules` question. */
+    /** The company's product modules. Options for the win-loss `product_modules` question. */
     product_modules: z.array(z.string()).default([]),
   }),
+  // Every default below MUST match config/templates/world.yaml. The templates
+  // are the spec: they are what the docs describe, what the tests assert
+  // against, and what an omitted key should silently resolve to. A default that
+  // disagrees with the template hands anyone who trims a key the inverse world.
   generate: z
     .object({
       transcripts: z.boolean().default(true),
       winloss: z.boolean().default(true),
       slack: z.boolean().default(true),
-      internal_collateral: z.boolean().default(true),
+      internal_collateral: z.boolean().default(false),
       // Touch-point kinds for the live weekly engine (advanceWorld). The
-      // retroactive backfill planner does NOT consult these — it plants the full
+      // retroactive backfill planner does NOT consult these. It plants the full
       // touch-point set on demand, gated only by the per-deal cadence below.
-      ae_notes: z.boolean().default(false),
-      emails: z.boolean().default(false),
+      ae_notes: z.boolean().default(true),
+      emails: z.boolean().default(true),
     })
     .default({}),
   detail: z
     .object({
-      call_transcripts: DetailLevel.default("medium"),
+      call_transcripts: DetailLevel.default("high"),
       phone_interviews: DetailLevel.default("high"),
-      surveys: DetailLevel.default("low"),
-      slack: DetailLevel.default("medium"),
+      surveys: DetailLevel.default("medium"),
+      slack: DetailLevel.default("low"),
       ae_notes: DetailLevel.default("low"),
       emails: DetailLevel.default("medium"),
     })
@@ -88,7 +92,43 @@ export const WorldConfigSchema = z.object({
   }),
   pipeline: z.object({
     stages: z.array(z.string()).min(2),
+    /**
+     * The TYPICAL band, not the envelope. Most deals are drawn triangularly
+     * inside it (mode = the midpoint); `cycle_outliers` is what reaches beyond.
+     */
     avg_sales_cycle_weeks: IntRange,
+    /**
+     * The tails. A pipeline where every deal lands inside one band reads as
+     * generated, for the same reason uniform diligence does: real ones always
+     * carry a few one-week closes, a few quarter-long grinds, and a few that go
+     * quiet and die of no decision. Optional, with defaults, so a config
+     * written before this existed keeps validating.
+     */
+    cycle_outliers: z
+      .object({
+        /** Warm inbound: closes almost immediately, leaving barely a trail. */
+        fast: z
+          .object({ rate: z.number().min(0).max(1).default(0.05), weeks: IntRange.default([1, 2]) })
+          .default({}),
+        /** Enterprise grind: procurement and security review drag it out. */
+        slog: z
+          .object({
+            rate: z.number().min(0).max(1).default(0.05),
+            weeks: IntRange.default([12, 16]),
+          })
+          .default({}),
+        /**
+         * Goes dark mid-cycle: the stage clock pauses, so the deal sits in one
+         * stage for weeks earning NO touch points, then resumes or dies.
+         */
+        stalled: z
+          .object({
+            rate: z.number().min(0).max(1).default(0.05),
+            stall_weeks: IntRange.default([3, 6]),
+          })
+          .default({}),
+      })
+      .default({}),
   }),
   winloss: z.object({
     baseline_win_rate: z.number().min(0).max(1),
@@ -160,7 +200,7 @@ export const WorldConfigSchema = z.object({
   /**
    * The market-intelligence buying motion (the "win when PMM is
    * involved" story). A larger-company cohort where a fraction of deals have no
-   * product-marketing persona driving — encoded purely as sampling bias. The
+   * product-marketing persona driving, encoded purely as sampling bias. The
    * cohort share ramps over time via state/trends.json. Optional: configs without
    * it simply have no MI cohort.
    */
@@ -412,9 +452,9 @@ const PainToModule = z.object({
 });
 
 /**
- * Durable product grounding for sales-call transcripts — positioning,
- * the domain/agent catalog (the demo surface), the pain→module map, and brand
- * guardrails — the company's messaging document rendered into every call prompt.
+ * Durable product grounding for sales-call transcripts: positioning, the
+ * domain/agent catalog (the demo surface), the pain→module map, and brand
+ * guardrails. The company's messaging document, rendered into every call prompt.
  */
 export const ProductConfigSchema = z.object({
   positioning: z.object({
@@ -472,7 +512,7 @@ export type SalesIc = z.infer<typeof SalesIc>;
 // --- aggregate ---------------------------------------------------------------
 
 /**
- * Domain use cases — what the buyer walked in asking for. Coarser than the
+ * Domain use cases. What the buyer walked in asking for. Coarser than the
  * product's 10 agents on purpose (a buyer says "get on top of our competitors",
  * not "a Battle Card agent"), so each use case maps to the agent(s) demoed for it.
  */
@@ -488,7 +528,7 @@ export const UseCaseSchema = z.object({
   buyer_pain: z.string(),
   lead_with: z.string(),
   /**
-   * Relative sampling weight per competitor on the deal — a skew, not a rule.
+   * Relative sampling weight per competitor on the deal. A skew, not a rule.
    * Competitors absent here score `default_weight`.
    */
   competitor_weights: z.record(z.string(), z.number().nonnegative()).default({}),
@@ -508,7 +548,7 @@ export type UseCasesConfig = z.infer<typeof UseCasesConfigSchema>;
 // the engine only draws from it deterministically.
 
 export const ProseConfigSchema = z.object({
-  /** Why THIS buyer is looking — the deal's backstory, one per deal. */
+  /** Why THIS buyer is looking. The deal's backstory, one per deal. */
   narrative_angles: z.array(z.string()).min(4),
   /** How the buying group communicates, one per deal. */
   buyer_tones: z.array(z.string()).min(3),
@@ -532,7 +572,7 @@ export type ProseConfig = z.infer<typeof ProseConfigSchema>;
 // --- connectors.yaml ---------------------------------------------------------
 // Per-destination wiring: whether each connector runs, and the destination-side
 // naming the engine writes into (CRM stage names, Drive folder tree, Slack
-// channels). Credentials stay in `.env` — this file is safe to commit.
+// channels). Credentials stay in `.env`, so this file is safe to commit.
 
 export const ConnectorsConfigSchema = z.object({
   salesforce: z

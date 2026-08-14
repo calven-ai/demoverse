@@ -1,5 +1,5 @@
 /**
- * `npm run apply` — the period entrypoint. See DESIGN.md §12–13.
+ * `npm run apply` is the period entrypoint. See docs/architecture.md#the-generation-request-protocol.
  *
  * Two phases, by design (the generation-request protocol):
  *
@@ -11,38 +11,7 @@
  *     ledger (content store), and optionally --reconcile into the external
  *     systems. Writes a run report to runs/<date>-report.md.
  *
- * Flags:
- *   --backfill     intent flag for the first big run (advance from start to now)
- *   --ingest       phase 2: ingest filled results (+ optional --reconcile)
- *   --reconcile    push the ledger into Salesforce/Drive/Slack (idempotent)
- *   --dry-run      compute + print, but make no writes (ledger or external)
- *   --nudge="..."  Tier-3 per-run nudge; echoed back per DESIGN §11
- *   --sf-limit=N   Salesforce smoke batch: push only the first N accounts (+
- *                  their contacts/opps). Idempotent; later runs fill the rest.
- *   --backfill-touchpoints  retroactively plan the full sales-cycle touch points
- *                  (transcripts, AE notes, emails, Slack, win-loss) for EXISTING
- *                  deals, then emit their generation requests.
- *   --backfill-stage-history  one-time migration: rebuild `stageHistory` for
- *                  deals that predate the field, by replaying the engine's own
- *                  deterministic stage schedule. Verifies the replay against
- *                  every stored close date and refuses to save on any drift.
- *   --opp=<id>     scope --backfill-touchpoints / --ingest / --reconcile to a
- *                  single opportunity (its account, contacts, deal + activities).
- *   --next=N       read-only: list the next N opportunities that still need a
- *                  detail layer (no artifacts yet, or planned-but-unfilled ones).
- *                  Machine-parseable, one per line:
- *                  oppId<TAB>status<TAB>accountName<TAB>untouched|planned:K
- *   --weeks=N      force N period(s) forward from simNow even when the world is
- *                  already current — the on-demand "live increment" (see
- *                  `npm run pipeline`). Without it, apply only generates the
- *                  periods the real calendar has actually produced.
- *   --new-opps=N   one-off override of how many deals each advanced period
- *                  creates. The standing rate stays in state/trends.json.
- *   --refill=<artifactId>  reset ONE generated artifact back to `planned` and
- *                  re-emit its prompt, so a bad result can be regenerated during
- *                  the lint-fix loop. Refuses if the artifact (or any of its
- *                  messages/emails) already carries an external id — that would
- *                  duplicate records in Salesforce/Slack.
+ * Flags are documented in USAGE below (`npm run apply -- --help`).
  */
 
 import { loadConfig } from "../src/config/load.js";
@@ -60,16 +29,127 @@ import { todayISO } from "../src/util/date.js";
 import { writeText, repoPath } from "../src/util/fs.js";
 import { readActiveDirectives } from "../src/directives.js";
 import { CohortIndex, loadCohort, saveCohort, enroll } from "../src/cohort.js";
+import { arg, flag, helpIfRequested, type Usage } from "../src/util/cli.js";
 
-function arg(name: string): string | undefined {
-  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
-  return hit ? hit.split("=").slice(1).join("=") : undefined;
-}
-function flag(name: string): boolean {
-  return process.argv.includes(`--${name}`);
-}
+const USAGE: Usage = {
+  usage: "npm run apply -- [flags]",
+  summary:
+    "Period entrypoint: advance the world and emit prompts (phase 1), then ingest the filled results (phase 2).",
+  flags: [
+    {
+      name: "--weeks=N",
+      desc: [
+        "Force N period(s) forward from simNow even when the world is already",
+        'current. This is the on-demand "live increment" (`npm run pipeline`).',
+        "Without it, apply only generates the periods the real calendar has",
+        "actually produced.",
+      ],
+    },
+    {
+      name: "--backfill",
+      desc: [
+        "Intent flag for the first big run: advance from the clock's start date",
+        "to now. On a fresh world that is a full history window, so expect",
+        "hundreds of prompts to fill.",
+      ],
+    },
+    { name: "--ingest", desc: "Phase 2: validate and file the filled results (+ optional --reconcile)." },
+    {
+      name: "--reconcile",
+      desc: "Push the ledger into Salesforce/HubSpot/Drive/Slack (idempotent upserts).",
+    },
+    { name: "--dry-run", desc: "Compute and print, but make no writes (ledger or external)." },
+    {
+      name: "--next=N",
+      desc: [
+        "Read-only: list the next N opportunities that still need a detail layer",
+        "(no artifacts yet, or planned-but-unfilled). One per line, tab-separated:",
+        "oppId<TAB>status<TAB>accountName<TAB>untouched|planned:K",
+      ],
+    },
+    {
+      name: "--opp=<id>",
+      desc: [
+        "Scope --backfill-touchpoints / --ingest / --reconcile to one opportunity",
+        "(its account, contacts, deal and activities).",
+      ],
+    },
+    {
+      name: "--backfill-touchpoints",
+      desc: [
+        "Retroactively plan a deal's WHOLE sales cycle (transcripts, AE notes,",
+        "emails, Slack, win-loss) and emit its prompts. Idempotent. Pair it with",
+        "--opp=<id>; capture the manifest immediately, the next plant overwrites it.",
+      ],
+    },
+    {
+      name: "--refill=<artifactId>",
+      desc: [
+        "Reset ONE generated artifact back to `planned` and re-emit its prompt, so",
+        "a bad result can be regenerated during the lint-fix loop. This is the",
+        "sanctioned way to fix prose; never hand-edit state/world.json. Refuses if",
+        "the artifact already carries an external id, since regenerating would",
+        "duplicate records in Salesforce/Slack.",
+      ],
+    },
+    {
+      name: '--nudge="..."',
+      desc: [
+        "Tier-3 per-run nudge, applied to this period only and not remembered.",
+        'For example: --nudge="2x losses to Pricing this week". The engine echoes',
+        "how it resolved it. Durable direction goes in state/directives.md.",
+      ],
+    },
+    {
+      name: "--new-opps=N",
+      desc: [
+        "One-off override of how many deals each advanced period creates. The",
+        "standing rate stays in state/trends.json.",
+      ],
+    },
+    {
+      name: "--sf-limit=N",
+      desc: [
+        "Salesforce smoke batch: push only the first N accounts (plus their",
+        "contacts and opps). Idempotent; later runs fill the rest.",
+      ],
+    },
+    {
+      name: "--backfill-stage-history",
+      desc: [
+        "One-time migration: rebuild `stageHistory` for deals that predate the",
+        "field, by replaying the engine's deterministic stage schedule. Verifies",
+        "the replay against every stored close date and refuses to save on drift.",
+      ],
+    },
+    { name: "--help, -h", desc: "Show this help." },
+  ],
+  examples: [
+    { cmd: "npm run pipeline", desc: "The weekly increment. Same as `apply -- --weeks=1`." },
+    {
+      cmd: "npm run apply -- --weeks=1 --dry-run",
+      desc: "See what one week would create, and write nothing.",
+    },
+    {
+      cmd: "npm run apply -- --ingest --reconcile",
+      desc: "File the prose you just wrote, then push the cohort.",
+    },
+    { cmd: "npm run apply -- --next=5", desc: "Which deals still need a detail layer?" },
+    {
+      cmd: "npm run apply -- --backfill-touchpoints --opp=opp-042",
+      desc: "Plant one deal's full sales cycle.",
+    },
+  ],
+  notes: [
+    "Every command is idempotent and supports --dry-run. Nothing external is",
+    "touched unless a connector is enabled in config/connectors.yaml AND its",
+    "credentials are present, and only cohort members ever reach external",
+    "systems. See AGENTS.md for the full generation-request protocol.",
+  ],
+};
 
 async function main(): Promise<void> {
+  helpIfRequested(USAGE);
   const dryRun = flag("dry-run");
   const ingest = flag("ingest");
   const reconcile = flag("reconcile");
@@ -91,13 +171,13 @@ async function main(): Promise<void> {
   const world = loadWorld();
   const clock = loadClock();
   const trends = loadTrends();
-  // A live world must speak the configured stage vocabulary — fail loudly, early.
+  // A live world must speak the configured stage vocabulary. Fail loudly, early.
   validateWorldStages(world, cfg);
 
   // --- --next=N: list opportunities that still need a detail layer ----------
   // Read-only. "Needs work" = no artifacts at all (untouched), or has artifacts
-  // still `planned` (planted but unfilled — reappears here so a crashed batch
-  // resumes cleanly). Ordered by opp id for a stable, deterministic queue.
+  // still `planned` (planted but unfilled). Those reappear here so a crashed
+  // batch resumes cleanly. Ordered by opp id for a stable, deterministic queue.
   if (nextArg !== undefined) {
     const n = Number(nextArg) || 10;
     const artCount = new Map<string, number>();
@@ -123,7 +203,7 @@ async function main(): Promise<void> {
       const state = (artCount.get(o.id) ?? 0) === 0 ? "untouched" : `planned:${planned}`;
       console.log(`${o.id}\t${o.status}\t${ledger.account(o.accountId).name}\t${state}`);
     }
-    if (pending.length === 0) console.log("(no opportunities need a detail layer — all filled)");
+    if (pending.length === 0) console.log("(no opportunities need a detail layer)");
     return;
   }
 
@@ -135,7 +215,7 @@ async function main(): Promise<void> {
     const { updated, skipped, mismatches } = backfillStageHistory(world, cfg, clock.startDate, clock.simNow);
     console.log(`Stage history: rebuilt ${updated} deal(s), ${skipped} already had one.`);
     if (mismatches.length > 0) {
-      console.log(`\n✗ ${mismatches.length} replay mismatch(es) — NOT saving:`);
+      console.log(`\n✗ ${mismatches.length} replay mismatch(es). NOT saving:`);
       for (const m of mismatches.slice(0, 10)) console.log(`   ${m}`);
       if (mismatches.length > 10) console.log(`   … +${mismatches.length - 10} more`);
       process.exitCode = 1;
@@ -159,7 +239,7 @@ async function main(): Promise<void> {
     const art = world.artifacts.find((a) => a.id === refillId);
     if (!art) throw new Error(`--refill: no artifact ${refillId} in the ledger`);
     if (art.status === "planned") {
-      console.log(`${refillId} is already planned — fill its result and re-run --ingest.`);
+      console.log(`${refillId} is already planned. Fill its result and re-run --ingest.`);
       return;
     }
     const hasExternal =
@@ -174,7 +254,7 @@ async function main(): Promise<void> {
       (art.emails ?? []).some((m) => m.salesforceId);
     if (hasExternal) {
       throw new Error(
-        `--refill: ${refillId} already has external records (status=${art.status}) — regenerating would duplicate them. Refusing.`,
+        `--refill: ${refillId} already has external records (status=${art.status}). Regenerating would duplicate them. Refusing.`,
       );
     }
     delete art.messages;
@@ -245,7 +325,7 @@ async function main(): Promise<void> {
     if (!dryRun) writeText(repoPath("runs", `${date}-report.md`), md);
     console.log(`\n${dryRun ? "(dry-run) " : ""}Run report → runs/${date}-report.md`);
     if (stillPending > 0)
-      console.log(`Note: ${stillPending} artifact(s) still need generation — fill them and re-run --ingest.`);
+      console.log(`Note: ${stillPending} artifact(s) still need generation. Fill them and re-run --ingest.`);
     return;
   }
 
@@ -349,8 +429,8 @@ async function main(): Promise<void> {
   saveWorld(world);
   saveClock(clock);
 
-  // Enroll this run's new deals in the Salesforce cohort as `weekly` members —
-  // they get the full detail layer, Slack included. Deliberately AFTER
+  // Enroll this run's new deals in the Salesforce cohort as `weekly` members.
+  // They get the full detail layer, Slack included. Deliberately AFTER
   // saveWorld: cohort.json must never name a deal the ledger did not keep.
   const cohort = loadCohort();
   if (cohort.members.length > 0 && result.enrolled.length > 0) {
@@ -358,7 +438,7 @@ async function main(): Promise<void> {
     if (added > 0) {
       saveCohort(cohort);
       console.log(
-        `\nCohort: enrolled ${added} new deal(s) as 'weekly' (Slack included) — ${cohort.members.length} members total.`,
+        `\nCohort: enrolled ${added} new deal(s) as 'weekly' (Slack included). ${cohort.members.length} members total.`,
       );
     }
   }
@@ -369,7 +449,7 @@ async function main(): Promise<void> {
   // backlog of artifacts planned for deals nobody intends to fill (deals outside
   // the cohort, planted before the cohort gate existed), and re-emitting all of
   // them would bury a ten-artifact increment in a two-hundred-request bundle.
-  // Leftovers are not lost — they keep their own earlier bundle on disk, and
+  // Leftovers are not lost. They keep their own earlier bundle on disk, and
   // `--ingest` still files any of them that get filled.
   const plantedThisRun = new Set(result.plannedArtifactIds);
   const emitting = world.artifacts.filter((a) => a.status === "planned" && plantedThisRun.has(a.id));
@@ -388,8 +468,8 @@ async function main(): Promise<void> {
 
   // Per-deal breakdown of THIS run's touch points. The living increment plants
   // a handful of artifacts spread over many deals (not a full detail layer on
-  // one), so the operator — or `npm run pipeline`, which dispatches one filler
-  // per deal — needs them grouped by opportunity, not as a flat list.
+  // one), so the operator (or `npm run pipeline`, which dispatches one filler
+  // per deal) needs them grouped by opportunity, not as a flat list.
   const plantedIds = new Set(result.plannedArtifactIds);
   const byDeal = new Map<string, string[]>();
   for (const a of world.artifacts) {
@@ -403,7 +483,7 @@ async function main(): Promise<void> {
     for (const [dealId, arts] of [...byDeal].sort((a, b) => a[0].localeCompare(b[0]))) {
       const opp = world.opportunities.find((o) => o.id === dealId);
       const label = opp
-        ? `${led.account(opp.accountId).name} — ${opp.stage}/${opp.status}`
+        ? `${led.account(opp.accountId).name} (${opp.stage}/${opp.status})`
         : "workspace-level (not tied to one deal)";
       console.log(`  ${dealId}\t${label}\t${arts.join(" ")}`);
     }

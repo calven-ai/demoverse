@@ -1,5 +1,5 @@
 /**
- * Coherence linter — a first-class, tested feature. See DESIGN.md §7.1, §15.
+ * Coherence linter, a first-class, tested feature. See docs/architecture.md#verification-the-coherence-linter.
  *
  * Two layers:
  *  1. Structural integrity over the whole ledger (every opp references a real
@@ -57,7 +57,7 @@ function artifactText(artifact: Artifact): string | null {
 }
 
 /**
- * Whether an artifact reflects the deal's CLOSED state — true for inherently
+ * Whether an artifact reflects the deal's CLOSED state. True for inherently
  * final kinds, or when its grounding snapshot carries a non-open outcome. Only
  * final artifacts are REQUIRED to name the competitor; an early-stage note/email
  * legitimately predates knowing it, so a miss there is a warning, not an error.
@@ -130,7 +130,7 @@ export function lint(world: World, cfg: Config, sampleSize = 0, opts: LintOption
       }
     }
     // Lost deals must record a loss reason; wins carry no reason column
-    // (the CRM contract has no win_reason — win rationale lives in win-loss surveys).
+    // (the CRM contract has no win_reason; win rationale lives in win-loss surveys).
     if (o.status === "lost" && !o.winLossReason) {
       findings.push({ severity: "error", deal: o.id, message: `lost deal has no loss reason` });
     }
@@ -147,8 +147,8 @@ export function lint(world: World, cfg: Config, sampleSize = 0, opts: LintOption
 
   // --- Layer 2: cross-system coherence on closed deals ----------------------
   // Only cohort members are ever generated or published, so deals outside the
-  // cohort have no prose by design and must not be reported as incoherent —
-  // otherwise the linter drowns in errors for deals nobody intends to fill.
+  // cohort have no prose by design and must not be reported as incoherent.
+  // Otherwise the linter drowns in errors for deals nobody intends to fill.
   const cohort = new CohortIndex();
   let closed = ledger.closedDeals().filter((d) => cohort.has(d.id));
   if (opts.oppId) {
@@ -158,21 +158,47 @@ export function lint(world: World, cfg: Config, sampleSize = 0, opts: LintOption
   }
 
   // Win-loss/slack artifacts only exist when their generation is switched on
-  // (Batch 1 is CRM-only) — don't require artifacts the run never produced.
+  // (Batch 1 is CRM-only), so don't require artifacts the run never produced.
   const expectWinlossArtifacts = cfg.world.generate.winloss;
   for (const deal of closed) {
     // A `none`-mode deal carries its win/loss signal in a #win-loss Slack post.
     // Seed cohort members never post to Slack, so for them that artifact is not
-    // merely missing — it was never plantable. Requiring it would be demanding
+    // merely missing. It was never plantable. Requiring it would be demanding
     // prose the engine is configured not to produce.
     checkDealCoherence(cfg, world, deal, findings, expectWinlossArtifacts && cohort.allowsSlack(deal.id));
   }
 
+  checkEmDashes(world, findings);
   if (opts.repetition) checkRepetition(world, cfg, findings);
 
   const errors = findings.filter((f) => f.severity === "error").length;
   const warnings = findings.filter((f) => f.severity === "warn").length;
   return { findings, checkedDeals: closed.length, errors, warnings };
+}
+
+// --- Em dashes in generated prose (warn-only) --------------------------------
+//
+// Nobody types an em dash into a CRM note. A corpus full of them is the loudest
+// tell that the prose came out of a model, which is the one thing this engine
+// exists to avoid. Warn rather than error: the artifact is otherwise coherent,
+// and the fix is a refill, not a hand-edit.
+
+const EM_DASH = /—/g; // prose-lint: allow-emdash (the needle itself)
+
+function checkEmDashes(world: World, findings: LintFinding[]): void {
+  for (const artifact of world.artifacts) {
+    if (artifact.status === "planned") continue;
+    const text = artifactText(artifact);
+    if (!text) continue;
+    const count = text.match(EM_DASH)?.length ?? 0;
+    if (count === 0) continue;
+    findings.push({
+      severity: "warn",
+      deal: artifact.dealId ?? undefined,
+      artifact: artifact.id,
+      message: `${count} em dash(es) in the prose. Rewrite those sentences: apply -- --refill=${artifact.id}`,
+    });
+  }
 }
 
 // --- Cross-deal repetition detector (warn-only) ------------------------------
@@ -293,7 +319,7 @@ function checkRepetition(world: World, cfg: Config, findings: LintFinding[]): vo
     reported.push(shingle);
     findings.push({
       severity: "warn",
-      message: `repeated phrase across ${deals.size} deals: "${shingle}" — consider adding it to banned_phrases (config/prose.yaml)`,
+      message: `repeated phrase across ${deals.size} deals: "${shingle}". Consider adding it to banned_phrases (config/prose.yaml)`,
     });
   }
 }
@@ -385,8 +411,8 @@ function checkDealCoherence(
     }
   }
 
-  // none-mode closed deals MUST have a winloss_post carrying the signal —
-  // but only once win-loss generation is switched on.
+  // none-mode closed deals MUST have a winloss_post carrying the signal, but
+  // only once win-loss generation is switched on.
   if (expectWinlossArtifacts && deal.winLossMode === "none") {
     const post = artifacts.find((a) => a.kind === "winloss_post");
     if (!post) {
@@ -401,11 +427,11 @@ function checkDealCoherence(
 
 export function formatFindings(result: LintResult): string {
   if (result.findings.length === 0)
-    return `✓ lint clean — ${result.checkedDeals} closed deals checked, no issues`;
+    return `✓ lint clean. ${result.checkedDeals} closed deals checked, no issues`;
   const lines = result.findings.map((f) => {
     const icon = f.severity === "error" ? "✗" : f.severity === "warn" ? "⚠" : "·";
     const loc = [f.deal && `deal=${f.deal}`, f.artifact && `art=${f.artifact}`].filter(Boolean).join(" ");
-    return `  ${icon} [${f.severity}] ${loc ? loc + " — " : ""}${f.message}`;
+    return `  ${icon} [${f.severity}] ${loc ? loc + ": " : ""}${f.message}`;
   });
   return [
     `lint: ${result.errors} error(s), ${result.warnings} warning(s) over ${result.checkedDeals} closed deals`,

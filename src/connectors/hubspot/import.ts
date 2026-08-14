@@ -8,16 +8,16 @@
  *   - "opportunity" one opportunity + its account + its buying-group contacts
  *   - "all"         every account, contact, and opportunity in the ledger
  *
- * Target companies are REAL accounts (name/domain preserved as-is) — see
- * `docs/repo-universe.md` / config/world.yaml `prospects`. Contacts and deals
+ * Target companies are REAL accounts (name/domain preserved as-is). See
+ * config/world.yaml `prospects` and src/generation/real-accounts.ts. Contacts and deals
  * are synthetic: contact emails are replaced with non-deliverable addresses,
- * and every record carries a `demo_world_notice` property saying so. Names —
- * company, contact and deal — are never decorated with a marker; they mirror
+ * and every record carries a `demo_world_notice` property saying so. Names
+ * (company, contact and deal) are never decorated with a marker; they mirror
  * the ledger exactly, as they do in Salesforce. Records are upserted by the
  * unique `demo_world_id` property, so reruns update rather than duplicate.
  *
  * Activities (calls, notes, emails) and owner provisioning are intentionally
- * out of scope — see the plan this module implements.
+ * out of scope.
  */
 
 import type { Account, Contact, Opportunity, Rep, World } from "../../ledger/schema.js";
@@ -126,7 +126,7 @@ export function selectHubSpotDataset(world: World, scope: HubSpotScope): HubSpot
 }
 
 /**
- * Real target companies keep their real name/domain — the operator's own ICP research
+ * Real target companies keep their real name/domain, from the operator's own ICP research
  * (see config/world.yaml `prospects`). Only the pipeline layered on top (deals,
  * contacts) is synthetic, and that is called out on every record.
  */
@@ -156,8 +156,8 @@ export function contactProperties(contact: Contact): Record<string, string> {
   return {
     firstname: first || "Demo",
     lastname: rest.join(" ") || "Contact",
-    // Contacts are synthetic people even on a real-account company record —
-    // never emit a source-lookalike or deliverable address (DESIGN §18).
+    // Contacts are synthetic people even on a real-account company record.
+    // Never emit a source-lookalike or deliverable address (see DISCLAIMER.md).
     email: `${contact.id}@example.com`,
     jobtitle: contact.title,
     demo_world_notice: fabricatedNotice,
@@ -250,8 +250,8 @@ function countUpsert(stats: { created: number; updated: number }, wasNew: boolea
 }
 
 /**
- * Import in strict dependency order — companies, contacts, deals, then
- * contact→company / deal→company / deal→contact associations — so an object
+ * Import in strict dependency order: companies, contacts, deals, then
+ * contact→company / deal→company / deal→contact associations, so an object
  * type is never associated before it exists. If an entire phase fails outright
  * (every record in it errored, most likely a credentials/schema/pipeline
  * problem rather than bad data), subsequent phases are skipped rather than
@@ -299,7 +299,7 @@ export async function importHubSpotDataset(
     );
     if (companyIds.size === 0) {
       throw new Error(
-        `HubSpot rejected every company in this batch (${result.numErrors} error(s)) — aborting before contacts/deals. ` +
+        `HubSpot rejected every company in this batch (${result.numErrors} error(s)). Aborting before contacts/deals. ` +
           "Check credentials, scopes, and that `hubspot:setup` has run.",
       );
     }

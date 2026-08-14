@@ -1,4 +1,4 @@
-# Disclaimer — synthetic data, used responsibly
+# Disclaimer: synthetic data, used responsibly
 
 Demoverse manufactures **clearly-fabricated demo data** for a **fictional
 company**. It exists so you can build, test and demo B2B software against a
@@ -11,10 +11,12 @@ responsibly means:
   service account. Never a production CRM, never a shared company workspace.
 - **No real people.** Contacts, reps and Slack personas are always fictional.
   The engine fabricates every person and gives contacts non-resolving
-  `.example` email domains by design — keep it that way.
+  `.example` email domains by design. Keep it that way.
 - **Real company names are opt-in and stay private.** You *may* ground your
-  fictional pipeline in real target-account names (your own prospect lists) or
-  name real competitor vendors — the reference deployment does. If you do, the
+  fictional pipeline in real target-account names (your own prospect lists, via
+  the optional `prospects` block: see
+  [docs/operations.md](docs/operations.md#real-target-account-names-optional-advanced))
+  or name real competitor vendors. The reference deployment does. If you do, the
   fabricated outcomes attached to those names (won/lost, pricing feedback,
   quotes) must remain inside your private demo systems. Never publish, post or
   present fabricated data about a real company where it could be mistaken for

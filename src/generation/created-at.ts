@@ -5,7 +5,7 @@
  * Salesforce, though, stamps every reconciled deal with the same wall-clock
  * CreatedDate (the reconcile run), which reads as obviously synthetic. To give
  * each deal a realistic, distinct creation instant we derive a business-hours
- * time-of-day from its `createdDate` — seeded, so replays and re-runs match.
+ * time-of-day from its `createdDate`, seeded so replays and re-runs match.
  *
  * We keep this SEPARATE from `createdDate`: that date stays exactly as generated
  * (close targets, stage fractions and the artifact timeline all key off it), and

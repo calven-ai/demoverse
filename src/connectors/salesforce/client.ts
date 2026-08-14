@@ -1,10 +1,10 @@
 /**
  * Salesforce (Developer Edition) client over the raw REST + SOAP-login APIs via
- * `fetch`. See DESIGN.md §3, §14.
+ * `fetch`. See docs/architecture.md#connectors.
  *
  * Auth uses the SOAP partner `login` call (username + password + security token)
  * to obtain a session id + instance URL; all record I/O then goes through the
- * REST sObject API. We deliberately avoid the jsforce SDK — its HTTP transport
+ * REST sObject API. We deliberately avoid the jsforce SDK because its HTTP transport
  * hangs under this runtime (tsx/Node) while raw fetch works reliably.
  *
  * Custom fields expected on the org are created by `scripts/sf-setup.ts`
@@ -75,6 +75,12 @@ export class SalesforceClient {
     return this.instanceUrl;
   }
 
+  /** Session id for hand-built SOAP calls (request headers only, never logged). */
+  sessionId(): string {
+    if (!this.accessToken) throw new Error("SalesforceClient.sessionId called before login()");
+    return this.accessToken;
+  }
+
   /** Authenticated REST/Tooling/Metadata request. Throws a readable SF error. */
   async request<T = unknown>(
     method: string,
@@ -95,7 +101,15 @@ export class SalesforceClient {
     });
     if (res.status === 204) return undefined;
     const text = await res.text();
-    const json = text ? (JSON.parse(text) as unknown) : undefined;
+    // A maintenance page or proxy error is HTML, not JSON; keep the readable
+    // error path below instead of throwing a bare SyntaxError here.
+    let json: unknown;
+    try {
+      json = text ? (JSON.parse(text) as unknown) : undefined;
+    } catch {
+      if (res.ok) throw new Error(`HTTP ${res.status}: expected JSON, got ${text.slice(0, 300)}`);
+      json = undefined;
+    }
     if (!res.ok) {
       const arr = json as { errorCode?: string; message?: string; fields?: string[] }[] | undefined;
       const msg = Array.isArray(arr)
@@ -130,7 +144,7 @@ export class SalesforceClient {
     try {
       res = (await this.request("POST", path, fields)) as typeof res;
     } catch (e) {
-      // The ledger is the source of truth — if it holds two same-named contacts,
+      // The ledger is the source of truth. If it holds two same-named contacts,
       // Salesforce must mirror it. Bypass the org's duplicate rule and retry once.
       if (!(e instanceof Error) || !e.message.includes("DUPLICATES_DETECTED")) throw e;
       res = (await this.request("POST", path, fields, {

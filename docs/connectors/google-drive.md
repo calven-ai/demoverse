@@ -1,6 +1,6 @@
 # Google Drive connector
 
-Drive holds the world's documents: call transcripts, AE notes, win-loss surveys and interviews, and internal collateral, filed as markdown in a tidy per-account folder tree. This guide sets up a Google Cloud service account, shares a dedicated folder with it, and covers the one hazard specific to Drive — orphaned files after a world reset.
+Drive holds the world's documents: call transcripts, AE notes, win-loss surveys and interviews, and internal collateral, filed as markdown in a tidy per-account folder tree. This guide sets up a Google Cloud service account and shares a dedicated folder with it. It also covers the one hazard specific to Drive. Orphaned files after a world reset.
 
 > **Dedicated folder only.** The engine writes into one shared folder you create for this purpose. Everything it manages lives under that root.
 
@@ -8,10 +8,10 @@ Drive holds the world's documents: call transcripts, AE notes, win-loss surveys 
 
 1. In the [Google Cloud console](https://console.cloud.google.com/), create a project (or reuse a scratch one).
 2. **APIs & Services → Library** → search **Google Drive API** → **Enable**.
-3. **IAM & Admin → Service Accounts** → **Create Service Account**. Name it something like `demoverse-drive`. No project roles are needed — access comes from folder sharing, not IAM.
+3. **IAM & Admin → Service Accounts** → **Create Service Account**. Name it something like `demoverse-drive`. No project roles are needed. Access comes from folder sharing, not IAM.
 4. Open the new service account → **Keys** → **Add Key** → **Create new key** → **JSON**. A key file downloads.
 
-Put the key file in the repo root (it's gitignored) or anywhere you like:
+Rename the download to `service-account.json` when placing it in the repo root. That exact name is what `.gitignore` covers; under the `<project-id>-<hex>.json` name GCP gives the download, the file is one `git add .` away from your remote, with only the secrets check's key-material scan left to catch it. Point `GOOGLE_APPLICATION_CREDENTIALS` in `.env` at it:
 
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=./service-account.json
@@ -19,9 +19,9 @@ GOOGLE_APPLICATION_CREDENTIALS=./service-account.json
 
 ## 2. Share a folder with the service account
 
-1. In Google Drive, create a dedicated folder — e.g. `Aurora Demo World`. A folder on a Shared Drive works too.
+1. In Google Drive, create a dedicated folder. Name it something like `Aurora Demo World`. A folder on a Shared Drive works too.
 2. **Share** it with the service account's email (the `…@….iam.gserviceaccount.com` address from the key file), as **Editor**.
-3. Open the folder in the browser and copy the id from the URL — the long string after `/folders/`:
+3. Open the folder in the browser and copy the id from the URL. It's the long string after `/folders/`:
 
 ```bash
 DRIVE_ROOT_FOLDER_ID=1AbCdEfGh...
@@ -71,9 +71,9 @@ As everywhere, only [cohort](../operations.md#the-cohort) deals reach Drive.
 
 ## `drive:audit` and the orphan hazard
 
-Drive is the one destination a downstream tool typically ingests *blind*: a watched-folder connector reads whatever is in the folder, with no CRM join to cross-check against. So a stale file doesn't sit there harmlessly — it gets ingested, and the tool derives accounts and deals for a company that exists nowhere else.
+Drive is the one destination a downstream tool typically ingests *blind*: a watched-folder connector reads whatever is in the folder, with no CRM join to cross-check against. So a stale file doesn't sit there harmlessly. It gets ingested, and the tool derives accounts and deals for a company that exists nowhere else.
 
-That's exactly what a world reset produces. After `npm run init -- --force`, the new ledger carries no Drive file ids, so the next reconcile re-uploads everything — and the *old* generation's files stay behind as orphans. The audit finds them by walking the tree and matching every file id against the ledger:
+That's exactly what a world reset produces. After `npm run init -- --force`, the new ledger carries no Drive file ids, so the next reconcile re-uploads everything and the *old* generation's files stay behind as orphans. The audit finds them by walking the tree and matching every file id against the ledger:
 
 ```bash
 npm run drive:audit                              # report orphans

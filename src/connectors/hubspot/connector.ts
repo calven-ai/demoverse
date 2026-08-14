@@ -1,5 +1,5 @@
 /**
- * HubSpot as a registered CRM connector — structure only (companies, contacts,
+ * HubSpot as a registered CRM connector, structure only (companies, contacts,
  * deals, associations; no activity timeline or files). Wraps the deterministic
  * importer (./import.ts), which is also drivable standalone via
  * `npm run hubspot:import`.
@@ -51,13 +51,13 @@ export async function reconcileHubspot(
     : full;
   const total = dataset.accounts.length + dataset.contacts.length + dataset.opportunities.length;
   if (opts.oppId && dataset.opportunities.length === 0) {
-    stats.note = `opportunity ${opts.oppId} not found or not in the cohort — skipped`;
+    stats.note = `opportunity ${opts.oppId} not found or not in the cohort, skipped`;
     return stats;
   }
 
   if (!hasEnv("HUBSPOT_ACCESS_TOKEN")) {
     stats.disabled = true;
-    stats.note = "HubSpot credentials absent (.env) — skipped";
+    stats.note = "HubSpot credentials absent (.env), skipped";
     stats.skipped = total;
     return stats;
   }

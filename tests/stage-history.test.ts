@@ -4,14 +4,14 @@
  * `stageHistory` is the raw material for time-in-stage / pipeline-velocity
  * analysis, and the backfill REPLAYS the engine's own schedule rather than
  * inventing dates. The property that matters is that a replay of an
- * already-advanced world reproduces exactly what the live run recorded — so
- * these tests advance a world, wipe the histories, replay, and compare.
+ * already-advanced world reproduces exactly what the live run recorded. These
+ * tests advance a world, wipe the histories, replay, and compare.
  */
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig } from "../src/trends.js";
@@ -22,7 +22,7 @@ import type { Period } from "../src/clock.js";
 const START = "2025-01-01";
 
 function advancedWorld(weeks: number) {
-  const cfg = loadConfig();
+  const cfg = testConfig();
   const world = emptyWorld("stage-history-test");
   world.reps = buildReps(cfg.salesTeam);
   const trends = seedTrendsFromConfig(cfg, START);

@@ -1,5 +1,5 @@
 /**
- * Deterministic world-advance — the core simulation. See DESIGN.md §5–7, §10.
+ * Deterministic world-advance, the core simulation. See docs/architecture.md#clock-periods-and-advance.
  *
  * For each pending period this computes the next desired world state: new
  * accounts/contacts/opportunities sampled from the Tier-1 distributions, open
@@ -10,8 +10,8 @@
  *
  * Variance model (the demo payoff): firmographics are sampled COHERENTLY (size
  * drives employee/revenue/funding), an account's ICP fit is DERIVED from those
- * raw fields (config/icp.yaml), and outcomes are correlated —
- * win probability is biased by ICP fit, competitor strength, multi-threading and
+ * raw fields (config/icp.yaml), and outcomes are correlated.
+ * Win probability is biased by ICP fit, competitor strength, multi-threading and
  * planted per-segment deltas; loss reason / price / product feedback correlate
  * with the competitor and outcome. Trends (state/trends.json) move volume,
  * competitor presence/strength and segment shares over time. The result is the
@@ -19,7 +19,7 @@
  */
 
 import { Rng } from "../util/rng.js";
-import { addDays, addWeeks, daysBetween, isBefore, type ISODate } from "../util/date.js";
+import { addDays, addWeeks, daysBetween, isBefore, DAYS_PER_QUARTER, type ISODate } from "../util/date.js";
 import { CohortIndex } from "../cohort.js";
 import { pickUseCase, opportunityName } from "../use-cases.js";
 import type { Config } from "../config/schema.js";
@@ -30,9 +30,9 @@ import type { Opportunity, World } from "../ledger/schema.js";
 import { icWinModifier } from "../sales-team.js";
 import { createdAtFor } from "./created-at.js";
 
-const DAYS_PER_QUARTER = 91.3125;
 import { buildRealAccountPool } from "./real-accounts.js";
-import { openStages, stageForFraction, stageRank } from "../pipeline/stages.js";
+import { openStages, stageRank } from "../pipeline/stages.js";
+import { dealShape, isThin, stageForElapsed, totalWeeks } from "../pipeline/shape.js";
 import {
   pickRep,
   sampleCompetitors,
@@ -77,21 +77,31 @@ export interface AdvanceResult {
   plannedArtifactIds: string[];
   /**
    * Deals this advance created, to be enrolled in the Salesforce cohort as
-   * `weekly` members by the CALLER — after it has saved the ledger. Reported
+   * `weekly` members by the CALLER, after it has saved the ledger. Reported
    * rather than written so a failed run cannot leave cohort.json describing
    * deals that were never persisted.
    */
   enrolled: { oppId: string; accountName: string; source: "weekly" }[];
 }
 
-/** Deterministic per-deal cycle length (recomputable from the seed). */
+/**
+ * The loss reason a stalled deal gravitates to. Matched against the configured
+ * `winloss.loss_reasons` picklist, and skipped when an operator has removed it.
+ */
+const NO_DECISION = "No decision";
+
+/**
+ * Deterministic per-deal cycle length (recomputable from the seed).
+ *
+ * Selling weeks only. A stalled deal's silent weeks are calendar time on top of
+ * this, so use `closeTarget` for anything date-shaped.
+ */
 export function cycleWeeks(world: World, cfg: Config, oppId: string): number {
-  const [lo, hi] = cfg.world.pipeline.avg_sales_cycle_weeks;
-  return new Rng(`${world.seed}|cycle|${oppId}`).int(lo, hi);
+  return dealShape(world, cfg, oppId).cycleWeeks;
 }
 
 export function closeTarget(world: World, cfg: Config, opp: Opportunity): ISODate {
-  return addWeeks(opp.createdDate, cycleWeeks(world, cfg, opp.id));
+  return addWeeks(opp.createdDate, totalWeeks(dealShape(world, cfg, opp.id)));
 }
 
 /**
@@ -126,7 +136,7 @@ export function advanceWorld(
   const enrolledIds = new Set<string>();
   const newlyEnrolled: { oppId: string; accountName: string; source: "weekly" }[] = [];
   const slackFor = (oppId: string): boolean => cohort.allowsSlack(oppId) || enrolledIds.has(oppId);
-  // Prose is planted only for deals that can actually reach a destination —
+  // Prose is planted only for deals that can actually reach a destination, on
   // the same argument that suppresses Slack at planting time rather than at
   // push time. A non-cohort deal never leaves the repo, so a transcript planned
   // for it can never be published; planting one only grows a backlog of
@@ -185,7 +195,7 @@ export function advanceWorld(
 
       const createdDate = addDays(period.start, rng.int(0, 6));
       const createdAt = createdAtFor(createdDate, rng);
-      // Competitors are sampled first so the use case can skew off them — you
+      // Competitors are sampled first so the use case can skew off them. You
       // meet a competitor because you are in their patch, not the other way
       // round. Use case never feeds back into the outcome (see src/use-cases.ts).
       const competitors = sampleCompetitors(cfg, rng, eff, isMI);
@@ -217,56 +227,63 @@ export function advanceWorld(
       };
       world.opportunities.push(opp);
       summary.newOpps++;
+      // A fast-track deal closes before a real buying process could leave a
+      // paper trail, so it skips the optional extras below and lands ~2 touch
+      // points in total. The gate is applied AFTER `shouldEmitPerStage` so the
+      // rng draw still happens and the per-period stream stays aligned.
+      const thin = isThin(dealShape(world, cfg, opp.id));
       // Deals born in a live run join the Salesforce cohort as `weekly` members:
       // they are the handful the operator adds each week and they get the FULL
       // detail layer, Slack included. (Enrollment is a no-op until a cohort has
-      // been selected — see src/cohort.ts.)
+      // been selected. See src/cohort.ts.)
       newlyEnrolled.push({ oppId: opp.id, accountName: account.name, source: "weekly" });
       enrolledIds.add(opp.id);
 
-      // Discovery call transcript + an opening Slack thread (Batch 3 — gated).
+      // Discovery call transcript + an opening Slack thread (Batch 3, gated).
       if (cfg.world.generate.transcripts) {
         planned({
           id: nextId(world.artifacts, "art"),
           kind: "call_transcript",
           dealId: opp.id,
-          title: `${account.name} — Discovery call`,
+          title: `${account.name} — Discovery call`, // prose-lint: allow-emdash (external record name)
           date: createdDate,
           grounding: { ...dealFacts(ledger, opp), stage: "Discovery" },
         });
       }
       if (
         cfg.world.generate.ae_notes &&
-        shouldEmitPerStage(cfg.world.artifacts.ae_notes_per_deal, "Discovery", rng)
+        shouldEmitPerStage(cfg.world.artifacts.ae_notes_per_deal, "Discovery", rng) &&
+        !thin
       ) {
         planned({
           id: nextId(world.artifacts, "art"),
           kind: "ae_note",
           dealId: opp.id,
-          title: `${account.name} — AE note (Discovery)`,
+          title: `${account.name} — AE note (Discovery)`, // prose-lint: allow-emdash (external record name)
           date: createdDate,
           grounding: { ...dealFacts(ledger, opp), stage: "Discovery" },
         });
       }
       if (
         cfg.world.generate.emails &&
-        shouldEmitPerStage(cfg.world.artifacts.emails_per_deal, "Discovery", rng)
+        shouldEmitPerStage(cfg.world.artifacts.emails_per_deal, "Discovery", rng) &&
+        !thin
       ) {
         planned({
           id: nextId(world.artifacts, "art"),
           kind: "email_exchange",
           dealId: opp.id,
-          title: `${account.name} — email thread (Discovery)`,
+          title: `${account.name} — email thread (Discovery)`, // prose-lint: allow-emdash (external record name)
           date: createdDate,
           grounding: { ...dealFacts(ledger, opp), stage: "Discovery" },
         });
       }
-      if (cfg.world.generate.slack && slackFor(opp.id)) {
+      if (cfg.world.generate.slack && slackFor(opp.id) && !thin) {
         planned({
           id: nextId(world.artifacts, "art"),
           kind: "slack_deal_thread",
           dealId: opp.id,
-          title: `#deals — ${account.name} kickoff`,
+          title: `#deals — ${account.name} kickoff`, // prose-lint: allow-emdash (external record name)
           date: createdDate,
           grounding: {
             ...dealFacts(ledger, opp),
@@ -282,8 +299,9 @@ export function advanceWorld(
       if (isBefore(period.end, opp.createdDate)) continue; // not created yet in this period
 
       const target = closeTarget(world, cfg, opp);
+      const shape = dealShape(world, cfg, opp.id);
       const dealRng = new Rng(`${world.seed}|close|${opp.id}`);
-      // A non-cohort deal still lives its whole life here — it stages, closes,
+      // A non-cohort deal still lives its whole life here. It stages, closes,
       // and records its outcome, because that is what grounds the win-rate,
       // competitor and ICP statistics. It just grows no prose.
       const withProse = proseFor(opp.id);
@@ -306,6 +324,13 @@ export function advanceWorld(
         opp.stageHistory.push({ stage: "Closed", date: period.end });
         if (!won) {
           opp.winLossReason = pickLossReason(cfg, opp, dealRng);
+          // A deal that went dark for weeks and then lost usually died of
+          // indecision, not of a competitor or a price. Nudge the recorded
+          // reason to match the shape the ledger already shows. `dealRng` is
+          // per-deal, so the extra draw cannot disturb any other deal.
+          if (shape.stallWeeks > 0 && NO_DECISION in cfg.world.winloss.loss_reasons && dealRng.chance(0.7)) {
+            opp.winLossReason = NO_DECISION;
+          }
           opp.repLossReason = pickRepLossReason(cfg, opp.winLossReason, dealRng);
         }
         opp.priceFeedback = pickPriceFeedback(dealRng, won, opp.winLossReason);
@@ -317,17 +342,18 @@ export function advanceWorld(
         if (won) summary.won++;
         else summary.lost++;
 
-        // Win-loss artifact by mode (Batch 2 — gated).
+        // Win-loss artifact by mode (Batch 2, gated).
         if (cfg.world.generate.winloss && withProse)
           planCloseArtifacts(world, cfg, ledger, opp, period.end, planned, rng, slackFor(opp.id));
-        // Closing AE note — the rep's own win/loss recap (grounds repLossReason,
+        // Closing AE note, the rep's own win/loss recap (grounds repLossReason,
         // the belief-vs-reality gap). Carries the closed facts (outcome + reason).
-        if (cfg.world.generate.ae_notes && withProse) {
+        // A fast-track deal skips it: nobody writes up a deal that closed itself.
+        if (cfg.world.generate.ae_notes && withProse && !isThin(shape)) {
           planned({
             id: nextId(world.artifacts, "art"),
             kind: "ae_note",
             dealId: opp.id,
-            title: `${account.name} — AE close note`,
+            title: `${account.name} — AE close note`, // prose-lint: allow-emdash (external record name)
             date: period.end,
             grounding: dealFacts(ledger, opp),
           });
@@ -337,7 +363,7 @@ export function advanceWorld(
             id: nextId(world.artifacts, "art"),
             kind: "slack_deal_thread",
             dealId: opp.id,
-            title: `#deals — ${account.name} closed ${opp.status}`,
+            title: `#deals — ${account.name} closed ${opp.status}`, // prose-lint: allow-emdash (external record name)
             date: period.end,
             grounding: {
               ...dealFacts(ledger, opp),
@@ -347,9 +373,15 @@ export function advanceWorld(
         }
       } else {
         // Progress the stage; plan a transcript when entering Evaluation/Proposal.
-        const frac =
-          daysBetween(opp.createdDate, period.end) / Math.max(1, daysBetween(opp.createdDate, target));
-        const newStage = stageForFraction(openStages(cfg), frac);
+        // A stalled deal's clock is frozen inside its stall window, so this
+        // returns the same stage for several periods running and the deal
+        // quietly earns nothing, which is the point.
+        const newStage = stageForElapsed(
+          cfg,
+          daysBetween(opp.createdDate, period.end),
+          Math.max(1, daysBetween(opp.createdDate, target)),
+          shape,
+        );
         if (
           newStage !== opp.stage &&
           stageRank(openStages(cfg), newStage) > stageRank(openStages(cfg), opp.stage)
@@ -367,7 +399,7 @@ export function advanceWorld(
               id: nextId(world.artifacts, "art"),
               kind: "call_transcript",
               dealId: opp.id,
-              title: `${acctName} — ${entered} call`,
+              title: `${acctName} — ${entered} call`, // prose-lint: allow-emdash (external record name)
               date: period.end,
               grounding: { ...dealFacts(ledger, opp), stage: entered },
             });
@@ -380,7 +412,7 @@ export function advanceWorld(
               id: nextId(world.artifacts, "art"),
               kind: "ae_note",
               dealId: opp.id,
-              title: `${acctName} — AE note (${entered})`,
+              title: `${acctName} — AE note (${entered})`, // prose-lint: allow-emdash (external record name)
               date: period.end,
               grounding: { ...dealFacts(ledger, opp), stage: entered },
             });
@@ -393,7 +425,7 @@ export function advanceWorld(
               id: nextId(world.artifacts, "art"),
               kind: "email_exchange",
               dealId: opp.id,
-              title: `${acctName} — email thread (${entered})`,
+              title: `${acctName} — email thread (${entered})`, // prose-lint: allow-emdash (external record name)
               date: period.end,
               grounding: { ...dealFacts(ledger, opp), stage: entered },
             });
@@ -402,7 +434,7 @@ export function advanceWorld(
       }
     }
 
-    // --- 3. Competitive questions in #competitive (Batch 3 — gated) ----------
+    // --- 3. Competitive questions in #competitive (Batch 3, gated) ------------
     if (cfg.world.generate.slack) {
       const qCount = rng.int(...cfg.world.slack.competitive_questions_per_week);
       for (let i = 0; i < qCount; i++) {
@@ -411,14 +443,14 @@ export function advanceWorld(
           id: nextId(world.artifacts, "art"),
           kind: "competitive_q",
           dealId: null,
-          title: `#competitive — question about ${competitor}`,
+          title: `#competitive — question about ${competitor}`, // prose-lint: allow-emdash (external record name)
           date: addDays(period.start, rng.int(0, 6)),
           grounding: { competitor },
         });
       }
     }
 
-    // --- 4. Internal collateral (once, at the very first period — gated) -----
+    // --- 4. Internal collateral (once, at the very first period, gated) -------
     if (isFirstEver && period.index === periods[0]!.index && cfg.world.generate.internal_collateral) {
       const n = rng.int(...cfg.world.artifacts.internal_collateral.count);
       for (let i = 0; i < n; i++) {

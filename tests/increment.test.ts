@@ -2,16 +2,21 @@
  * Living-increment tests.
  *
  * The world is meant to accumulate its history a slice at a time: an increment
- * opens a couple of deals, moves each open deal at most one stage, and plants
- * only the touch points those events earned. These tests pin the two properties
- * that keep that motion honest — the forced clock (an increment runs on demand,
- * not when the calendar allows it) and the per-run intake override.
+ * opens a couple of deals, moves the open ones forward, and plants only the
+ * touch points those events earned. These tests pin the properties that keep
+ * that motion honest: the forced clock (an increment runs on demand, not when
+ * the calendar allows it), the per-run intake override, and the deal-shape
+ * variety that stops every deal from walking an identical pipeline.
+ *
+ * Note that a deal does NOT always move exactly one stage per period. Stages
+ * are derived from elapsed fraction of the cycle, so a short deal skips some
+ * and a stalled one holds still. See src/pipeline/shape.ts.
  */
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig } from "../src/trends.js";
@@ -27,7 +32,7 @@ function clockAt(simNow: string, periodIndex = 10): Clock {
 }
 
 function freshWorld() {
-  const cfg = loadConfig();
+  const cfg = testConfig();
   const world = emptyWorld("increment-test");
   world.reps = buildReps(cfg.salesTeam);
   return { cfg, world, trends: seedTrendsFromConfig(cfg, START) };
@@ -35,7 +40,7 @@ function freshWorld() {
 
 test("a forced increment runs even when the world is already current", () => {
   const clock = clockAt("2026-08-13");
-  // The calendar owes nothing — this is the exact state a routine run finds.
+  // The calendar owes nothing. This is the exact state a routine run finds.
   assert.equal(pendingPeriods(clock, "2026-08-13").length, 0);
 
   const periods = forcedPeriods(clock, 1);
@@ -69,40 +74,125 @@ test("--new-opps overrides intake exactly, for that run only", () => {
   advanceWorld(world, cfg, trends, START, periods, new CohortIndex(EMPTY_COHORT), { newOppsPerPeriod: 5 });
   assert.equal(world.opportunities.length, 10, "5 deals per period, exactly");
 
-  // The standing rate is untouched — a later run without the flag falls back to it.
+  // The standing rate is untouched. A later run without the flag falls back to it.
   assert.deepEqual(trends.volume.newOppsPerWeek, cfg.world.volume.new_opps_per_week);
 });
 
-test("an increment moves an open deal at most one stage and plants only that stage's touch points", () => {
+test("an increment moves deals forward a slice at a time, never backwards", () => {
   const { cfg, world, trends } = freshWorld();
   const cohort = new CohortIndex(EMPTY_COHORT);
   const stages = cfg.world.pipeline.stages;
 
-  // Open a cohort of deals, then advance one week at a time and watch a single
-  // deal: a real one does not jump Discovery → Negotiation in a week.
+  // Watch EVERY deal, not just one. Tracking a single deal made this test
+  // depend on which cycle length that deal happened to draw, so a real
+  // regression could hide behind a lucky seed.
   advanceWorld(world, cfg, trends, START, forcedPeriods(clockAt(START, 0), 1), cohort, {
     newOppsPerPeriod: 6,
   });
-  const tracked = world.opportunities[0]!.id;
 
   let clock = clockAt("2025-01-08", 1);
-  for (let week = 0; week < 8; week++) {
-    const opp = world.opportunities.find((o) => o.id === tracked)!;
-    if (opp.status !== "open") break;
-    const before = stages.indexOf(opp.stage);
-    const artsBefore = world.artifacts.filter((a) => a.dealId === tracked).length;
+  let sawProgress = false;
+  for (let week = 0; week < 12; week++) {
+    const before = new Map(
+      world.opportunities.map((o) => [
+        o.id,
+        {
+          rank: stages.indexOf(o.stage),
+          open: o.status === "open",
+          arts: world.artifacts.filter((a) => a.dealId === o.id).length,
+        },
+      ]),
+    );
 
     advanceWorld(world, cfg, trends, START, forcedPeriods(clock, 1), cohort, { newOppsPerPeriod: 0 });
     clock = clockAt(forcedPeriods(clock, 1)[0]!.end, clock.periodIndex + 1);
 
-    const after = stages.indexOf(world.opportunities.find((o) => o.id === tracked)!.stage);
-    assert.ok(after >= before, "a deal never moves backwards");
-    assert.ok(after - before <= 1, `deal jumped ${after - before} stages in one week`);
+    for (const opp of world.opportunities) {
+      const was = before.get(opp.id);
+      if (!was || !was.open) continue;
+      const after = stages.indexOf(opp.stage);
+      assert.ok(after >= was.rank, `${opp.id} moved backwards`);
+      if (after > was.rank) sawProgress = true;
 
-    const planted = world.artifacts.filter((a) => a.dealId === tracked).length - artsBefore;
-    assert.ok(planted <= 4, `one increment planted ${planted} artifacts on a single deal`);
+      // A single period is still a SLICE of a deal's life, never its whole
+      // paper trail, however far the stage pointer moved.
+      const planted = world.artifacts.filter((a) => a.dealId === opp.id).length - was.arts;
+      assert.ok(planted <= 5, `one increment planted ${planted} artifacts on ${opp.id}`);
+    }
   }
 
-  const opp = world.opportunities.find((o) => o.id === tracked)!;
-  assert.ok(opp.stageHistory.length >= 2, "the deal recorded its progression");
+  assert.ok(sawProgress, "no deal ever advanced a stage");
+  for (const opp of world.opportunities) {
+    assert.ok(opp.stageHistory.length >= 1, `${opp.id} recorded no history`);
+  }
+});
+
+test("short cycles skip stages; long ones walk the full pipeline", () => {
+  const { cfg, world, trends } = freshWorld();
+  const cohort = new CohortIndex(EMPTY_COHORT);
+
+  // 30 weeks of intake, so every archetype gets a chance to appear.
+  let clock = clockAt(START, 0);
+  for (let week = 0; week < 30; week++) {
+    advanceWorld(world, cfg, trends, START, forcedPeriods(clock, 1), cohort, { newOppsPerPeriod: 3 });
+    clock = clockAt(forcedPeriods(clock, 1)[0]!.end, clock.periodIndex + 1);
+  }
+
+  const closed = world.opportunities.filter((o) => o.status !== "open");
+  assert.ok(closed.length > 20, "not enough closed deals to judge shape variety");
+
+  const openStageCount = cfg.world.pipeline.stages.length - 1;
+  const pathLengths = new Set(closed.map((o) => o.stageHistory.length));
+
+  // The bug this replaces: with a uniform cycle draw, every deal of four weeks
+  // or more produced the SAME five-entry history, so the pipeline looked
+  // hard-coded. Real ones vary.
+  assert.ok(pathLengths.size >= 3, `deals only ever took ${pathLengths.size} distinct path shapes`);
+  assert.ok(
+    closed.some((o) => o.stageHistory.length < openStageCount),
+    "no deal ever skipped a stage",
+  );
+  assert.ok(
+    closed.some((o) => o.stageHistory.length === openStageCount + 1),
+    "no deal ever walked the full pipeline",
+  );
+});
+
+test("a stalled deal goes quiet: consecutive periods in one stage, earning nothing", () => {
+  const { cfg, world, trends } = freshWorld();
+  const cohort = new CohortIndex(EMPTY_COHORT);
+
+  let clock = clockAt(START, 0);
+  const silentStreak = new Map<string, number>();
+  const bestStreak = new Map<string, number>();
+
+  for (let week = 0; week < 30; week++) {
+    const before = new Map(
+      world.opportunities.map((o) => [
+        o.id,
+        {
+          stage: o.stage,
+          open: o.status === "open",
+          arts: world.artifacts.filter((a) => a.dealId === o.id).length,
+        },
+      ]),
+    );
+    advanceWorld(world, cfg, trends, START, forcedPeriods(clock, 1), cohort, { newOppsPerPeriod: 3 });
+    clock = clockAt(forcedPeriods(clock, 1)[0]!.end, clock.periodIndex + 1);
+
+    for (const opp of world.opportunities) {
+      const was = before.get(opp.id);
+      if (!was || !was.open || opp.status !== "open") continue;
+      const quiet =
+        opp.stage === was.stage && world.artifacts.filter((a) => a.dealId === opp.id).length === was.arts;
+      const run = quiet ? (silentStreak.get(opp.id) ?? 0) + 1 : 0;
+      silentStreak.set(opp.id, run);
+      bestStreak.set(opp.id, Math.max(bestStreak.get(opp.id) ?? 0, run));
+    }
+  }
+
+  // Before archetypes, progression was a pure function of elapsed fraction, so
+  // a deal could never genuinely go dark. Now some do.
+  const longest = Math.max(...bestStreak.values());
+  assert.ok(longest >= 3, `longest silent stretch was ${longest} periods; expected a real stall`);
 });

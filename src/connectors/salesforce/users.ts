@@ -4,8 +4,8 @@
  *
  * The owners are the operator's own admin users (config/sales-team.yaml):
  *   - an existing user is REUSED when one already has the rep's email;
- *   - otherwise a new System Administrator is created with that email
- *     — a real account, so Salesforce sends the usual activation email.
+ *   - otherwise a new System Administrator is created with that email, a real
+ *     account, so Salesforce sends the usual activation email.
  *
  * Idempotent: reused on re-runs.
  */
@@ -66,7 +66,7 @@ export async function ensureAeUsers(client: SalesforceClient, world: World): Pro
     try {
       id = await client.upsert("User", { ...base, Username: rep.email });
     } catch (e) {
-      // Username must be globally unique across all Salesforce — fall back.
+      // Username must be globally unique across all Salesforce. Fall back.
       if (String((e as Error).message).includes("DUPLICATE_USERNAME")) {
         const [lp, dom] = rep.email.split("@");
         id = await client.upsert("User", { ...base, Username: `${lp}.${orgId.toLowerCase()}@${dom}` });

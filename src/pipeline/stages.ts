@@ -31,7 +31,7 @@ export function stageRank(stages: string[], stage: string): number {
 
 /**
  * The Salesforce datetime custom field recording when a deal entered a stage.
- * Derived by convention — `Stage_<Stage>_At__c` — so the reconciler and the
+ * Derived by convention (`Stage_<Stage>_At__c`), so the reconciler and the
  * provisioning script (`npm run sf:stage-fields`) can never disagree about a
  * field's name.
  */
@@ -49,7 +49,7 @@ export function stageDateFields(cfg: Config): Record<string, string> {
 /**
  * Guard: a live world must speak the configured stage vocabulary. A renamed
  * stage on a world that already has deals is operator error (records would
- * silently stop matching) — catch it loudly before anything runs.
+ * silently stop matching), so catch it loudly before anything runs.
  */
 export function validateWorldStages(world: World, cfg: Config): void {
   const known = new Set([...openStages(cfg), CLOSED_STAGE]);

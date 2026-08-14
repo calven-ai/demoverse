@@ -1,9 +1,9 @@
 /**
- * Insight pre-flight — the Batch-1 review tool. See the plan, Part C.
+ * Insight pre-flight: check the ledger will chart well before any external push.
  *
  * Reads the generated ledger (state/world.json) and runs the SAME aggregations
  * the downstream product's dashboards (ICP / Win-Loss / CI / Persona) compute as Postgres
- * GROUP BYs — so we can SEE, before any external push, that the structured CRM
+ * GROUP BYs. Before any external push we can SEE that the structured CRM
  * data will produce meaningful, on-brand charts (not noise). It also checks each
  * planted "hero story" is statistically visible, and exports the pipeline to CSV
  * for eyeballing.
@@ -54,10 +54,10 @@ interface Ctx {
   windowEnd: string;
   /**
    * The competitor whose trends.json entry carries a strength bump, with the
-   * bump's date window — the "toughens then recovers" story, when planted.
+   * bump's date window. This is the "toughens then recovers" story, when planted.
    */
   bumpedCompetitor?: { name: string; from: string; to: string };
-  /** Industry with positive weight drift in trends.json — the emerging-segment story. */
+  /** Industry with positive weight drift in trends.json. The emerging-segment story. */
   emergingIndustry?: string;
   /** Competitor whose config lists "Price" among its typical loss reasons. */
   priceCompetitor?: string;
@@ -98,7 +98,7 @@ function summary(ctx: Ctx): void {
 
 function icpSection(ctx: Ctx): void {
   const { decided, acct } = ctx;
-  section(ctx, "ICP dashboard — in-ICP vs out-of-ICP");
+  section(ctx, "ICP dashboard (in-ICP vs out-of-ICP)");
   const inIcp = decided.filter((o) => acct(o).icpTier !== "Tier 3");
   const out = decided.filter((o) => acct(o).icpTier === "Tier 3");
   const cyc = (ds: Opp[]) =>
@@ -129,7 +129,7 @@ function icpSection(ctx: Ctx): void {
       .join("  ")}`,
   );
 
-  // Win rate by attribute — industry / size / region (WinRateByAttribute).
+  // Win rate by industry / size / region (WinRateByAttribute).
   for (const [label, key] of [
     ["industry", (a: Account) => a.industry],
     ["size", (a: Account) => a.size],
@@ -174,7 +174,7 @@ function pricingSection(ctx: Ctx): void {
   const aboveBase = world.opportunities.filter((o) => o.amount > entBase[o.billingTerm]);
   line(
     ctx,
-    `Deals above the Enterprise base price (add-ons): ${aboveBase.length} (${pct(aboveBase.length / world.opportunities.length)} — target ≤10%)`,
+    `Deals above the Enterprise base price (add-ons): ${aboveBase.length} (${pct(aboveBase.length / world.opportunities.length)}, target ≤10%)`,
   );
   const distinct = [...new Set(world.opportunities.map((o) => o.amount))].sort((a, b) => a - b);
   line(ctx, `Distinct prices in use: ${distinct.map(usd).join(", ")}`);
@@ -188,7 +188,7 @@ function competitiveSection(ctx: Ctx): void {
     ctx,
     `Contested deals: ${contested.length} (${pct(contested.length / decided.length)}) · competitive win rate ${pct(wr(contested))}`,
   );
-  line(ctx, `Leaderboard (per competitor — "win" = ${ctx.companyShort} wins the deal):`);
+  line(ctx, `Leaderboard per competitor ("win" = ${ctx.companyShort} wins the deal):`);
   const names = new Set(ctx.world.opportunities.flatMap((o) => o.competitors));
   for (const name of [...names].sort()) {
     const ds = decided.filter((o) => o.competitors.includes(name));
@@ -200,7 +200,7 @@ function competitiveSection(ctx: Ctx): void {
   }
   // Loss reasons (LossReasonsChart).
   const lost = decided.filter((o) => o.status === "lost");
-  const reasons = groupBy(lost, (o) => o.winLossReason ?? "—");
+  const reasons = groupBy(lost, (o) => o.winLossReason ?? "(none)");
   line(
     ctx,
     `Loss reasons: ${[...reasons.entries()]
@@ -221,7 +221,7 @@ function competitiveSection(ctx: Ctx): void {
 
 function personaSection(ctx: Ctx): void {
   const { decided } = ctx;
-  section(ctx, "Persona dashboard — multi-threading");
+  section(ctx, "Persona dashboard (multi-threading)");
   const single = decided.filter((o) => o.contactIds.length <= 1);
   const multi = decided.filter((o) => o.contactIds.length >= 3);
   line(ctx, `Single-threaded (≤1 contact): n=${single.length}  win ${pct(wr(single))}`);
@@ -242,7 +242,7 @@ function personaSection(ctx: Ctx): void {
   line(ctx, `→ PMM-present win lift: ${pct(wr(withPmm) - wr(noPmm))}`);
 }
 
-/** Market-intelligence cohort — non-PMM buyers / bigger companies. */
+/** Market-intelligence cohort of non-PMM buyers at bigger companies. */
 function marketIntelSection(ctx: Ctx): void {
   const { decided, acct } = ctx;
   const comp = ctx.miCompetitor;
@@ -258,7 +258,7 @@ function marketIntelSection(ctx: Ctx): void {
   const sizes = groupBy(alphaNoPmm, (o) => acct(o).size);
   line(
     ctx,
-    `No-PMM deal sizes: ${[...sizes.entries()].map(([k, v]) => `${k}=${v.length}`).join("  ") || "—"}`,
+    `No-PMM deal sizes: ${[...sizes.entries()].map(([k, v]) => `${k}=${v.length}`).join("  ") || "(none)"}`,
   );
   const tiers = groupBy(alphaNoPmm, (o) => acct(o).icpTier);
   line(
@@ -267,26 +267,26 @@ function marketIntelSection(ctx: Ctx): void {
       [...tiers.entries()]
         .sort()
         .map(([k, v]) => `${k}=${v.length}`)
-        .join("  ") || "—"
+        .join("  ") || "(none)"
     }`,
   );
   // Loss reasons recorded on cohort losses (should be normal enum values).
   const lost = alphaNoPmm.filter((o) => o.status === "lost");
-  const reasons = groupBy(lost, (o) => o.winLossReason ?? "—");
+  const reasons = groupBy(lost, (o) => o.winLossReason ?? "(none)");
   line(
     ctx,
     `No-PMM loss reasons: ${
       [...reasons.entries()]
         .sort((a, b) => b[1].length - a[1].length)
         .map(([k, v]) => `${k}=${v.length}`)
-        .join("  ") || "—"
+        .join("  ") || "(none)"
     }`,
   );
 }
 
 function salesTeamSection(ctx: Ctx): void {
   const { world, ledger, decided } = ctx;
-  section(ctx, "Sales-team dashboard — AE performance");
+  section(ctx, "Sales-team dashboard (AE performance)");
   const ics = world.reps.filter((r) => r.role === "ic");
   const cyc = (ds: Opp[]) =>
     mean(ds.filter((o) => o.closeDate).map((o) => daysBetween(o.createdDate, o.closeDate!)));
@@ -295,7 +295,7 @@ function salesTeamSection(ctx: Ctx): void {
     .map((ic) => {
       const ds = decided.filter((o) => o.ownerRepId === ic.id);
       const rev = ds.filter((o) => o.status === "won").reduce((s, o) => s + o.amount, 0);
-      const mgr = ic.managerId ? ledger.rep(ic.managerId).name : "—";
+      const mgr = ic.managerId ? ledger.rep(ic.managerId).name : "none";
       return { ic, n: ds.length, win: wr(ds), rev, cyc: cyc(ds), mgr };
     })
     .sort((a, b) => b.win - a.win);
@@ -463,7 +463,7 @@ function heroChecks(ctx: Ctx): void {
     detail: `owner win-rate spread ${pct(spread)}; David/NA ${pct(teamWr("NA"))} vs Lukas/EMEA ${pct(teamWr("EMEA"))}; managers own 0 deals=${noManagerDeals}`,
   });
 
-  // 8 · Market-intelligence expansion — win when PMM is involved.
+  // 8 · Market-intelligence expansion. Win when PMM is involved.
   const withPmm = decided.filter((o) => hasPmm(ctx, o));
   const noPmm = decided.filter((o) => !hasPmm(ctx, o));
   const comp = ctx.miCompetitor;
@@ -486,7 +486,7 @@ function heroChecks(ctx: Ctx): void {
     detail: `PMM-present win ${pct(wr(withPmm))} vs absent ${pct(wr(noPmm))} (Δ ${pct(wr(withPmm) - wr(noPmm))}); no-PMM n=${noPmm.length}; ${comp ?? "MI"} no-PMM win ${pct(wr(alphaNoPmm))}; no-PMM share H1 ${pct(shareH1)} → H2 ${pct(shareH2)}`,
   });
 
-  for (const c of checks) line(ctx, `${c.pass ? "✓" : "✗"} ${c.name} — ${c.detail}`);
+  for (const c of checks) line(ctx, `${c.pass ? "✓" : "✗"} ${c.name}: ${c.detail}`);
   const passed = checks.filter((c) => c.pass).length;
   line(ctx, `\n${passed}/${checks.length} hero stories statistically visible.`);
 }
@@ -631,7 +631,7 @@ function main(): void {
     out: [],
   };
 
-  line(ctx, `# Insight pre-flight — generated pipeline (${world.opportunities.length} opps)`);
+  line(ctx, `# Insight pre-flight for the generated pipeline (${world.opportunities.length} opps)`);
   summary(ctx);
   pricingSection(ctx);
   icpSection(ctx);

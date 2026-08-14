@@ -2,7 +2,7 @@
  * Golden-seed snapshot: pins the simulation's draws across refactors.
  *
  * Runs a 30-week world from a fixed seed with the prospect pool disabled
- * (synthetic names only — self-contained and free of real company names) and
+ * (synthetic names only, keeping it self-contained and free of real company names) and
  * compares a structural digest against the committed snapshot. Any change to
  * RNG draw order, sampling, outcomes, or touch-point planning shows up here.
  *
@@ -14,7 +14,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
-import { loadConfig } from "../src/config/load.js";
+import { testConfig } from "./fixture.js";
 import { emptyWorld } from "../src/ledger/ledger.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig } from "../src/trends.js";
@@ -31,7 +31,7 @@ const WEEKS = 30;
 const EMPTY_COHORT: Cohort = { version: 1, targetSize: 0, members: [] };
 
 function goldenConfig(): Config {
-  const cfg = loadConfig();
+  const cfg = testConfig();
   // Snapshot must not depend on external prospect CSVs (nor bake their company
   // names into a committed fixture); the synthetic path has identical rng order.
   return { ...cfg, world: { ...cfg.world, prospects: undefined } };

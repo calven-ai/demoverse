@@ -1,6 +1,6 @@
 /**
- * Touch-point planning — which prose artifacts a deal earns, when, with which
- * grounding snapshot. Split from advance.ts; shared by the live weekly engine
+ * Touch-point planning. Decides which prose artifacts a deal earns, when, and
+ * with which grounding snapshot. Split from advance.ts; shared by the live weekly engine
  * and the retroactive backfill planner.
  */
 
@@ -89,7 +89,7 @@ export function shouldEmitPerStage(
  *
  * `none` mode deliberately produces no survey or interview: its signal lives in
  * a #win-loss Slack post-mortem instead. When Slack is not a destination for
- * this deal (a `seed` cohort member — see src/cohort.ts) that post cannot exist,
+ * this deal (a `seed` cohort member, see src/cohort.ts) that post cannot exist,
  * so the deal simply closes with no win-loss artifact at all. That is the
  * intended outcome, not a gap: real teams only run win-loss on a subset of
  * deals, and the linter's none-mode rule is scoped to match.
@@ -112,7 +112,7 @@ export function planCloseArtifacts(
       id: nextId(world.artifacts, "art"),
       kind: "survey",
       dealId: opp.id,
-      title: `${acct.name} — win-loss survey`,
+      title: `${acct.name} — win-loss survey`, // prose-lint: allow-emdash (external record name)
       date,
       grounding: facts,
     });
@@ -121,7 +121,7 @@ export function planCloseArtifacts(
       id: nextId(world.artifacts, "art"),
       kind: "interview",
       dealId: opp.id,
-      title: `${acct.name} — win-loss interview`,
+      title: `${acct.name} — win-loss interview`, // prose-lint: allow-emdash (external record name)
       date,
       grounding: facts,
     });
@@ -130,7 +130,7 @@ export function planCloseArtifacts(
       id: nextId(world.artifacts, "art"),
       kind: "winloss_post",
       dealId: opp.id,
-      title: `#win-loss — ${acct.name} ${opp.status} post-mortem`,
+      title: `#win-loss — ${acct.name} ${opp.status} post-mortem`, // prose-lint: allow-emdash (external record name)
       date,
       grounding: facts,
     });
@@ -143,10 +143,10 @@ export function planCloseArtifacts(
 // that were already advanced/closed with the touch-point switches off carry
 // none. This planner reconstructs a deal's whole sales cycle from its RECORDED
 // timeline (createdDate → closeDate, the stages it visited) and plants the full
-// touch-point set — call transcripts, AE notes, email threads, the deal's Slack
+// touch-point set: call transcripts, AE notes, email threads, the deal's Slack
 // thread, an optional #competitive question, and the win-loss artifact on close.
 //
-// Unlike the live engine it does NOT consult cfg.world.generate.* — it is an
+// Unlike the live engine it does NOT consult cfg.world.generate.*. It is an
 // explicit operator action ("backfill this deal"), gated only by the per-deal
 // cadence config (an empty cadence ⇒ none of that kind). Idempotent at deal
 // granularity: a deal that already has any artifact is skipped.
@@ -167,16 +167,31 @@ export function planDealTouchpoints(
   const created = opp.createdDate;
   const end = opp.closeDate ?? horizonDate;
   const span = Math.max(0, daysBetween(created, end));
-  // Distribute the stages the deal reached across [created, end]: Discovery at
-  // the start, later stages interpolated. Closed deals reach every stage; an
-  // open deal reaches up to its current stage.
+  // Which stages this deal ACTUALLY visited, and when.
+  //
+  // Prefer the recorded `stageHistory`: a deal that skipped Evaluation (short
+  // cycles routinely do) must not be handed an Evaluation transcript here, or
+  // the backfill would contradict the ledger the live engine wrote. Deals
+  // predating `stageHistory` fall back to the old assumption, every stage in
+  // order, interpolated evenly across [created, end].
   const stages = openStages(cfg);
-  const reachedIdx = opp.status === "open" ? stageRank(stages, opp.stage) : stages.length - 1;
-  const stageDate = (i: number): ISODate => addDays(created, Math.round((span * i) / stages.length));
+  const openVisits = opp.stageHistory.filter((h) => stages.includes(h.stage));
+  const visits: { stage: string; date: ISODate }[] =
+    openVisits.length > 0
+      ? openVisits.map((h) => ({ stage: h.stage, date: h.date }))
+      : (() => {
+          const reachedIdx = opp.status === "open" ? stageRank(stages, opp.stage) : stages.length - 1;
+          const out: { stage: string; date: ISODate }[] = [];
+          for (let i = 0; i <= reachedIdx && i < stages.length; i++) {
+            out.push({
+              stage: stages[i]!,
+              date: addDays(created, Math.round((span * i) / stages.length)),
+            });
+          }
+          return out;
+        })();
 
-  for (let i = 0; i <= reachedIdx && i < stages.length; i++) {
-    const stage = stages[i]!;
-    const date = stageDate(i);
+  for (const [i, { stage, date }] of visits.entries()) {
     // Leak-safe grounding: an early-stage artifact must not reference the
     // eventual outcome, so override outcome/reason to the open state.
     const groundingOpen = { ...dealFacts(ledger, opp), stage, outcome: "open", winLossReason: undefined };
@@ -186,7 +201,7 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "call_transcript",
         dealId: opp.id,
-        title: `${acctName} — ${stage} call`,
+        title: `${acctName} — ${stage} call`, // prose-lint: allow-emdash (external record name)
         date,
         grounding: groundingOpen,
       });
@@ -196,7 +211,7 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "ae_note",
         dealId: opp.id,
-        title: `${acctName} — AE note (${stage})`,
+        title: `${acctName} — AE note (${stage})`, // prose-lint: allow-emdash (external record name)
         date,
         grounding: groundingOpen,
       });
@@ -206,7 +221,7 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "email_exchange",
         dealId: opp.id,
-        title: `${acctName} — email thread (${stage})`,
+        title: `${acctName} — email thread (${stage})`, // prose-lint: allow-emdash (external record name)
         date,
         grounding: groundingOpen,
       });
@@ -216,22 +231,29 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "slack_deal_thread",
         dealId: opp.id,
-        title: `#deals — ${acctName} kickoff`,
+        title: `#deals — ${acctName} kickoff`, // prose-lint: allow-emdash (external record name)
         date,
         grounding: { ...groundingOpen, messageCount: rng.int(...cfg.world.slack.posts_per_deal.deal_thread) },
       });
     }
   }
 
-  // An opportunity-scoped #competitive question on a subset of deals — the AE
-  // flagging a competitor they ran into on this deal.
-  if (allowSlack && opp.competitors.length > 0 && rng.chance(cfg.world.artifacts.competitive_q_rate)) {
+  // An opportunity-scoped #competitive question on a subset of deals. The AE
+  // flags a competitor they ran into on this deal.
+  if (
+    allowSlack &&
+    visits.length > 0 &&
+    opp.competitors.length > 0 &&
+    rng.chance(cfg.world.artifacts.competitive_q_rate)
+  ) {
     planned({
       id: nextId(world.artifacts, "art"),
       kind: "competitive_q",
       dealId: opp.id,
-      title: `#competitive — ${opp.competitors[0]} on ${acctName}`,
-      date: stageDate(Math.min(1, reachedIdx)),
+      title: `#competitive — ${opp.competitors[0]} on ${acctName}`, // prose-lint: allow-emdash (external record name)
+      // Early in the cycle: the second stage the deal reached, or the first if
+      // it never got that far.
+      date: visits[Math.min(1, visits.length - 1)]!.date,
       grounding: { competitor: opp.competitors[0] },
     });
   }
@@ -241,7 +263,7 @@ export function planDealTouchpoints(
   if (opp.status !== "open") {
     const closeDate = opp.closeDate ?? end;
     planCloseArtifacts(world, cfg, ledger, opp, closeDate, planned, rng, allowSlack);
-    // The close note is the one note a rep almost always writes — but "almost".
+    // The close note is the one note a rep almost always writes, but "almost".
     // ae_close_note_rate keeps the CRM from being uniformly well-logged, which
     // is what makes win-loss interviews necessary downstream.
     if (rng.chance(cfg.world.artifacts.ae_close_note_rate)) {
@@ -249,7 +271,7 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "ae_note",
         dealId: opp.id,
-        title: `${acctName} — AE close note`,
+        title: `${acctName} — AE close note`, // prose-lint: allow-emdash (external record name)
         date: closeDate,
         grounding: dealFacts(ledger, opp),
       });
@@ -259,7 +281,7 @@ export function planDealTouchpoints(
         id: nextId(world.artifacts, "art"),
         kind: "slack_deal_thread",
         dealId: opp.id,
-        title: `#deals — ${acctName} closed ${opp.status}`,
+        title: `#deals — ${acctName} closed ${opp.status}`, // prose-lint: allow-emdash (external record name)
         date: closeDate,
         grounding: {
           ...dealFacts(ledger, opp),

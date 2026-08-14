@@ -1,5 +1,5 @@
 /**
- * The Salesforce cohort — which deals are allowed to leave this repo.
+ * The Salesforce cohort: which deals are allowed to leave this repo.
  *
  * The ledger deliberately holds far more deals than the demo org should show:
  * the full 283-deal history is what grounds the win rate, per-competitor win
@@ -12,7 +12,7 @@
  * only ever walks its members. Deals outside it stay in the ledger and simply
  * never leave the repo.
  *
- * Membership carries only what CANNOT be derived — chiefly `source`:
+ * Membership carries only what CANNOT be derived, chiefly `source`:
  *
  *   seed    the one-time backfill cohort. Transcripts + emails always, AE notes
  *           and win-loss occasionally, and NO Slack: the demo Slack workspace is
@@ -75,7 +75,7 @@ export function saveCohort(cohort: Cohort): void {
  * Membership index. Built once per command; `has()` is the gate every reconcile
  * target and the `--next` queue run through.
  *
- * An ABSENT cohort file means "no cohort selected yet" and everything passes —
+ * An ABSENT cohort file means "no cohort selected yet" and everything passes,
  * so the engine behaves exactly as it did before this file existed, and adding
  * cohort scoping cannot retroactively break a fresh `init`.
  */
@@ -91,8 +91,8 @@ export class CohortIndex {
   /**
    * Is this deal allowed to reach the external systems at all?
    *
-   * A null/absent dealId means the artifact is NOT deal-scoped — a standalone
-   * #competitive question, a piece of internal collateral — so the cohort has
+   * A null/absent dealId means the artifact is NOT deal-scoped (a standalone
+   * #competitive question, a piece of internal collateral), so the cohort has
    * no opinion on it and it passes. The cohort governs which DEALS exist
    * externally, not which channel content does.
    */
@@ -113,7 +113,7 @@ export class CohortIndex {
    */
   allowsSlack(oppId: string | null | undefined): boolean {
     if (!this.active) return true;
-    if (oppId == null) return true; // not deal-scoped — see has()
+    if (oppId == null) return true; // not deal-scoped, see has()
     return this.bySource.get(oppId) === "weekly";
   }
 

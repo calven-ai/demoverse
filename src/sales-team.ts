@@ -1,8 +1,8 @@
 /**
- * Sales-team helpers (config/sales-team.yaml). See the plan addendum.
+ * Sales-team helpers (config/sales-team.yaml).
  *
  * Builds the rep roster for the ledger (managers + ICs, with role + manager
- * links) and evaluates each AE's time-dependent win modifier — the per-rep
+ * links) and evaluates each AE's time-dependent win modifier, the per-rep
  * performance signal that makes "win rate by AE" a real leaderboard instead of
  * noise. Managers own no deals; their number is the rollup of their reports.
  */
@@ -35,7 +35,7 @@ export function buildReps(salesTeam: SalesTeamConfig): Rep[] {
 }
 
 /**
- * An AE's win-probability modifier at `quarters` since the world start —
+ * An AE's win-probability modifier at `quarters` since the world start:
  * `win_modifier + ramp_per_quarter × quarters`. Returns 0 for managers/unknown.
  */
 export function icWinModifier(salesTeam: SalesTeamConfig, repId: string, quarters: number): number {

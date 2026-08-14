@@ -1,17 +1,18 @@
 # =============================================================================
-# slack-personas.yaml — synthetic Slack identities
+# slack-personas.yaml
+# Synthetic Slack identities.
 #
 # WHAT THIS FILE CONTROLS
 #   Who posts in the demo Slack workspace. ONE controller app posts every
 #   message under a per-message username + avatar (chat:write.customize), so
 #   this roster can be any size. Two groups:
-#     internal_personas — standing employee voices for #general / #competitive
+#     internal_personas   standing employee voices for #general / #competitive
 #                         / #win-loss (they have no CRM link)
-#     rep_personas      — the deal-owning reps from sales-team.yaml, who also
+#     rep_personas        the deal-owning reps from sales-team.yaml, who also
 #                         post in Slack (same person owns the deal in the CRM
 #                         and discusses it in Slack)
-#   Buyer-side contacts are referenced by name in threads but never post —
-#   internal chatter is employees only.
+#   Buyer-side contacts are referenced by name in threads but never post.
+#   Internal chatter is employees only.
 #
 # HOW TO FILL IT IN (the /setup wizard walks you through this)
 #   1. Copy to config/slack-personas.yaml. Rename the internal roster to
@@ -23,17 +24,17 @@
 #      (e.g. "Avery Stone" -> avery.stone). If they don't match, the persona
 #      won't bind to the rep.
 #   3. `voice` is a one-line voice card rendered into Slack prompts so the
-#      personas don't all sound alike — and so they don't fall into fixed
+#      personas don't all sound alike. It also keeps them out of fixed
 #      reflexes (the VP congratulating every win, the CSM volunteering
 #      onboarding on every thread). Edit freely; it changes only future prose.
 #
 # AVATARS
 #   avatar_style: initials | emoji | image. `initials` (the default here)
-#   needs no `avatar` field at all — Slack renders an initials block, no
+#   needs no `avatar` field at all. Slack renders an initials block, with no
 #   external assets involved. If you switch to `image`, set each persona's
 #   `avatar` to an http(s) URL of a clearly-synthetic illustrated avatar
 #   (never a real person's photo); a :shortcode: value renders as an emoji
-#   icon instead. Names + icons are baked in at first post — set them before
+#   icon instead. Names + icons are baked in at first post, so set them before
 #   the backfill.
 # =============================================================================
 
@@ -44,7 +45,7 @@ internal_personas:
   - handle: taylor.ceo
     display: Taylor Brennan     # TODO: fictional CEO
     role: CEO
-    voice: "posts rarely and briefly — one short sentence, usually a question about revenue impact or repeatability; never cheerleads"
+    voice: "posts rarely and briefly. One short sentence, usually a question about revenue impact or repeatability; never cheerleads"
   - handle: dana.marketing
     display: Dana Okafor        # TODO: fictional marketing lead
     role: Head of Marketing
@@ -52,7 +53,7 @@ internal_personas:
   - handle: chris.sales
     display: Chris Mercer       # TODO: fictional VP Sales
     role: VP Sales
-    voice: "blunt and pipeline-focused — asks what's repeatable, what stalled, who else fits the pattern; congratulates rarely and briefly"
+    voice: "blunt and pipeline-focused. Asks what's repeatable, what stalled, who else fits the pattern; congratulates rarely and briefly"
   - handle: priya.se
     display: Priya Raman        # TODO: fictional sales engineer
     role: Sales Engineer
@@ -72,13 +73,13 @@ internal_personas:
 rep_personas:
   - handle: avery.stone
     display: Avery Stone
-    voice: "structured deal narrator — writes 2–4 sentence updates with the why behind the outcome; occasionally self-critical about what he missed"
+    voice: "structured deal narrator. Writes 2–4 sentence updates with the why behind the outcome; occasionally self-critical about what he missed"
   - handle: casey.nguyen
     display: Casey Nguyen
-    voice: "steady and factual — logs what happened and the next step, rarely editorializes"
+    voice: "steady and factual. Logs what happened and the next step, rarely editorializes"
   - handle: riley.foster
     display: Riley Foster
-    voice: "the new hire — asks more questions than she answers, tags teammates for help, over-shares learnings"
+    voice: "the new hire. Asks more questions than she answers, tags teammates for help, over-shares learnings"
   - handle: sam.whitfield
     display: Sam Whitfield
-    voice: "quick and informal — short lines, dry humor, leads with the number or the blocker; hates writing long updates"
+    voice: "quick and informal. Short lines, dry humor, leads with the number or the blocker; hates writing long updates"

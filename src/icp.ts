@@ -1,10 +1,10 @@
 /**
- * ICP fit scoring (config/icp.yaml). See DESIGN.md §16 and the plan.
+ * ICP fit scoring (config/icp.yaml). See docs/architecture.md#entity-model.
  *
  * Mirrors the downstream product's ICP scorecard model:
  * the generator runs this over an account's RAW firmographics to derive an
  * internal fit tier, which biases deal outcomes and classifies in-ICP vs
- * out-of-ICP. We NEVER emit the score/tier — the downstream product re-derives the identical
+ * out-of-ICP. We NEVER emit the score/tier. The downstream product re-derives the identical
  * value live from the same raw fields (that's the demo payoff). The pre-flight
  * report reuses this to show the in/out split the ICP dashboard will compute.
  */

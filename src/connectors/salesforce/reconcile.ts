@@ -2,7 +2,7 @@
  * Reconcile the pipeline (Accounts, Contacts, Opportunities) into Salesforce.
  * Idempotent: the ledger stores each record's salesforceId, so re-runs update.
  *
- * NOT YET WIRED — skipped at runtime until SF_* credentials exist. The code is
+ * NOT YET WIRED. Skipped at runtime until SF_* credentials exist. The code is
  * complete so it activates the moment the org is provisioned.
  */
 
@@ -28,7 +28,7 @@ import { standardFirmographics } from "./firmographics.js";
  * Deal touch points that reconcile to the Salesforce activity timeline.
  *
  * NOTE: `call_transcript` is deliberately ABSENT. Transcripts go to Google Drive
- * only (src/connectors/drive/reconcile.ts) — the downstream product ingests them through its watched-folder
+ * only (src/connectors/drive/reconcile.ts). The downstream product ingests them through its watched-folder
  * connector, and its Salesforce adapter never reads Task/ContentVersion anyway,
  * so pushing them here bought nothing and burned the org's ~5 MB data cap on
  * ContentVersion blobs. AE notes and email threads stay on the timeline: they
@@ -40,7 +40,7 @@ const ACTIVITY_KINDS: Artifact["kind"][] = ["ae_note", "email_exchange"];
 // activities. It requires the org-level "Set Audit Fields upon Record Creation"
 // toggle (off in this org), and even when present it did not actually backdate
 // Task/ContentVersion records. The activity timeline is driven by ActivityDate
-// (set below), which needs no special permission — so the timeline still lands
+// (set below), which needs no special permission, so the timeline still lands
 // on the historical touch-point date.
 
 export async function reconcileSalesforce(
@@ -52,7 +52,7 @@ export async function reconcileSalesforce(
   const stats = emptyStats("salesforce");
   const ledger = new Ledger(world);
 
-  // Scope: the Salesforce cohort first — the ledger holds the full multi-hundred
+  // Scope: the Salesforce cohort first. The ledger holds the full multi-hundred
   // deal history for statistical grounding, but only cohort members are meant to
   // exist in the org (see src/cohort.ts). An unselected cohort passes everything,
   // so this is a no-op until `npm run cohort:select` has run.
@@ -74,10 +74,10 @@ export async function reconcileSalesforce(
       stats.note = `opportunity ${opts.oppId} not found in ledger`;
       return stats;
     }
-    // A non-member must never reach the org, even when named explicitly — that
+    // A non-member must never reach the org, even when named explicitly. That
     // is exactly how the org drifted back above its intended size before.
     if (!cohort.has(opp.id)) {
-      stats.note = `opportunity ${opp.id} is not in the Salesforce cohort — skipped`;
+      stats.note = `opportunity ${opp.id} is not in the Salesforce cohort, skipped`;
       return stats;
     }
     opportunities = [opp];
@@ -97,7 +97,7 @@ export async function reconcileSalesforce(
 
   if (!hasEnv("SF_USERNAME", "SF_PASSWORD")) {
     stats.disabled = true;
-    stats.note = "Salesforce not provisioned (.env SF_* absent) — skipped";
+    stats.note = "Salesforce not provisioned (.env SF_* absent), skipped";
     stats.skipped = total;
     return stats;
   }
@@ -122,8 +122,8 @@ export async function reconcileSalesforce(
   for (const acct of accounts) {
     try {
       // NOTE: we deliberately do NOT push the derived ICP fit (acct.icpScore/
-      // icpTier) — the downstream product re-derives it from the raw firmographics below
-      // (DESIGN §16 guardrail). Only raw inputs are reconciled.
+      // icpTier). The downstream product re-derives it from the raw firmographics below
+      // (ICP guardrail). Only raw inputs are reconciled.
       const id = await client.upsert(
         "Account",
         {
@@ -139,7 +139,7 @@ export async function reconcileSalesforce(
           Triggers__c: acct.triggers.join("; "),
           Tech_Stack__c: acct.techStack.join("; "),
           // Standard fields the downstream product always imports and derives size/bands/region
-          // from — a representative point inside each band (firmographics.ts).
+          // from, a representative point inside each band (firmographics.ts).
           ...standardFirmographics(acct, cfg.world.segments.region_countries),
         },
         acct.external.salesforceId,
@@ -185,7 +185,7 @@ export async function reconcileSalesforce(
   const allStageFields = Object.values(stageFieldByStage);
   const missingStageFields = allStageFields.filter((f) => !oppFields.has(f));
   if (missingStageFields.length > 0) {
-    stats.note = `${stats.note ? stats.note + "; " : ""}stage-date fields absent in org (${missingStageFields.length}/${allStageFields.length}) — skipped`;
+    stats.note = `${stats.note ? stats.note + "; " : ""}stage-date fields absent in org (${missingStageFields.length}/${allStageFields.length}), skipped`;
   }
   for (const opp of opportunities) {
     try {
@@ -217,7 +217,7 @@ export async function reconcileSalesforce(
         Product_Feedback__c: opp.productFeedback.join("; "),
         Tech_Stack_Requirements__c: opp.techStackRequirements.join("; "),
         Win_Loss_Mode__c: opp.winLossMode,
-        // When the deal entered each stage — the raw material for time-in-stage
+        // When the deal entered each stage, the raw material for time-in-stage
         // and pipeline-velocity analysis. Omitted while the org lacks the fields.
         ...stageDateValues(opp, stageFieldByStage, oppFields),
       };
@@ -245,7 +245,7 @@ export async function reconcileSalesforce(
  * Per-stage entry-date custom fields on Opportunity. Salesforce's own
  * `OpportunityHistory` cannot carry this: it is system-generated, so every
  * transition would be stamped with the reconcile time instead of the simulated
- * date — and typical CRM adapters do not read that object anyway.
+ * date. Typical CRM adapters do not read that object anyway.
  *
  * Create these in Setup as **Date** fields on Opportunity. Until they exist the
  * reconciler simply omits them (see `opportunityFieldNames`), so this is safe to
@@ -253,7 +253,7 @@ export async function reconcileSalesforce(
  */
 // Stage-date fields are derived from config: see stageDateFields() in src/pipeline/stages.ts.
 
-/** The Opportunity fields this org actually has — used to skip absent ones. */
+/** The Opportunity fields this org actually has, used to skip absent ones. */
 async function opportunityFieldNames(client: SalesforceClient): Promise<Set<string>> {
   const described = await client.request<{ fields: { name: string }[] }>(
     "GET",
@@ -276,7 +276,7 @@ function stageDateValues(
   return out;
 }
 
-/** SOQL `IN (…)` lists have a practical length cap — chunk well under it. */
+/** SOQL `IN (…)` lists have a practical length cap. Chunk well under it. */
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
@@ -294,7 +294,7 @@ function chunk<T>(items: T[], size: number): T[][] {
  *
  * Idempotent without storing ids: existing (opportunity, contact) pairs are read
  * back from the org and only missing rows are inserted. `Role` carries the
- * engine's configured buying-role vocabulary VERBATIM — the standard OCR Role
+ * engine's configured buying-role vocabulary VERBATIM. The standard OCR Role
  * picklist is unrestricted in this org, so the exact enum survives the round trip
  * rather than being flattened onto Salesforce's own shorter list.
  */
@@ -366,12 +366,12 @@ async function reconcileContactRoles(
  *  - ae_note         → a logged Task (the note body in the Description)
  *  - email_exchange  → one Email Task per message
  *
- * Transcripts are NOT handled here — see the ACTIVITY_KINDS note above.
+ * Transcripts are NOT handled here. See the ACTIVITY_KINDS note above.
  *
  * Create-once: a logged activity is immutable, so anything that already carries a
  * stored id (artifact.external.salesforceId / a per-email EmailMessage.salesforceId)
- * is skipped — this keeps re-runs duplicate-free AND avoids PATCHing read-only Task
- * fields like TaskSubtype. Does NOT change artifact.status for ae_note — that also
+ * is skipped. This keeps re-runs duplicate-free AND avoids PATCHing read-only Task
+ * fields like TaskSubtype. Does NOT change artifact.status for ae_note. That also
  * reconciles to Drive, which owns the status flip. email_exchange reconciles ONLY
  * here, so once every message carries a salesforceId the artifact is marked
  * reconciled.
@@ -420,7 +420,7 @@ async function reconcileActivities(
           stats.created++;
           tasks++;
         }
-        // Salesforce is this kind's only destination — fully logged means reconciled.
+        // Salesforce is this kind's only destination. Fully logged means reconciled.
         if (emails.length > 0 && emails.every((m) => m.salesforceId)) art.status = "reconciled";
         continue;
       }

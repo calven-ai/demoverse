@@ -54,7 +54,7 @@ export async function reconcileSlack(
 
   if (!hasEnv("SLACK_BOT_TOKEN")) {
     stats.disabled = true;
-    stats.note = "Slack credentials absent (.env) — skipped";
+    stats.note = "Slack credentials absent (.env), skipped";
     stats.skipped = pending.length;
     return stats;
   }

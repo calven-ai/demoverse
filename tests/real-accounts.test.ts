@@ -1,5 +1,5 @@
 /**
- * Real-account ingestion tests (DESIGN §18 — real logos, synthetic people).
+ * Real-account ingestion tests (DISCLAIMER.md: real logos, synthetic people).
  * Covers the quote-aware CSV parser, the CSV→enum normalization for known rows
  * across the two header shapes, domain dedupe, and the seeded draw pool
  * (industry preference, MI "large" preference, consumed-state, exhaustion).

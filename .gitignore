@@ -4,12 +4,23 @@ node_modules/
 # Build output
 dist/
 
-# Credentials — never commit
-.env
-.env.local
+# Credentials: never commit.
+# Ignore every env file by glob, so a variant nobody predicted (.env.prod,
+# .env.bak, ".env 2") is covered too. The tracked template is the one
+# exception, and `npm run secrets:check` verifies it stays empty.
+.env*
+!.env.example
+
+# Key material, under whatever name the vendor console hands you.
 *.pem
+*.p12
+*.pfx
+*.key
 service-account*.json
 gcp-key*.json
+client_secret*.json
+*credentials*.json
+token.json
 
 # Generation request scratch (filled by the agent in-session, not persisted)
 state/requests/

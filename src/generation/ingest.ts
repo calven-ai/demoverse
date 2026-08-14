@@ -1,8 +1,8 @@
 /**
- * Ingest filled generation results back into the ledger. See DESIGN.md §12.
+ * Ingest filled generation results back into the ledger. See docs/architecture.md#the-generation-request-protocol.
  *
  * After the agent fills the requests, this validates each result, files markdown
- * bodies into the content store (state/content/<id>.md — committed, so the world
+ * bodies into the content store (state/content/<id>.md, committed, so the world
  * is rebuildable and diffs are readable), and attaches structured Slack messages
  * to their artifacts. Schema/shape failures leave the artifact "planned" so it is
  * re-requested rather than written as bad data.
@@ -69,7 +69,7 @@ function personaResolver(
   const withRole = (name: string, role?: string): string => (role ? `${name} (${role})` : name);
   // The customer's sales org: deal-owning ICs are Account Executives; managers
   // show their management title. (Their CRM `title` may say something else, e.g.
-  // "Co-founder" — in the Slack sales context they are AEs.)
+  // "Co-founder", but in the Slack sales context they are AEs.)
   const repRole = (r: World["reps"][number]): string =>
     r.role === "manager" ? (r.title ?? "Sales Manager") : "Account Executive";
   for (const r of world.reps) {
@@ -109,7 +109,19 @@ export function ingestResults(
     if (!artifact) continue;
     if (artifact.status !== "planned") continue; // already generated/reconciled
 
-    const result = readResult(periodIndex, req);
+    // A truncated or malformed result file must not abort the whole ingest:
+    // report it per-artifact and leave the artifact planned for a re-fill.
+    let result;
+    try {
+      result = readResult(periodIndex, req);
+    } catch (e) {
+      report.invalid.push({
+        artifactId: req.artifactId,
+        reason: `unreadable result file: ${(e as Error).message}`,
+      });
+      report.pending.push(req.artifactId);
+      continue;
+    }
     if (!result) {
       report.pending.push(req.artifactId);
       continue;

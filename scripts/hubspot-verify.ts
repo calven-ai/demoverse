@@ -1,5 +1,5 @@
 /**
- * Verify a prior `hubspot:import` — batch-reads every `demo_world_id` this
+ * Verify a prior `hubspot:import`. Batch-reads every `demo_world_id` this
  * scope would import, diffs properties, and (by default) checks the
  * contact→company / deal→company / deal→contact associations. Read-only.
  * Exits non-zero if anything is missing or mismatched.

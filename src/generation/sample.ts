@@ -1,5 +1,5 @@
 /**
- * Deal sampling — accounts, buying groups, tiers, amounts, competitors. Split
+ * Deal sampling: accounts, buying groups, tiers, amounts, competitors. Split
  * from advance.ts; pure functions over config + seeded Rng (see advance.ts for
  * the determinism contract).
  */
@@ -21,7 +21,7 @@ export function pickRep(world: World, rng: Rng, region: string): string {
   return rng.pick(pool).id;
 }
 
-/** Independent Bernoulli inclusion per key — for tech_stack[] / triggers[]. */
+/** Independent Bernoulli inclusion per key, for tech_stack[] / triggers[]. */
 export function bernoulliSet(dist: Record<string, number>, rng: Rng): string[] {
   const out: string[] = [];
   for (const [k, p] of Object.entries(dist)) if (rng.chance(p)) out.push(k);
@@ -32,8 +32,8 @@ export function sampleCompetitors(cfg: Config, rng: Rng, eff: EffectiveParams, i
   const weights: Record<string, number> = {};
   for (const c of cfg.competitors.competitors) weights[c.name] = eff.competitorPresence[c.name] ?? c.strength;
 
-  // Market-intelligence cohort deals are contested by the configured MI competitor —
-  // that competitor dominates the cohort (config market_intelligence.competitor).
+  // Market-intelligence cohort deals are contested by the configured MI competitor.
+  // That competitor dominates the cohort (config market_intelligence.competitor).
   const mi = cfg.world.market_intelligence;
   if (isMI && mi) {
     const competitors = [mi.competitor];
@@ -65,7 +65,7 @@ export function sampleCompetitors(cfg: Config, rng: Rng, eff: EffectiveParams, i
  * (identical rng order to the pre-real-accounts engine, so old worlds still
  * replay). Market-intelligence cohort accounts (`cohort === "mi"`) prefer a
  * genuinely large real vendor, else are forced to the Enterprise firmographic
- * skew — the "bigger / different ICP" read (world.yaml market_intelligence).
+ * skew, the "bigger / different ICP" read (world.yaml market_intelligence).
  */
 export function makeAccount(
   world: World,
@@ -149,7 +149,7 @@ export function makeBuyingGroup(
   let primaryId = "";
 
   const makeContact = (persona: PersonasConfig["personas"][number]): Contact => {
-    // Redraw on a name collision within the same account — identical name+email
+    // Redraw on a name collision within the same account. Identical name+email
     // pairs read as data errors and trip Salesforce's contact duplicate rule.
     const taken = new Set(
       [...world.contacts.filter((c) => c.accountId === account.id), ...contacts].map((c) => c.name),
@@ -170,7 +170,7 @@ export function makeBuyingGroup(
 
   // Market-intelligence, no-PMM motion: a non-PMM persona drives, and NO product
   // marketing role is in the room. The recorded buying group is what lets the product
-  // surface "deals without a PMM persona lose more" (DESIGN §16 — we never state
+  // surface "deals without a PMM persona lose more" (the ICP guardrail; we never state
   // it, only the raw contacts).
   const mi = cfg.world.market_intelligence;
   if (opts?.pmmAbsent && mi) {

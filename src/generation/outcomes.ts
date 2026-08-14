@@ -1,5 +1,5 @@
 /**
- * Deal outcomes — win/loss decision and the correlated feedback fields. Split
+ * Deal outcomes: the win/loss decision and the correlated feedback fields. Split
  * from advance.ts; pure functions over config + seeded Rng.
  */
 
@@ -29,7 +29,7 @@ export function decideWin(
   const threadingAdj = Math.min(0.18, Math.max(0, opp.contactIds.length - 1) * 0.05);
   const segmentAdj = eff.segmentWinRateDelta[account.industry] ?? 0;
   // Per-AE performance (the rep leaderboard / team-rollup signal). personaAdj is
-  // the no-PMM penalty (≤0) — a deal with no product-marketing persona wins less.
+  // the no-PMM penalty (≤0). A deal with no product-marketing persona wins less.
   const pWin = Math.max(
     0.05,
     Math.min(
@@ -54,7 +54,7 @@ export function pickLossReason(cfg: Config, opp: Opportunity, rng: Rng): string 
 /**
  * The AE-believed loss reason (what the owner records on the CRM). ~80% of the
  * time it matches the actual `winLossReason`; ~20% the AE misattributes it to a
- * DIFFERENT reason — the belief-vs-reality gap the product later surfaces by comparing
+ * DIFFERENT reason. That is the belief-vs-reality gap the product later surfaces by comparing
  * this with the prospect's win-loss reason. Stays within the configured loss-reason vocab.
  */
 export function pickRepLossReason(cfg: Config, actual: string, rng: Rng): string {

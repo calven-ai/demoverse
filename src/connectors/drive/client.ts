@@ -1,5 +1,5 @@
 /**
- * Google Drive client (service account). See DESIGN.md §3, §14.
+ * Google Drive client (service account). See docs/architecture.md#connectors.
  *
  * Markdown artifacts live in a structured folder tree under a dedicated demo
  * folder shared with the service-account email. Upserts are idempotent: the
@@ -80,7 +80,7 @@ export class DriveClient {
     return created.data.id!;
   }
 
-  /** Smoke test: create -> read -> delete a temp file (Phase A). */
+  /** Smoke test: create -> read -> delete a temp file. */
   async smokeTest(): Promise<void> {
     const folder = await this.ensureFolder("_smoke");
     const id = await this.upsertMarkdown(folder, "smoke.md", "# smoke test\n");

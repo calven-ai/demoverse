@@ -1,5 +1,5 @@
 /**
- * KPI computation + run-report rendering. See DESIGN.md §13, §15 (KPI curve check).
+ * KPI computation + run-report rendering. See docs/architecture.md#verification-the-coherence-linter.
  *
  * Realized win-rate / volume curves are computed from the closed-deal population
  * and diffed against the configured/trend targets so the report can flag drift.
@@ -61,10 +61,10 @@ export function renderRunReport(args: {
 }): string {
   const kpis = computeKpis(args.world);
   const target = evaluateTrends(args.trends, args.cfg, args.startDate, args.simNow);
-  const winRatePct = kpis.winRate === null ? "—" : `${(kpis.winRate * 100).toFixed(1)}%`;
+  const winRatePct = kpis.winRate === null ? "n/a" : `${(kpis.winRate * 100).toFixed(1)}%`;
   const targetPct = `${(target.winRateTarget * 100).toFixed(1)}%`;
   const drift =
-    kpis.winRate === null ? "—" : `${((kpis.winRate - target.winRateTarget) * 100).toFixed(1)} pts`;
+    kpis.winRate === null ? "n/a" : `${((kpis.winRate - target.winRateTarget) * 100).toFixed(1)} pts`;
 
   const periodRows = args.periods
     .map(
@@ -85,7 +85,7 @@ export function renderRunReport(args: {
     )
     .join("\n");
 
-  return `# Run report — ${args.date}
+  return `# Run report ${args.date}
 
 **Simulation now:** ${args.simNow}  ·  **Periods generated this run:** ${args.periods.length}
 ${args.nudge ? `\n**Per-run nudge (Tier 3):** ${args.nudge}\n` : ""}

@@ -1,5 +1,5 @@
 /**
- * Slack controller-app client. See DESIGN.md §9.
+ * Slack controller-app client. See docs/architecture.md#connectors.
  *
  * ONE controller app posts every message under a per-message username + avatar
  * via chat:write.customize, rendering an unlimited roster of "people" from one
@@ -52,7 +52,9 @@ export class SlackClient {
       cursor = res.response_metadata?.next_cursor || undefined;
     } while (cursor);
 
-    throw new Error(`Slack channel #${clean} not found. Create it in the workspace (RUNBOOK §Setup).`);
+    throw new Error(
+      `Slack channel #${clean} not found. Create it in the workspace (docs/connectors/slack.md).`,
+    );
   }
 
   private iconFields(avatar?: string): { icon_emoji?: string; icon_url?: string } {
@@ -81,15 +83,15 @@ export class SlackClient {
   }
 
   /** Delete a previously-posted message (used to re-post under a changed
-   * username/avatar — Slack can't change those on chat.update). */
+   * username/avatar, which chat.update cannot do). */
   async deleteMessage(channelId: string, ts: string): Promise<void> {
     await this.web.chat.delete({ channel: channelId, ts }).catch(() => {});
   }
 
-  /** Smoke test: post -> delete a temp message (Phase A). */
+  /** Smoke test: post -> delete a temp message. */
   async smokeTest(channelName: string): Promise<void> {
     const ch = await this.channelId(channelName);
-    const ts = await this.post(ch, "smoke test — please ignore", { username: "Demo-World Bot" });
+    const ts = await this.post(ch, "smoke test, please ignore", { username: "Demo-World Bot" });
     await this.web.chat.delete({ channel: ch, ts }).catch(() => {});
   }
 }

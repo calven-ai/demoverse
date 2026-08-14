@@ -1,19 +1,20 @@
 /**
- * `npm run assign-use-cases` — backfill the primary use case onto deals that
+ * `npm run assign-use-cases` backfills the primary use case onto deals that
  * predate the field, and rename them "<Account> - <Use Case>".
  *
  * Two assignment paths, because the ledger holds two kinds of deal:
  *
- *   Deals WITH prose already written — their transcripts, notes and emails exist
+ *   Deals WITH prose already written. Their transcripts, notes and emails exist
  *     and are not being regenerated, so the use case is inferred FROM that prose
  *     by keyword match (config/use-cases.yaml `keywords`). The label then
  *     describes what the deal actually discusses instead of contradicting it.
  *     Where the prose is genuinely ambiguous it falls through to the weighted
  *     draw, and the report says which deals those were.
  *
- *   Deals with no prose yet — the ordinary competitor-weighted draw, identical
- *     to what a live run would have produced (`pickUseCase`), so backfilled and
- *     freshly-generated deals are statistically indistinguishable.
+ *   Deals with no prose yet. These take the ordinary competitor-weighted draw,
+ *     identical to what a live run would have produced (`pickUseCase`), so
+ *     backfilled and freshly-generated deals are statistically
+ *     indistinguishable.
  *
  * Deterministic: seeded on the world seed + deal id, so re-running is stable.
  * Idempotent: deals that already carry a use case are left alone unless
@@ -61,9 +62,9 @@ function proseFor(world: World, dealId: string): string {
 }
 
 /**
- * Score each use case by keyword hits. Longer keywords are worth more — "battle
- * card" is far stronger evidence than "copy" — so a single specific phrase
- * outweighs several generic ones.
+ * Score each use case by keyword hits. Longer keywords are worth more, since
+ * "battle card" is far stronger evidence than "copy", so a single specific
+ * phrase outweighs several generic ones.
  */
 function inferFromProse(prose: string): { name: string; score: number; runnerUp: number } | undefined {
   if (!prose) return undefined;
@@ -103,7 +104,7 @@ interface Change {
 const changes: Change[] = [];
 let skipped = 0;
 
-// Pass 1: infer from prose wherever prose exists. These are immovable — the
+// Pass 1: infer from prose wherever prose exists. These are immovable. The
 // label must not contradict transcripts we are not regenerating.
 const inferences = new Map<string, ReturnType<typeof inferFromProse>>();
 const todo: Opportunity[] = [];
@@ -119,7 +120,7 @@ for (const opp of world.opportunities) {
 
 // Pass 2: the COHORT gets quota-based allocation so every use case is
 // represented well enough for the product to say something about it. The rest of the
-// ledger draws independently — it never leaves the repo, so it only has to look
+// ledger draws independently. It never leaves the repo, so it only has to look
 // natural, and an independent draw is the more honest model of reality.
 const cohortUnassigned = todo.filter((o) => cohort.has(o.id) && !inferences.has(o.id));
 const preassigned: Record<string, number> = {};
@@ -171,7 +172,7 @@ for (const c of changes) {
   if (cohort.has(c.opp.id)) cohortDist[c.useCase] = (cohortDist[c.useCase] ?? 0) + 1;
 }
 
-console.log(`Use-case assignment — ${changes.length} deal(s) to update, ${skipped} already assigned\n`);
+console.log(`Use-case assignment: ${changes.length} deal(s) to update, ${skipped} already assigned\n`);
 console.log(`Distribution (all ledger deals / cohort only):`);
 for (const uc of useCases(cfg)) {
   console.log(

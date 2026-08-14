@@ -1,5 +1,5 @@
 /**
- * `npm run cohort:prune-winloss` — thin win-loss artifacts down to a target rate.
+ * `npm run cohort:prune-winloss` thins win-loss artifacts down to a target rate.
  *
  * Win-loss is meant to be SCARCE. A real team does not run an exit interview or
  * a survey on every closed deal, so a demo org where all 45 closed deals carry
@@ -12,8 +12,9 @@
  *
  * Selection is deterministic (seeded on the cohort + target) and keeps the
  * won/lost balance of the surviving set proportional to the deals that have an
- * artifact today — so thinning does not quietly bias the win-loss corpus toward
- * losses, which would skew everything the downstream product derives from it.
+ * artifact today. Thinning therefore does not quietly bias the win-loss corpus
+ * toward losses, which would skew everything the downstream product derives
+ * from it.
  *
  * For every deal that loses its artifact the script also flips the opportunity's
  * `winLossMode` to `none`, so the ledger explains its own absence and a later
@@ -47,7 +48,7 @@ const restoreArg = process.argv.find((a) => a.startsWith("--restore="));
 
 const cohortFile = loadCohort();
 if (cohortFile.members.length === 0) {
-  console.error("No cohort selected — run `npm run cohort:select` first.");
+  console.error("No cohort selected. Run `npm run cohort:select` first.");
   process.exit(1);
 }
 const cohort = new CohortIndex(cohortFile);
@@ -55,8 +56,8 @@ const world = loadWorld();
 
 /**
  * Undo a `none` flip on one deal. Needed because a prune can be wrong in a way
- * only the linter sees afterwards — a Slack-enabled member whose win/loss signal
- * then exists nowhere. Re-plant with `apply --backfill-touchpoints` afterwards.
+ * only the linter sees afterwards. A Slack-enabled member's win/loss signal can
+ * then exist nowhere. Re-plant with `apply --backfill-touchpoints` afterwards.
  */
 if (restoreArg) {
   const oppId = restoreArg.split("=")[1]!;
@@ -66,7 +67,7 @@ if (restoreArg) {
     process.exit(1);
   }
   if (opp.winLossMode !== "none") {
-    console.error(`✗ ${oppId} is already winLossMode=${opp.winLossMode} — nothing to restore.`);
+    console.error(`✗ ${oppId} is already winLossMode=${opp.winLossMode}. Nothing to restore.`);
     process.exit(1);
   }
   const mode = new Rng(`restore-winloss:${oppId}`).float() < 0.4 ? "interview" : "survey";
@@ -95,9 +96,9 @@ for (const a of world.artifacts) {
  * Slack-enabled (`weekly`) members are excluded: for them a `none`-mode close is
  * not "no win-loss signal at all" but "the signal moved to a #win-loss post",
  * which this script does not plant. Flipping one to `none` here would strip the
- * artifact and leave the deal with no win/loss signal in any system — a lint
- * error, and a real hole in the story. Seed members carry no Slack, so `none`
- * genuinely means none, which is the case this script is for.
+ * artifact and leave the deal with no win/loss signal in any system. That is a
+ * lint error, and a real hole in the story. Seed members carry no Slack, so
+ * `none` genuinely means none, which is the case this script is for.
  */
 const holders = world.opportunities
   .filter((o) => cohort.has(o.id) && o.stage === "Closed" && !cohort.allowsSlack(o.id))
@@ -110,7 +111,7 @@ const holders = world.opportunities
 const closedCohort = world.opportunities.filter((o) => cohort.has(o.id) && o.stage === "Closed").length;
 
 if (holders.length === 0) {
-  console.log("No closed cohort deal carries a win-loss artifact — nothing to prune.");
+  console.log("No closed cohort deal carries a win-loss artifact. Nothing to prune.");
   process.exit(0);
 }
 
@@ -118,7 +119,7 @@ const won = holders.filter((h) => h.opp.status === "won");
 const lost = holders.filter((h) => h.opp.status !== "won");
 
 console.log(
-  `Win-loss coverage — ${holders.length} of ${closedCohort} closed cohort deals (${pct(holders.length, closedCohort)})`,
+  `Win-loss coverage: ${holders.length} of ${closedCohort} closed cohort deals (${pct(holders.length, closedCohort)})`,
 );
 console.log(`  won  ${won.length}   lost ${lost.length}`);
 
@@ -137,7 +138,7 @@ if (targetKeep < 0 || targetKeep > holders.length) {
 const rng = new Rng(`prune-winloss:${cohortFile.members.length}:${targetKeep}`);
 
 // Unfilled artifacts go first. Prose that has already been written cost tokens
-// and is valid content, and its Drive file is live — dropping a `planned`
+// and is valid content, and its Drive file is live. Dropping a `planned`
 // placeholder instead costs nothing and spares an unnecessary delete. Same
 // principle as cohort:prune-slack.
 const unfilled = holders.filter((h) => h.artifacts.every((a) => a.status === "planned"));
@@ -167,7 +168,7 @@ const foreign = doomedArtifacts.filter((a) => {
   return Object.entries(e).some(([k, v]) => v && !/^drive/i.test(k));
 });
 if (foreign.length > 0) {
-  console.error(`\n✗ ${foreign.length} artifact(s) carry a non-Drive external id — refusing to orphan them.`);
+  console.error(`\n✗ ${foreign.length} artifact(s) carry a non-Drive external id. Refusing to orphan them.`);
   for (const a of foreign.slice(0, 5))
     console.error(`   ${a.id} ${a.kind} ${a.dealId} ${JSON.stringify(a.external)}`);
   process.exit(1);
@@ -177,7 +178,7 @@ const inDrive = doomedArtifacts.filter((a) => a.external?.driveFileId);
 
 const survWon = holders.filter((h) => !doomed.includes(h) && h.opp.status === "won").length;
 console.log(
-  `\nTarget: keep ${targetKeep} (${pct(targetKeep, closedCohort)} of closed cohort deals) — ${survWon} won / ${targetKeep - survWon} lost`,
+  `\nTarget: keep ${targetKeep} (${pct(targetKeep, closedCohort)} of closed cohort deals, ${survWon} won / ${targetKeep - survWon} lost)`,
 );
 console.log(
   `Remove: ${doomedArtifacts.length} artifact(s) across ${doomed.length} deal(s); ${inDrive.length} have a Drive file to trash\n`,
@@ -192,7 +193,7 @@ if (!confirm) {
   process.exit(0);
 }
 
-// 1. Drive — trash, never permanently delete.
+// 1. Drive. Trash the files, never permanently delete them.
 const auth = new google.auth.GoogleAuth({
   keyFile: env("GOOGLE_APPLICATION_CREDENTIALS", true)!,
   scopes: ["https://www.googleapis.com/auth/drive"],
@@ -214,18 +215,18 @@ for (const a of inDrive) {
 }
 if (failures.length > 0) {
   console.error(
-    `\n✗ ${failures.length} Drive file(s) failed to trash — ledger left untouched so this stays re-runnable:`,
+    `\n✗ ${failures.length} Drive file(s) failed to trash. Ledger left untouched so this stays re-runnable:`,
   );
   for (const f of failures.slice(0, 5)) console.error(`   ${f}`);
   process.exit(1);
 }
 
-// 2. Local prose — the artifact is gone, its content file should not linger.
+// 2. Local prose. The artifact is gone, so its content file should not linger.
 for (const a of doomedArtifacts) {
   if (a.contentPath) await rm(repoPath(a.contentPath), { force: true });
 }
 
-// 3. Ledger — drop the artifacts and record WHY each deal now has none.
+// 3. Ledger. Drop the artifacts and record WHY each deal now has none.
 const remove = new Set(doomedArtifacts.map((a) => a.id));
 world.artifacts = world.artifacts.filter((a) => !remove.has(a.id));
 const doomedDeals = new Set(doomed.map((h) => h.opp.id));
@@ -236,7 +237,7 @@ saveWorld(world);
 
 console.log(`\n✓ trashed ${trashed} Drive file(s) (recoverable for 30 days)`);
 console.log(`✓ removed ${remove.size} artifact(s); ${doomedDeals.size} deal(s) set to winLossMode=none`);
-console.log(`\nNext: push the winLossMode change to Salesforce's Win_Loss_Mode__c —`);
+console.log(`\nNext: push the winLossMode change to Salesforce's Win_Loss_Mode__c:`);
 console.log(
   `  ${[...doomedDeals]
     .map((id) => `npm run apply -- --reconcile --opp=${id}`)
@@ -256,5 +257,5 @@ function pick<T>(pool: T[], n: number, rng: Rng): T[] {
 }
 
 function pct(n: number, total: number): string {
-  return total === 0 ? "—" : `${Math.round((100 * n) / total)}%`;
+  return total === 0 ? "n/a" : `${Math.round((100 * n) / total)}%`;
 }

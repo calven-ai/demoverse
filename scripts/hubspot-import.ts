@@ -1,5 +1,5 @@
 /**
- * Import CRM structure (companies, contacts, deals, associations — no
+ * Import CRM structure (companies, contacts, deals, associations, but no
  * activities) into a dedicated HubSpot test account.
  *
  *   npm run hubspot:import -- --dry-run                       # bounded pilot preview (no writes)
@@ -9,7 +9,7 @@
  *   npm run hubspot:import -- --all --dry-run                  # full-ledger preflight (no writes)
  *   npm run hubspot:import -- --all                             # full-ledger import
  *
- * `--all` is never the implicit default — it must be passed explicitly. Every
+ * `--all` is never the implicit default. It must be passed explicitly. Every
  * record is upserted by its unique `demo_world_id`, so reruns (including a
  * `--all` after a `--opp=` pilot) update existing records instead of
  * duplicating them.
