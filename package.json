@@ -39,6 +39,7 @@
     "pipeline": "tsx scripts/apply.ts --weeks=1",
     "assign-use-cases": "tsx scripts/assign-use-cases.ts",
     "backfill:created-at": "tsx scripts/backfill-created-at.ts",
+    "repair:slack-identities": "tsx scripts/repair-slack-identities.ts",
     "cohort": "tsx scripts/cohort-status.ts",
     "cohort:select": "tsx scripts/cohort-select.ts",
     "cohort:prune-slack": "tsx scripts/cohort-prune-slack.ts",
