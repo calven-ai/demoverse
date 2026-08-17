@@ -834,6 +834,61 @@ test("ingest resolves an email thread's contactRef to a real contact id", () => 
   }
 });
 
+test("ingest resolves an @-prefixed slack handle, and rejects an off-roster one", () => {
+  const persona = cfg.slackPersonas.internal_personas[0]!;
+  const periodIndex = 990002;
+  const dir = repoPath("state", "requests", String(periodIndex), "results");
+
+  const plant = (w: World, id: string): void => {
+    w.artifacts.push({
+      id,
+      kind: "competitive_q",
+      dealId: "opp-001",
+      title: "competitive question",
+      detailLevel: "low",
+      date: "2025-06-30",
+      grounding: { competitor: cfg.competitors.competitors[0]!.name },
+      status: "planned",
+      external: {},
+    });
+  };
+
+  try {
+    // The prompt renders the roster as "Display (@handle, role)" and asks for that
+    // exact handle, so a result that copies the "@handle" verbatim must still bind
+    // to the persona's display name and avatar.
+    const w = oneDealWorld();
+    plant(w, "art-slk");
+    const ctx = { config: cfg, ledger: new Ledger(w), seed: w.seed };
+    const req = buildRequest(ctx, w.artifacts.at(-1)!);
+    ensureDir(dir);
+    writeJson(repoPath(dir, "art-slk.json"), {
+      messages: [{ personaHandle: `@${persona.handle}`, text: "How do we counter their pricing claim?" }],
+    });
+    const report = ingestResults(w, cfg, periodIndex, [req]);
+    assert.ok(report.filled.includes("art-slk"), `expected art-slk to ingest: ${JSON.stringify(report)}`);
+    const msg = w.artifacts.find((a) => a.id === "art-slk")!.messages![0]!;
+    assert.equal(msg.personaHandle, persona.handle, "handle should be stored normalized (no @)");
+    assert.ok(msg.personaDisplay.startsWith(persona.display), "display name should come from the roster");
+    assert.equal(msg.avatar, persona.avatar, "avatar should be bound from the roster");
+
+    // A handle that is on nobody's roster is a grounding violation: stay planned so
+    // it is regenerated rather than posted under an invented identity.
+    const w2 = oneDealWorld();
+    plant(w2, "art-slk2");
+    const ctx2 = { config: cfg, ledger: new Ledger(w2), seed: w2.seed };
+    const req2 = buildRequest(ctx2, w2.artifacts.at(-1)!);
+    writeJson(repoPath(dir, "art-slk2.json"), {
+      messages: [{ personaHandle: "nobody.here", text: "How do we counter their pricing claim?" }],
+    });
+    const report2 = ingestResults(w2, cfg, periodIndex, [req2]);
+    assert.ok(report2.pending.includes("art-slk2"), "off-roster handle should leave the artifact planned");
+    assert.equal(w2.artifacts.find((a) => a.id === "art-slk2")!.status, "planned");
+  } finally {
+    rmSync(repoPath("state", "requests", String(periodIndex)), { recursive: true, force: true });
+  }
+});
+
 test("Rng is seed-stable and weighted() respects weights", () => {
   const r1 = new Rng("abc");
   const r2 = new Rng("abc");

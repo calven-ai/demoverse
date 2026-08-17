@@ -60,11 +60,14 @@ export interface IngestReport {
 
 /** Build handle -> {display, avatar} from reps + persona config. The Slack display
  * name carries the persona's role in parentheses so it's clear who's speaking, e.g.
- * "Lukas (Account Executive)" or "Alex Romano (Head of Product Marketing)". */
-function personaResolver(
+ * "Lukas (Account Executive)" or "Alex Romano (Head of Product Marketing)".
+ *
+ * Returns undefined for a handle that is not on the roster, so the caller can reject
+ * the result instead of posting under a made-up identity. */
+export function personaResolver(
   world: World,
   cfg: Config,
-): (handle: string) => { display: string; avatar?: string } {
+): (handle: string) => { display: string; avatar?: string } | undefined {
   const map = new Map<string, { display: string; avatar?: string }>();
   const withRole = (name: string, role?: string): string => (role ? `${name} (${role})` : name);
   // The customer's sales org: deal-owning ICs are Account Executives; managers
@@ -77,21 +80,32 @@ function personaResolver(
   }
   // rep_personas pin the avatar; role still comes from the matching rep.
   for (const p of cfg.slackPersonas.rep_personas) {
-    const rep = world.reps.find((r) => handleFor(r.name) === p.handle);
-    map.set(p.handle, {
+    const rep = world.reps.find((r) => handleFor(r.name) === normalizeHandle(p.handle));
+    map.set(normalizeHandle(p.handle), {
       display: withRole(p.display, rep ? repRole(rep) : "Account Executive"),
       avatar: p.avatar,
     });
   }
   // Standing internal personas carry an explicit role.
   for (const p of cfg.slackPersonas.internal_personas) {
-    map.set(p.handle, { display: withRole(p.display, p.role), avatar: p.avatar });
+    map.set(normalizeHandle(p.handle), { display: withRole(p.display, p.role), avatar: p.avatar });
   }
-  return (handle: string) => map.get(handle) ?? { display: handle };
+  return (handle: string) => map.get(normalizeHandle(handle));
 }
 
 function handleFor(name: string): string {
   return name.toLowerCase().replace(/[^a-z]+/g, ".");
+}
+
+/**
+ * Canonical form of a persona handle. The Slack prompts render the roster as
+ * "Display (@handle, role)" and ask for that exact handle, so a filled result very
+ * reasonably comes back with the "@" attached ("@dana.pmm"); config may carry stray
+ * case or whitespace. Every lookup and every stored handle goes through here so all
+ * those spellings land on one key.
+ */
+export function normalizeHandle(handle: string): string {
+  return handle.trim().replace(/^@+/, "").toLowerCase();
 }
 
 export function ingestResults(
@@ -167,10 +181,24 @@ export function ingestResults(
         report.pending.push(req.artifactId);
         continue;
       }
+      // An off-roster handle is a grounding violation, not a cosmetic one: it would
+      // post under a bare handle with no avatar. Reject so it is regenerated.
+      const unknown = parsed.data.messages
+        .map((m) => m.personaHandle)
+        .filter((h) => !resolve(h))
+        .filter((h, i, all) => all.indexOf(h) === i);
+      if (unknown.length > 0) {
+        report.invalid.push({
+          artifactId: req.artifactId,
+          reason: `unknown slack persona handle(s): ${unknown.join(", ")} - must be on the prompt's roster`,
+        });
+        report.pending.push(req.artifactId);
+        continue;
+      }
       const messages: SlackMessage[] = parsed.data.messages.map((m) => {
-        const persona = resolve(m.personaHandle);
+        const persona = resolve(m.personaHandle)!;
         return {
-          personaHandle: m.personaHandle,
+          personaHandle: normalizeHandle(m.personaHandle),
           personaDisplay: persona.display,
           avatar: persona.avatar,
           text: m.text,
