@@ -55,7 +55,7 @@ export const WorldConfigSchema = z.object({
       ae_notes: z.boolean().default(true),
       emails: z.boolean().default(true),
     })
-    .default({}),
+    .prefault({}),
   detail: z
     .object({
       call_transcripts: DetailLevel.default("high"),
@@ -65,14 +65,14 @@ export const WorldConfigSchema = z.object({
       ae_notes: DetailLevel.default("low"),
       emails: DetailLevel.default("medium"),
     })
-    .default({}),
+    .prefault({}),
   window: z
     .object({
       history_quarters: z.number().int().positive().default(4),
       period: z.enum(["week", "month"]).default("week"),
       keep_fresh_days: z.number().int().positive().default(120),
     })
-    .default({}),
+    .prefault({}),
   volume: z.object({
     new_opps_per_week: IntRange,
     pricing: z.object({
@@ -109,14 +109,14 @@ export const WorldConfigSchema = z.object({
         /** Warm inbound: closes almost immediately, leaving barely a trail. */
         fast: z
           .object({ rate: z.number().min(0).max(1).default(0.05), weeks: IntRange.default([1, 2]) })
-          .default({}),
+          .prefault({}),
         /** Enterprise grind: procurement and security review drag it out. */
         slog: z
           .object({
             rate: z.number().min(0).max(1).default(0.05),
             weeks: IntRange.default([12, 16]),
           })
-          .default({}),
+          .prefault({}),
         /**
          * Goes dark mid-cycle: the stage clock pauses, so the deal sits in one
          * stage for weeks earning NO touch points, then resumes or dies.
@@ -126,9 +126,9 @@ export const WorldConfigSchema = z.object({
             rate: z.number().min(0).max(1).default(0.05),
             stall_weeks: IntRange.default([3, 6]),
           })
-          .default({}),
+          .prefault({}),
       })
-      .default({}),
+      .prefault({}),
   }),
   winloss: z.object({
     baseline_win_rate: z.number().min(0).max(1),
@@ -581,19 +581,19 @@ export const ConnectorsConfigSchema = z.object({
       /** Engine pipeline stage → Salesforce Opportunity StageName picklist value. */
       stage_map: z.record(z.string(), z.string()),
     })
-    .default({ stage_map: {} }),
+    .prefault({ stage_map: {} }),
   hubspot: z
     .object({
       enabled: z.boolean().default(false),
     })
-    .default({}),
+    .prefault({}),
   drive: z
     .object({
       enabled: z.boolean().default(true),
       /** Artifact kind → top-level folder name in the shared Drive folder. */
       folders: z.record(z.string(), z.string()),
     })
-    .default({ folders: {} }),
+    .prefault({ folders: {} }),
   slack: z
     .object({
       enabled: z.boolean().default(true),
@@ -601,7 +601,7 @@ export const ConnectorsConfigSchema = z.object({
       channels: z.record(z.string(), z.string()),
       fallback_channel: z.string().default("#general"),
     })
-    .default({ channels: {} }),
+    .prefault({ channels: {} }),
 });
 export type ConnectorsConfig = z.infer<typeof ConnectorsConfigSchema>;
 
