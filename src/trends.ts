@@ -68,7 +68,7 @@ export const TrendsSchema = z.object({
       /** Static additive win-rate delta for deals in this industry. */
       winRateDelta: z.record(z.string(), z.number()).default({}),
     })
-    .default({}),
+    .prefault({}),
   /**
    * Market-intelligence cohort trajectory (the "win when PMM is
    * involved" story). The cohort SHARE of new opps ramps over time, an emerging
