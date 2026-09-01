@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint peer-caps the compiler at `>=4.8.4 <6.1.0`, so a
+      # TypeScript major lands as an unresolvable `npm ci` and a red CI run.
+      # The codebase itself already compiles clean under 7.x; remove this rule
+      # once typescript-eslint ships TS 7 support. See #11.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
