@@ -4,7 +4,11 @@ The runbook for a world that's already alive: the weekly routine, the two motion
 
 ## The weekly routine
 
-Most weeks the whole operation is five steps and zero decisions:
+By default nobody runs it. The **Weekly pipeline increment** workflow advances the world every Sunday at 19:00 UTC: Claude Code fills the week's touch points, the workflow pushes them to your connectors, and the result is committed to `main`. Each run's summary page carries the report (deals opened, progressed, closed, artifacts generated) and the push outcome. Your part is to `git pull` before working locally and to act on a red run. Setup, secrets and failure handling are in [automation.md](automation.md).
+
+### Running it manually
+
+For an extra week, a heavier intake, a nudge, or a repo without Actions, run the same loop by hand. It is five steps and zero decisions:
 
 ```bash
 npm run pipeline                        # 1. one increment: open · progress · close · plan touch points
@@ -193,7 +197,7 @@ tested default.
 | `npm run init [-- --force] [-- --seed=X]` | Scaffold (or regenerate) `state/` from config |
 | `npm run pipeline` | One forced weekly increment (= `apply -- --weeks=1`) |
 | `npm run apply` | Generate every period the real calendar has produced (a fresh world's whole back-catalog) |
-| `npm run apply -- --ingest [--reconcile] [--opp=]` | Validate + file results (+ push) |
+| `npm run apply -- --ingest [--reconcile] [--opp=]` | Validate + file results (+ push; exits non-zero on any connector error) |
 | `npm run apply -- --reconcile --sf-limit=N` | Salesforce smoke batch: push only the first N accounts (plus their contacts and opps); idempotent |
 | `npm run apply -- --backfill` | The one-time historical seed: the same catch-up run, under its intent flag |
 | `npm run apply -- --backfill-touchpoints --opp=` | Plant one deal's full detail layer |

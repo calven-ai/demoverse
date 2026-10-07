@@ -10,10 +10,14 @@ Claude-Code-specific.
 
 | Skill | What it runs |
 | --- | --- |
-| `/setup` | The onboarding playbook (AGENTS.md Part 2): interview → config → init → first increment → optional connectors |
+| `/setup` | The onboarding playbook (AGENTS.md Part 2): interview → config → init → first increment → optional connectors → weekly automation |
 | `/pipeline-update [weeks]` | The routine weekly increment, end to end: advance → fill via `opp-filler` subagents → ingest → lint → fix → reconcile → commit |
 | `/backfill-opps [N]` | The detail-layer loop for N opportunities: plant → fill (one subagent per opp) → ingest → lint → fix → reconcile → commit per opp |
 | `/import-hubspot` | The deterministic HubSpot import: provision the schema → import the CRM structure into the dedicated test account → verify record-by-record |
+
+`/pipeline-update` also runs unattended every Sunday from
+`.github/workflows/pipeline-update.yml` (`claude -p`, steps 1-4; the workflow
+reconciles and commits). See `docs/automation.md`.
 
 ## Subagent strategy (critical for context health)
 

@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Weekly GitHub Actions workflow (`.github/workflows/pipeline-update.yml`) that
+  runs `/pipeline-update` headless every Sunday, pushes to the configured
+  connectors and commits the result. It is now the default way a world
+  advances; setup in `docs/automation.md`. A `reconcile_only` run retries a
+  failed push without advancing.
+
+### Changed
+- `apply -- --ingest --reconcile` exits non-zero when any connector reports an
+  error, so unattended runs fail visibly.
+
 ## [0.1.0] - 2026-08-14
 
 First public release.

@@ -19,6 +19,10 @@ yet. It happens in a later increment, when the deal reaches Evaluation.
 
 ## Steps
 
+The weekly GitHub Actions workflow (`.github/workflows/pipeline-update.yml`,
+`docs/automation.md`) runs this skill headless for steps 1-4, then reconciles
+and commits itself. Invoked by hand, run every step.
+
 1. **Advance.** `npm run pipeline` (one week). For a longer jump or a heavier
    intake: `npm run apply -- --weeks=N --new-opps=M`.
 

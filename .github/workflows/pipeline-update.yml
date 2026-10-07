@@ -1,0 +1,181 @@
+name: Weekly pipeline increment
+
+# Advances the world one week, hands-off. Claude Code runs /pipeline-update
+# headless for steps 1-4 (advance, fill with one opp-filler subagent per deal,
+# ingest, lint). The workflow then commits, pushes to the enabled connectors
+# itself, and commits the external ids, so a connector failure turns the run
+# red instead of hiding in Claude's report. Setup: docs/automation.md.
+#
+# Secrets (environment `automation`, deployment branch policy: main only):
+#   CLAUDE_CODE_OAUTH_TOKEN      from `claude setup-token`, or instead
+#   ANTHROPIC_API_KEY            a Console API key
+#   Connectors, each optional (an unset one is skipped):
+#   SF_LOGIN_URL, SF_USERNAME, SF_PASSWORD, SF_SECURITY_TOKEN
+#   GOOGLE_SERVICE_ACCOUNT_JSON  the full contents of service-account.json
+#   DRIVE_ROOT_FOLDER_ID
+#   SLACK_BOT_TOKEN
+#
+# A failed push is retried with "Run workflow" and `reconcile_only` checked,
+# which pushes without advancing another week.
+#
+# A repo without config/world.yaml (this upstream repo, or a clone that has not
+# run /setup yet) skips the run with a green check.
+#
+# Schedule is UTC. 0 19 * * 0 = Sunday 20:00 CET (winter) / 21:00 CEST (summer).
+
+on:
+  schedule:
+    - cron: "0 19 * * 0"
+  workflow_dispatch:
+    inputs:
+      weeks:
+        description: "Weeks to advance"
+        required: false
+        default: "1"
+      reconcile_only:
+        description: "Only retry the push to connectors (after fixing a credential); do not advance"
+        type: boolean
+        default: false
+
+concurrency:
+  group: pipeline-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  increment:
+    runs-on: ubuntu-latest
+    environment: automation
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Preflight
+        id: preflight
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WEEKS: ${{ inputs.weeks || '1' }}
+          RECONCILE_ONLY: ${{ inputs.reconcile_only || false }}
+        run: |
+          if [ ! -f config/world.yaml ]; then
+            echo "No config/world.yaml in this repo. Run /setup and commit the config to enable the weekly run. Skipped." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
+          if [ "$RECONCILE_ONLY" = "true" ]; then
+            echo "mode=reconcile" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "mode=increment" >> "$GITHUB_OUTPUT"
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::Set CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY in the 'automation' environment (docs/automation.md)."
+            exit 1
+          fi
+          if ! [[ "$WEEKS" =~ ^[1-9][0-9]?$ ]]; then
+            echo "::error::weeks must be a whole number from 1 to 99, got '$WEEKS'."
+            exit 1
+          fi
+          echo "weeks=$WEEKS" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v7
+        if: steps.preflight.outputs.run == 'true'
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.preflight.outputs.run == 'true'
+        run: npm ci
+
+      - name: Install Claude Code
+        if: steps.preflight.outputs.mode == 'increment'
+        run: npm install -g @anthropic-ai/claude-code
+
+      # Claude gets no connector credentials: it only advances, fills, ingests
+      # and lints. The push happens in the deterministic step below.
+      - name: Advance and fill
+        id: claude
+        if: steps.preflight.outputs.mode == 'increment'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WEEKS: ${{ steps.preflight.outputs.weeks }}
+        run: |
+          set -o pipefail
+          claude -p "Run the /pipeline-update skill (.claude/skills/pipeline-update/SKILL.md) for ${WEEKS} week(s), with no extra flags.
+
+          This is an unattended scheduled run: nobody can answer questions. Follow steps 1-4 exactly, including one opp-filler subagent per deal. Skip step 5 (push) and step 6 (commit): the workflow reconciles and runs git after you, so do NOT run --reconcile or git. If the skill says to stop and let the operator decide (world several periods ahead of the real calendar, win-loss scarcity broken, detail-layer creep), stop there and explain why in the report instead of continuing.
+
+          Finish by printing ONLY the step-7 report as markdown: deals opened, deals progressed (with the stage entered), deals closed won/lost, artifacts generated, and anything left unresolved." \
+            --model claude-sonnet-5-5 \
+            --allowedTools "Bash(npm run *)" "Read" "Write" "Edit" "Glob" "Grep" "Agent" \
+            | tee "$RUNNER_TEMP/increment-report.md"
+
+      - name: Write the Drive service-account key
+        if: steps.claude.outcome == 'success' || steps.preflight.outputs.mode == 'reconcile'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > service-account.json
+            chmod 600 service-account.json
+          fi
+
+      # Exits non-zero when any enabled connector reports an error.
+      - name: Push to connectors
+        id: reconcile
+        if: steps.claude.outcome == 'success' || steps.preflight.outputs.mode == 'reconcile'
+        env:
+          SF_LOGIN_URL: ${{ secrets.SF_LOGIN_URL }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
+          DRIVE_ROOT_FOLDER_ID: ${{ secrets.DRIVE_ROOT_FOLDER_ID }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          set -o pipefail
+          if [ -f service-account.json ]; then export GOOGLE_APPLICATION_CREDENTIALS="$PWD/service-account.json"; fi
+          npm run apply -- --ingest --reconcile 2>&1 | tee "$RUNNER_TEMP/reconcile.log"
+
+      - name: Remove the key
+        if: always()
+        run: rm -f service-account.json
+
+      # Commits even when the push failed: the prose is done, and partial
+      # upserts recorded external ids that must not be lost (they prevent
+      # duplicates on the retry).
+      - name: Commit and push
+        if: always() && (steps.claude.outcome == 'success' || steps.preflight.outputs.mode == 'reconcile')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "${{ steps.preflight.outputs.mode == 'reconcile' && 'reconcile' || 'pipeline increment' }} $(date +%F)"
+            git push
+          fi
+
+      - name: Report
+        if: always() && steps.preflight.outputs.run == 'true'
+        run: |
+          report="$RUNNER_TEMP/increment-report.md"
+          log="$RUNNER_TEMP/reconcile.log"
+          if [ -s "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+          {
+            echo
+            echo "### Push to connectors: ${{ steps.reconcile.outcome }}"
+            if [ -s "$log" ]; then
+              echo '```'
+              sed -n '/^Reconcile:/,/^$/p' "$log"
+              echo '```'
+            fi
+            if [ "${{ steps.reconcile.outcome }}" = "failure" ]; then
+              echo "Fix the credential, then run this workflow with \`reconcile_only\` checked (or \`npm run apply -- --ingest --reconcile\` locally). Nothing needs regenerating."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

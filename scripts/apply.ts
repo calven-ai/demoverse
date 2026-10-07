@@ -326,6 +326,9 @@ async function main(): Promise<void> {
     console.log(`\n${dryRun ? "(dry-run) " : ""}Run report → runs/${date}-report.md`);
     if (stillPending > 0)
       console.log(`Note: ${stillPending} artifact(s) still need generation. Fill them and re-run --ingest.`);
+    // Exit non-zero on any connector error so an unattended run (CI, a loop)
+    // fails visibly instead of reporting success with nothing pushed.
+    if (stats?.some((s) => s.errors.length > 0)) process.exitCode = 1;
     return;
   }
 

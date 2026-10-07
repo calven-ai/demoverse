@@ -198,6 +198,13 @@ npm run apply -- --ingest         # validate + file the prose
 npm run lint                      # prove the story is coherent
 ```
 
+**Then let it run itself.** Push the repo to a private GitHub repository, add
+a Claude token as a secret, and the bundled workflow advances the world every
+Sunday: Claude Code fills the week's touch points, the workflow pushes them to
+your connectors and commits the result. Setup takes five minutes:
+[docs/automation.md](docs/automation.md). `npm run pipeline` and
+`/pipeline-update` remain for running a week by hand.
+
 **Connect real systems when you're ready.** Each guide takes a few minutes with
 a free account, and every connector stays off until you flip it on in
 `config/connectors.yaml`:
