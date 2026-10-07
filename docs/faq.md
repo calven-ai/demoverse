@@ -4,7 +4,7 @@ What Demoverse needs, what it touches, and why the data looks the way it does, p
 
 ## Do I need Claude Code?
 
-No, though you do need *a* coding agent, because the agent's model is what generates the transcripts, emails and Slack threads. Which one is up to you. The engine's contract is files, not APIs: it emits prompt files, and anything that can read and write files can fill them, whether that's Claude Code, Codex, Cursor, another agent, or a script of your own against a model API. Nothing in the engine knows or cares what produced a result. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) and slash commands (`/setup`, `/pipeline-update`, `/backfill-opps`), which make Claude Code the smoothest ride. Filling a request by hand is worth doing once to see the contract, but a world's worth of prose is not a hand-writing job. The full spec is [request-protocol.md](request-protocol.md).
+No, though you do need *a* coding agent, because the agent's model is what generates the transcripts, emails and Slack threads. Which one is up to you. The engine's contract is files, not APIs: it emits prompt files, and anything that can read and write files can fill them, whether that's Claude Code, Codex, Cursor, another agent, or a script of your own against a model API. Nothing in the engine knows or cares what produced a result. The repo ships agent guidance (`AGENTS.md`) and slash commands (`/setup`, `/pipeline-update`, `/backfill-opps`), which make Claude Code the smoothest ride. Filling a request by hand is worth doing once to see the contract, but a world's worth of prose is not a hand-writing job. The full spec is [request-protocol.md](request-protocol.md).
 
 ## Is the prose AI-generated? Does Demoverse call an LLM?
 

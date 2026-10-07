@@ -14,6 +14,9 @@ All notable changes to this project are documented here. The format follows
   failed push without advancing.
 
 ### Changed
+- `AGENTS.md` is the one instruction file: `CLAUDE.md` is gone, because Claude
+  Code 2.1.277 and later read `AGENTS.md` directly. The skills table, the
+  subagent rule and the bulk-backfill loop moved into its Part 3.
 - `apply -- --ingest --reconcile` exits non-zero when any connector reports an
   error, so unattended runs fail visibly.
 

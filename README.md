@@ -54,14 +54,14 @@ Google Drive and Slack, where your product ingests it like production data.
 ### Works with
 
 <p align="center">
-  <a href="CLAUDE.md"><img src="docs/assets/logos/claude-code.svg" width="26" height="26" alt="Claude Code"></a>
+  <a href="AGENTS.md"><img src="docs/assets/logos/claude-code.svg" width="26" height="26" alt="Claude Code"></a>
   <a href="AGENTS.md"><img src="docs/assets/logos/codex.svg" width="26" height="26" alt="Codex"></a>
   <a href="AGENTS.md"><img src="docs/assets/logos/cursor.svg" width="26" height="26" alt="Cursor"></a>
   <a href="AGENTS.md"><img src="docs/assets/logos/agents-md.svg" width="26" height="26" alt="Any AGENTS.md-aware tool"></a>
 </p>
 
 <p align="center">
-  <b><a href="CLAUDE.md">Claude Code</a> · <a href="AGENTS.md">Codex</a> · <a href="AGENTS.md">Cursor</a> · <a href="AGENTS.md">any AGENTS.md-aware tool</a></b><br>
+  <b><a href="AGENTS.md">Claude Code</a> · <a href="AGENTS.md">Codex</a> · <a href="AGENTS.md">Cursor</a> · <a href="AGENTS.md">any AGENTS.md-aware tool</a></b><br>
   <sub>the agent you already run is what generates the content: call transcripts, email threads, Slack messages, win-loss interviews</sub>
 </p>
 
