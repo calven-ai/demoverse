@@ -99,10 +99,10 @@ and commits itself. Invoked by hand, run every step.
 - **Win-loss scarcity.** ~2 closed deals in 3 carry no survey or interview
   (`config/world.yaml` `winloss.mode_mix`, `none: 0.67`). If most of an
   increment's closes have one, stop and reconcile the config before generating.
-  See CLAUDE.md.
+  See AGENTS.md, "Rules for filling requests".
 - **Clock drift.** Every forced increment moves the world a week past reality.
   Run one when you want the pipeline to move. Do not run five in a row to
   simulate five weeks unless the operator asked for exactly that.
 - **Standing volume vs. one-off.** `--new-opps` is a one-off. To change the rate
   for good, amend `state/directives.md` + `state/trends.json`
-  (`volume.newOppsPerWeek`). That is Tier 2, per CLAUDE.md.
+  (`volume.newOppsPerWeek`). That is Tier 2, per AGENTS.md "Setting direction".

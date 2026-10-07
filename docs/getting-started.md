@@ -129,7 +129,7 @@ Do a couple by hand first, to feel the protocol. Then hand the batch to your age
 
   The emitted prompts require `contactRef` on every message. It's always the **buyer's** email, even when the rep is the sender, and it links the thread to the right CRM contact.
 
-**Via your agent.** Point it at the manifest and let it fill everything. The repo ships agent guidance (`AGENTS.md`, `CLAUDE.md`) plus a `/pipeline-update` command that runs the whole weekly loop. The full spec of prompts, result formats, and validation lives in [request-protocol.md](request-protocol.md).
+**Via your agent.** Point it at the manifest and let it fill everything. The repo ships agent guidance (`AGENTS.md`) plus a `/pipeline-update` command that runs the whole weekly loop. The full spec of prompts, result formats, and validation lives in [request-protocol.md](request-protocol.md).
 
 ## Ingest and lint
 

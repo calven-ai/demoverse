@@ -1,16 +1,11 @@
 # AGENTS.md: how a coding agent drives Demoverse
 
-Demoverse is **operated by a coding agent, not just a human**. The deterministic
-TypeScript engine does all the mechanical, error-prone work; the agent does the
-judgment and the prose. This file is the contract for that handoff, readable by
-any agent tool (Claude Code, Codex, Cursor, Copilot, …). Three parts:
-
-1. **The engine contract.** The split of responsibilities, and the
-   generation-request protocol that is the core loop.
-2. **The onboarding playbook.** Walking a new user from a fresh clone to a
-   living world. `/setup` in Claude Code runs this; other agents follow it
-   directly.
-3. **Per-tool notes.**
+Demoverse is **operated by a coding agent**. The deterministic TypeScript
+engine does the mechanical work; the agent does the judgment and the prose.
+This file is the contract for that handoff, for any agent tool (Claude Code,
+Codex, Cursor, Copilot, …): Part 1 is the engine contract and the core loop,
+Part 2 takes a new user from a fresh clone to a living world, Part 3 has
+per-tool notes.
 
 ---
 
@@ -18,17 +13,13 @@ any agent tool (Claude Code, Codex, Cursor, Copilot, …). Three parts:
 
 ### The split (don't cross it)
 
-| Deterministic engine (code) | Agent (you) |
-| --- | --- |
-| Ledger I/O, ids, referential integrity | Interpreting directives + nudges |
-| Simulation clock, trend evaluation | Choosing nothing structural (the code already did) |
-| Sampling the world (accounts/contacts/deals/competitors) | **Writing the prose** for each emitted request |
-| Schema validation, coherence lint, reports | Editing `state/directives.md` + `state/trends.json` when direction changes |
-| Reconcile (CRM/Drive/Slack upserts via the connector registry) | n/a |
-
-**You never hand-edit `state/world.json`.** Structure is the code's job. You only:
-(1) fill generation requests, and (2) when the operator sets new direction, update
-`state/directives.md` + `state/trends.json`.
+The engine owns everything structural: ledger I/O, ids and referential
+integrity, the simulation clock and trends, sampling accounts, contacts, deals
+and competitors, schema validation, the coherence lint, reports, and reconcile
+into CRM, Drive and Slack. You own two things: **writing the prose** for each
+emitted request, and, when the operator sets new direction, updating
+`state/directives.md` + `state/trends.json`. **You never hand-edit
+`state/world.json`.**
 
 ### The generation-request protocol (the core loop)
 
@@ -106,7 +97,8 @@ opportunity:
    or `planned:K` for planted-but-unfilled, which is resumable.
 2. Per opp: `npm run apply -- --backfill-touchpoints --opp=<id>` (idempotent).
    **Capture the manifest immediately; the next plant overwrites it.**
-3. Fill via ONE dedicated agent context per opportunity (never batch deals).
+3. Fill via ONE dedicated agent context per opportunity, never batched
+   (Claude Code: the `opp-filler` subagent, Part 3).
 4. `npm run apply -- --ingest --opp=<id>` → fix invalid →
    `npm run lint -- --opp=<id>` → fix errors via `--refill=<artifactId>` + a
    scoped re-fill → `npm run apply -- --ingest --reconcile --opp=<id>` →
@@ -223,23 +215,30 @@ fill → `npm run apply -- --ingest --reconcile` → `npm run lint` → commit.
 
 ## Part 3: Per-tool notes
 
-**Claude Code** gets the richest integration. `/setup` (this playbook),
-`/pipeline-update` (the weekly increment end to end), `/backfill-opps N`
-(the detail-layer loop), and `/import-hubspot` (the deterministic HubSpot
-structure import + verify) live in `.claude/skills/`. The `opp-filler` subagent
-(`.claude/agents/opp-filler.md`) fills one opportunity per subagent, so the main
-context stays lean. `CLAUDE.md` imports this file. For a long backfill, run
-`/backfill-opps` iteratively and commit per opportunity.
+**Claude Code** (v2.1.277 or later reads this file directly). Skills in
+`.claude/skills/`:
+
+| Skill | What it runs |
+| --- | --- |
+| `/setup` | Part 2, end to end |
+| `/pipeline-update [weeks]` | The weekly increment: advance → fill → ingest → lint → fix → reconcile → commit. Also runs unattended every Sunday from `.github/workflows/pipeline-update.yml` (steps 1-4; the workflow reconciles and commits; `docs/automation.md`) |
+| `/backfill-opps [N]` | The detail-layer loop for N opportunities, one commit per opp. For a bulk backfill run `/loop /backfill-opps 5` until `npm run apply -- --next=1` prints `(no opportunities need a detail layer)` |
+| `/import-hubspot` | Provision the HubSpot schema, import the CRM structure into the dedicated test account, verify record by record |
+
+Never write result prose in the main context. Every fill goes through the
+`opp-filler` subagent (`.claude/agents/opp-filler.md`, Read/Write/Glob only),
+one per opportunity; the main context runs only `apply`, `lint` and `git`,
+serially. If a subagent hits a session limit, relaunch it for the remaining
+artifacts of that same deal.
 
 **Codex / Cursor / other AGENTS.md-aware tools**: this file is the whole
-contract, with no extra setup. Follow Part 2 for onboarding and Part 1 for the
-weekly loop. Mirror the context-hygiene rule by hand: fill **one opportunity
-per session/task**, keep `apply`/`lint` serial, and commit per opportunity
-during backfills.
+contract. Mirror the subagent rule by hand: fill **one opportunity per
+session/task**, keep `apply`/`lint` serial, and commit per opportunity during
+backfills.
 
-**No agent at all**: the engine runs fine without one, but nothing in the repo
-generates the prose, so artifacts stay empty until a model writes them. The
-prompts in `state/requests/` are self-contained briefs a human can fill by hand,
-which works for a handful of artifacts and not for a world of them. The
-realistic no-agent path is scripting your own filler: `docs/request-protocol.md`
-specifies the result formats for any generator you point at a model API.
+**No agent at all**: the engine runs, but nothing writes the prose, so
+artifacts stay empty until a model does. The prompts in `state/requests/` are
+self-contained briefs a human can fill for a handful of artifacts, not a
+world. The realistic path is your own filler script:
+`docs/request-protocol.md` specifies the result formats for any generator you
+point at a model API.
