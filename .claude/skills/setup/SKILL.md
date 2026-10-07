@@ -63,13 +63,32 @@ real call before declaring done**:
 Remind the user each time: **dedicated, isolated orgs/workspaces only** (see
 DISCLAIMER.md). Credentials go in `.env` (gitignored), never into config files.
 
-## Wrap (Step 6)
+## Commit (Step 6)
 
 ```bash
 git add -A && git commit -m "demoverse: initial world for <Company>"
 ```
 
-Print the weekly routine and point at `/pipeline-update`:
+## Automate (Step 7, recommended)
+
+Offer to make the weekly run hands-off (`docs/automation.md`). With a yes:
+
+1. The repo must be a **private** GitHub repo. If `git remote -v` shows none,
+   or a public one, have the user create a private repo and push to it.
+2. Create the `automation` environment with a `main`-only deployment branch
+   policy (the UI, or `gh api` on `repos/{owner}/{repo}/environments/automation`).
+3. Secrets: a Claude credential (`claude setup-token` → `CLAUDE_CODE_OAUTH_TOKEN`,
+   or `ANTHROPIC_API_KEY`) plus the values of every connector enabled in Step 5.
+   Have the user run `! gh secret set <NAME> --env automation` for each, so
+   values never pass through you. For Drive, `GOOGLE_SERVICE_ACCOUNT_JSON` is the
+   key file's contents:
+   `gh secret set GOOGLE_SERVICE_ACCOUNT_JSON --env automation < service-account.json`.
+4. Push, then `gh workflow run pipeline-update.yml` and `gh run watch`. On green,
+   `git pull` and show the run's summary.
+
+Close by telling the user the world now advances every Sunday at 19:00 UTC, and
+that `/pipeline-update` still runs a week by hand. If they declined automation,
+print the manual routine instead:
 
 ```
 npm run pipeline → fill requests → npm run apply -- --ingest --reconcile → npm run lint → commit

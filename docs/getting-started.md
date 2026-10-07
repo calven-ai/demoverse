@@ -152,7 +152,7 @@ Commit the increment:
 git add -A && git commit -m "first increment"
 ```
 
-That's the whole loop. Run `npm run pipeline` again next week and the world keeps living. Deals accumulate their history across runs, exactly as real ones do. The weekly routine, steering knobs, and maintenance commands are in [operations.md](operations.md).
+That's the whole loop, and from here it can run itself: push the repo to a private GitHub repository and the bundled workflow advances the world every Sunday, with no one at the keyboard ([automation.md](automation.md)). Or run `npm run pipeline` again by hand whenever you want the week to move. Either way deals accumulate their history across runs, exactly as real ones do. The weekly routine, steering knobs, and maintenance commands are in [operations.md](operations.md).
 
 ## Connect systems later
 

@@ -32,6 +32,11 @@ any agent tool (Claude Code, Codex, Cursor, Copilot, …). Three parts:
 
 ### The generation-request protocol (the core loop)
 
+By default this loop runs unattended: `.github/workflows/pipeline-update.yml`
+runs steps 1-4 weekly through Claude Code, then reconciles and commits itself
+(see `docs/automation.md`). Run it by hand for an extra week, a nudge, or a
+repo without Actions.
+
 1. **Plan.** Run `npm run pipeline` for one living increment on demand (it
    equals `npm run apply -- --weeks=1`). Plain `npm run apply` generates only the
    periods the real calendar has produced, and `-- --backfill` covers the first
@@ -201,10 +206,18 @@ real call** before declaring success (Salesforce: a scoped
 Drive/Slack: reconcile and confirm the file/post appears). Remind the user:
 isolated, dedicated orgs and workspaces only.
 
-**Step 6 · Wrap.** Commit everything
-(`git commit -m "demoverse: initial world for <Company>"`), and print the
-weekly routine: `npm run pipeline` → fill → `npm run apply -- --ingest
---reconcile` → `npm run lint` → commit.
+**Step 6 · Commit.**
+`git add -A && git commit -m "demoverse: initial world for <Company>"`.
+
+**Step 7 · Automate (recommended).** Offer to make the weekly run hands-off
+per `docs/automation.md`: push to a **private** GitHub repo, create the
+`automation` environment restricted to `main`, and set a Claude credential plus
+each enabled connector's values as environment secrets. The user enters secret
+values themselves (`gh secret set <NAME> --env automation` prompts for them);
+never echo or store them. Verify with one manual run
+(`gh workflow run pipeline-update.yml`, then `gh run watch`) and `git pull`.
+If the user declines, print the manual routine instead: `npm run pipeline` →
+fill → `npm run apply -- --ingest --reconcile` → `npm run lint` → commit.
 
 ---
 
