@@ -18,7 +18,7 @@ import { testConfig } from "./fixture.js";
 import { emptyWorld, Ledger } from "../src/ledger/ledger.js";
 import { World, type Artifact } from "../src/ledger/schema.js";
 import { buildReps } from "../src/sales-team.js";
-import { seedTrendsFromConfig, loadTrends } from "../src/trends.js";
+import { seedTrendsFromConfig, loadTrends, curveAt, voiceFor } from "../src/trends.js";
 import { advanceWorld, backfillTouchpoints } from "../src/generation/advance.js";
 import { checkinDate, postSaleCalls } from "../src/generation/touchpoints.js";
 import { CohortIndex, COHORT_PATH, type Cohort } from "../src/cohort.js";
@@ -951,4 +951,66 @@ test("backfill plants each post-sale call once, even on an already-backfilled de
   assert.equal(postSale().length, expected);
   const again = backfillTouchpoints(w, cfg, "opp-001", horizon, new CohortIndex(EMPTY_COHORT));
   assert.equal(again.plannedArtifactIds.length, 0, "post-sale calls are idempotent");
+});
+
+test("curveAt interpolates between dated points and is flat outside them", () => {
+  const pts: [string, number][] = [
+    ["2025-01-01", 0],
+    ["2025-01-11", 1],
+  ];
+  assert.equal(curveAt([], "2025-01-05"), undefined);
+  assert.equal(curveAt(pts, "2024-12-01"), 0);
+  assert.equal(curveAt(pts, "2025-01-06"), 0.5);
+  assert.equal(curveAt(pts, "2026-01-01"), 1);
+});
+
+test("voice arcs: deterministic, category-filtered, capped, and absent without arcs", () => {
+  const trends = seedTrendsFromConfig(cfg, "2025-06-23");
+  assert.equal(trends.voice.arcs.length, 0, "trends start with no voice arcs");
+  const arc = (label: string, category: "pain" | "gain"): (typeof trends.voice.arcs)[number] => ({
+    label,
+    category,
+    says: `we keep hitting ${label}`,
+    points: [["2025-01-01", 1]],
+  });
+  trends.voice.arcs = [
+    arc("a", "pain"),
+    arc("b", "pain"),
+    arc("c", "pain"),
+    arc("d", "pain"),
+    arc("e", "gain"),
+  ];
+  const first = voiceFor(trends, "2025-07-01", "k", ["pain"]);
+  assert.deepEqual(voiceFor(trends, "2025-07-01", "k", ["pain"]), first, "same key, same pick");
+  assert.equal(first.arcs.length, trends.voice.maxArcsPerArtifact, "weight 1 arcs fill the cap");
+  assert.ok(
+    first.arcs.every((a) => a.category === "pain"),
+    "only the requested categories",
+  );
+
+  const w = oneDealWorld();
+  w.artifacts.push({
+    id: "art-voice",
+    kind: "call_transcript",
+    dealId: "opp-001",
+    title: "discovery call",
+    detailLevel: "medium",
+    date: "2025-07-01",
+    grounding: { stage: "Discovery" },
+    status: "planned",
+    external: {},
+  });
+  const art = w.artifacts.at(-1)!;
+  const base = { config: cfg, ledger: new Ledger(w), seed: w.seed };
+  assert.ok(!buildRequest(base, art).prompt.includes("CUSTOMER VOICE"), "no trends, no voice block");
+  assert.ok(
+    !buildRequest({ ...base, trends: seedTrendsFromConfig(cfg, "2025-06-23") }, art).prompt.includes(
+      "CUSTOMER VOICE",
+    ),
+    "no arcs, no voice block",
+  );
+  assert.ok(
+    buildRequest({ ...base, trends }, art).prompt.includes("CUSTOMER VOICE"),
+    "a weight-1 arc is voiced",
+  );
 });

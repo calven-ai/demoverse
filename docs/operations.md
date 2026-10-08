@@ -93,7 +93,21 @@ Some direction changes durably: "from now on, win rate climbs". That's a **Tier-
    "winRate": { "baseline": 0.48, "trendPerQuarter": 0.04 }
    ```
 
-The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward: data already written stays, only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
+The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`; what buyers talk about over time → `voice.arcs` and `voice.gainShare`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward: data already written stays, only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
+
+A voice arc is a theme with a dated weight curve. A call, survey or interview dated where the weight is high is likely to have the buyer say it, in their own words and quotably, so a theme dashboard sees it rise and fade. `gainShare` steers the balance of gains (what works, what they expect) against pains over time. Post-sale calls voice `gain` and `job` arcs; pre-sale calls voice `pain`, `buying_trigger` and `job`.
+
+```jsonc
+"voice": {
+  "arcs": [
+    { "label": "AI search answers", "category": "pain",
+      "says": "Buyers ask an AI assistant before they ever talk to us.",
+      "points": [["2025-01-01", 0.1], ["2025-09-01", 0.8]] }
+  ],
+  "gainShare": [["2025-01-01", 0.3], ["2025-09-01", 0.5]],
+  "maxArcsPerArtifact": 3
+}
+```
 
 ## Lint triage
 

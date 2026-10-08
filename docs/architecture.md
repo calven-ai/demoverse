@@ -75,7 +75,7 @@ A routine week takes **zero input**. You set direction occasionally, and the eng
 | 2 · Active directives | `state/directives.md` → materialized in `state/trends.json` | ~quarterly | Durable trajectory changes that persist until amended |
 | 3 · Per-run nudge | `apply -- --nudge="…"` | one-off | A single period's twist; not remembered |
 
-`state/trends.json` is the load-bearing middle: the live trajectories the engine samples from (win-rate baseline and per-quarter trend, per-competitor strength and drift, intake volume), plus a `directiveEffects` log tying each value back to the directive that set it. `directives.md` holds the human-readable intent; `trends.json` is its auditable materialization. Before applying any Tier-2 or Tier-3 instruction, the engine echoes back how it resolved it. Worked example: [operations.md](operations.md#changing-the-story).
+`state/trends.json` is the load-bearing middle: the live trajectories the engine samples from (win-rate baseline and per-quarter trend, per-competitor strength and drift, intake volume, and the customer-voice arcs: themes buyers talk about, with dated weights), plus a `directiveEffects` log tying each value back to the directive that set it. `directives.md` holds the human-readable intent; `trends.json` is its auditable materialization. Before applying any Tier-2 or Tier-3 instruction, the engine echoes back how it resolved it. Worked example: [operations.md](operations.md#changing-the-story).
 
 ## Verification: the coherence linter
 

@@ -118,6 +118,9 @@ because regenerating would duplicate them.
   - "ramp velocity" → raise `volume.newOppsPerWeek`; note it in `directiveEffects`.
   - "Competitor A is getting tougher" → set
     `competitors.<name>.driftPerQuarter` positive; drop the `winRate` trend.
+  - "buyers are starting to talk about X" → add a `voice.arcs` entry
+    (`label`, `category` pain|job|buying_trigger|gain, `says`, dated
+    `[date, weight]` points); `voice.gainShare` steers gains vs pains.
   Amending = move the entry to `## Superseded` and adjust from that date forward.
 
 ### Ergonomics you can rely on

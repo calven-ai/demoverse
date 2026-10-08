@@ -24,6 +24,7 @@ import { z } from "zod";
 import { repoPath, readJson, writeJson, fileExists } from "./util/fs.js";
 import { daysBetween, DAYS_PER_QUARTER, type ISODate } from "./util/date.js";
 import type { Config } from "./config/schema.js";
+import { Rng } from "./util/rng.js";
 
 const TRENDS_PATH = repoPath("state", "trends.json");
 
@@ -82,6 +83,34 @@ export const TrendsSchema = z.object({
       pmmAbsentRate: z.number().min(0).max(1),
     })
     .optional(),
+  /**
+   * Customer-voice trajectories: what buyers TALK about, over time. Without
+   * these every pain/trigger/job is drawn from a static bank, so a theme
+   * dashboard sees noise instead of something rising or fading.
+   *   - arcs: a theme with a dated weight curve (piecewise-linear points); an
+   *     artifact dated where the weight is high is likely to voice it
+   *   - gainShare: target share of the buyer's statements that are gains
+   *     (what works, what they expect to get) vs pains, over time
+   */
+  voice: z
+    .object({
+      arcs: z
+        .array(
+          z.object({
+            label: z.string(),
+            category: z.enum(["pain", "job", "buying_trigger", "gain"]),
+            /** How a buyer would actually say it: the quotable kernel. */
+            says: z.string(),
+            /** [ISO date, weight 0..1] points; linear between, flat outside. */
+            points: z.array(z.tuple([z.string(), z.number().min(0).max(1)])).min(1),
+          }),
+        )
+        .default([]),
+      gainShare: z.array(z.tuple([z.string(), z.number().min(0).max(1)])).default([]),
+      /** Cap on arcs voiced in one artifact, so a call never reads like a checklist. */
+      maxArcsPerArtifact: z.number().int().min(1).default(3),
+    })
+    .prefault({}),
   /** Append-only audit of how each Tier-2/3 directive was materialized here. */
   directiveEffects: z
     .array(
@@ -224,4 +253,45 @@ export function evaluateTrends(
     marketIntelShare,
     pmmAbsentRate,
   };
+}
+
+/** Piecewise-linear value of dated [date, value] points at `date` (flat outside). */
+export function curveAt(points: [string, number][], date: ISODate): number | undefined {
+  if (!points.length) return undefined;
+  const sorted = [...points].sort((a, b) => a[0].localeCompare(b[0]));
+  if (date <= sorted[0]![0]) return sorted[0]![1];
+  for (let i = 1; i < sorted.length; i++) {
+    const [d1, v1] = sorted[i]!;
+    if (date <= d1) {
+      const [d0, v0] = sorted[i - 1]!;
+      const span = daysBetween(d0, d1);
+      return span <= 0 ? v1 : v0 + ((v1 - v0) * daysBetween(d0, date)) / span;
+    }
+  }
+  return sorted[sorted.length - 1]![1];
+}
+
+export type VoiceArc = Trends["voice"]["arcs"][number];
+
+/**
+ * The customer-voice themes one artifact should carry: each arc is included
+ * with probability = its weight at `date` (stable per `key`), strongest first,
+ * capped. `categories` restricts which kinds fit the artifact (a check-in call
+ * voices gains, not buying triggers).
+ */
+export function voiceFor(
+  trends: Trends,
+  date: ISODate,
+  key: string,
+  categories: VoiceArc["category"][],
+): { arcs: VoiceArc[]; gainShare?: number } {
+  const rng = new Rng(`voice|${key}`);
+  const picked = trends.voice.arcs
+    .filter((a) => categories.includes(a.category))
+    .map((a) => ({ a, w: curveAt(a.points, date) ?? 0 }))
+    .filter(({ w }) => rng.chance(w))
+    .sort((x, y) => y.w - x.w)
+    .slice(0, trends.voice.maxArcsPerArtifact)
+    .map(({ a }) => a);
+  return { arcs: picked, gainShare: curveAt(trends.voice.gainShare, date) };
 }

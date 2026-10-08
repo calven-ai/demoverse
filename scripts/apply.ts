@@ -266,7 +266,7 @@ async function main(): Promise<void> {
       return;
     }
     saveWorld(world);
-    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed };
+    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed, trends };
     const dir = emitRequests(clock.periodIndex, [buildRequest(ctx, art)]);
     console.log(`✓ ${refillId} reset to planned; prompt re-emitted → ${dir.replace(repoPath() + "/", "")}/`);
     console.log(
@@ -289,7 +289,7 @@ async function main(): Promise<void> {
   // --- Phase 2: ingest filled results --------------------------------------
   if (ingest) {
     const planned = world.artifacts.filter((a) => a.status === "planned" && (!oppId || a.dealId === oppId));
-    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed };
+    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed, trends };
     const requests = planned.map((a) => buildRequest(ctx, a));
     const report = ingestResults(world, cfg, clock.periodIndex, requests);
     console.log(
@@ -336,7 +336,7 @@ async function main(): Promise<void> {
   // Retroactively plants the full sales-cycle touch-point set on deals that were
   // already advanced/closed (the live engine only plants them going forward).
   if (backfillTp) {
-    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed };
+    const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed, trends };
     if (dryRun) {
       const clone = structuredClone(world);
       const { plannedArtifactIds } = backfillTouchpoints(clone, cfg, oppId, clock.simNow);
@@ -456,7 +456,7 @@ async function main(): Promise<void> {
   // `--ingest` still files any of them that get filled.
   const plantedThisRun = new Set(result.plannedArtifactIds);
   const emitting = world.artifacts.filter((a) => a.status === "planned" && plantedThisRun.has(a.id));
-  const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed };
+  const ctx = { config: cfg, ledger: new Ledger(world), seed: world.seed, trends };
   const requests = emitting.map((a) => buildRequest(ctx, a));
   const dir = emitRequests(clock.periodIndex, requests);
   const backlog = world.artifacts.filter((a) => a.status === "planned" && !plantedThisRun.has(a.id)).length;

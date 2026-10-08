@@ -23,6 +23,10 @@ All notable changes to this project are documented here. The format follows
   `artifacts.customer_checkin` / `customer_review`, with attendees in
   `personas.yaml` and briefs in `prose.yaml` `stage_focus`). They carry the
   gains that pre-sale calls lack.
+- Customer-voice arcs in `state/trends.json` (`voice.arcs`, `voice.gainShare`):
+  dated themes that calls, surveys and interviews voice in proportion to their
+  weight at the artifact's date, so a theme rises and fades across the corpus.
+  Empty by default, which leaves prompts unchanged.
 
 ### Changed
 - `AGENTS.md` is the one instruction file: `CLAUDE.md` is gone, because Claude
