@@ -27,6 +27,10 @@ All notable changes to this project are documented here. The format follows
   dated themes that calls, surveys and interviews voice in proportion to their
   weight at the artifact's date, so a theme rises and fades across the corpus.
   Empty by default, which leaves prompts unchanged.
+- `cohort:select --shape-trend`: adds decided deals to the cohort so its
+  monthly competitive win rate follows a line between the trends' targets
+  (`--from`, `--to`, `--months`, `--max-add`, `--min-n`). Membership only,
+  never outcomes; additive; dry-run with `--dry-run`.
 
 ### Changed
 - `AGENTS.md` is the one instruction file: `CLAUDE.md` is gone, because Claude

@@ -22,6 +22,8 @@
  *   npm run cohort:select                 # 50 deals, ~62% win rate
  *   npm run cohort:select -- --size=50 --open=5
  *   npm run cohort:select -- --dry-run    # print the pick, write nothing
+ *   npm run cohort:select -- --shape-trend --dry-run   # add deals so the monthly
+ *                                         # competitive win rate climbs (below)
  */
 
 import { loadWorld } from "../src/ledger/ledger.js";
@@ -102,6 +104,90 @@ function fillBySpread(
 
 function emptySeen(): Record<string, Map<string, number>> {
   return { competitor: new Map(), tier: new Map(), size: new Map(), quarter: new Map() };
+}
+
+if (process.argv.includes("--shape-trend")) {
+  shapeTrend();
+  process.exit(0);
+}
+
+/**
+ * `--shape-trend`: add decided competitive deals from the ledger so the
+ * cohort's MONTHLY competitive win rate (wins / decided deals with a named
+ * competitor, by close month) climbs along a straight line from `--from` to
+ * `--to` over the trailing `--months`. A dashboard that plots each month raw
+ * swings wildly on a handful of deals; only membership is steered here, never
+ * an outcome. Additive only: existing members are never dropped. `--from` and
+ * `--to` default to the trends' win-rate target at the first and last month.
+ */
+function shapeTrend(): void {
+  const months = Number(arg("months") ?? 12);
+  const minN = Number(arg("min-n") ?? 4);
+  const maxAdd = Number(arg("max-add") ?? 4);
+  const cohort = loadCohort();
+  const inCohort = new Set(cohort.members.map((m) => m.oppId));
+  const clock = loadClock();
+  const end = clock.simNow.slice(0, 7);
+  const [ey, em] = end.split("-").map(Number) as [number, number];
+  const monthKeys: string[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(ey, em - 1 - i, 1));
+    monthKeys.push(d.toISOString().slice(0, 7));
+  }
+  const trends = loadTrends();
+  const targetAt = (mk: string): number =>
+    evaluateTrends(trends, cfg, clock.startDate, `${mk}-01`).winRateTarget;
+  const from = Number(arg("from") ?? targetAt(monthKeys[0]!));
+  const to = Number(arg("to") ?? targetAt(monthKeys.at(-1)!));
+  const decidedCompetitive = world.opportunities.filter(
+    (o) => (o.status === "won" || o.status === "lost") && o.competitors.length > 0 && o.closeDate,
+  );
+  const picked: Opportunity[] = [];
+  console.log(
+    `Trend shaping: ${monthKeys[0]} to ${end}, ${(from * 100).toFixed(0)}% -> ${(to * 100).toFixed(0)}%\n`,
+  );
+  console.log("  month    target  before        after         add");
+  monthKeys.forEach((mk, i) => {
+    const target = months > 1 ? from + ((to - from) * i) / (months - 1) : to;
+    const inMonth = decidedCompetitive.filter((o) => o.closeDate!.startsWith(mk));
+    const W = inMonth.filter((o) => inCohort.has(o.id) && o.status === "won").length;
+    const L = inMonth.filter((o) => inCohort.has(o.id) && o.status === "lost").length;
+    const pool = (s: string) =>
+      inMonth.filter((o) => !inCohort.has(o.id) && o.status === s).sort((a, b) => a.id.localeCompare(b.id));
+    const aw = pool("won");
+    const al = pool("lost");
+    // Brute-force the (wins, losses) to add: closest to target, then fewest added.
+    let best = { a: 0, b: 0, cost: Infinity };
+    for (let a = 0; a <= Math.min(aw.length, maxAdd); a++) {
+      for (let b = 0; b <= Math.min(al.length, maxAdd - a); b++) {
+        const n = W + L + a + b;
+        if (n === 0) continue;
+        const miss = Math.abs((W + a) / n - target);
+        const cost = miss + 0.02 * (a + b) + (n < minN ? 0.1 * (minN - n) : 0);
+        if (cost < best.cost) best = { a, b, cost };
+      }
+    }
+    const seen = emptySeen();
+    const add = [...fillBySpread(aw, best.a, seen), ...fillBySpread(al, best.b, seen)];
+    picked.push(...add);
+    const fmt = (w: number, l: number) =>
+      `${w}/${w + l} ${w + l ? ((100 * w) / (w + l)).toFixed(0).padStart(3) : "  -"}%`.padEnd(13);
+    console.log(
+      `  ${mk}  ${(target * 100).toFixed(0).padStart(4)}%  ${fmt(W, L)} ${fmt(W + best.a, L + best.b)} +${best.a}W +${best.b}L`,
+    );
+  });
+  console.log(`\n  ${picked.length} deals to add: ${picked.map((o) => o.id).join(" ")}`);
+  if (dryRun) {
+    console.log("\n[dry-run] nothing written.");
+    return;
+  }
+  const added = enroll(
+    cohort,
+    picked.map((o) => ({ oppId: o.id, accountName: acctOf(o).name, source: "seed" as const })),
+    todayISO(),
+  );
+  saveCohort(cohort);
+  console.log(`\nstate/cohort.json: ${cohort.members.length} members (${added} newly enrolled).`);
 }
 
 // --- seed: everything already filled ---------------------------------------

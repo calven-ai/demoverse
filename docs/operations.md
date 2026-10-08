@@ -66,6 +66,7 @@ Only deals in `state/cohort.json` ever reach external systems: a curated ~50-dea
 npm run cohort                          # status table + regenerate the summary
 npm run cohort -- --pending             # members still needing generation
 npm run cohort:select                   # (re)pick membership, deterministic
+npm run cohort:select -- --shape-trend --dry-run   # add deals so the monthly win rate climbs
 npm run cohort:prune-slack              # drop unfilled Slack artifacts from seed members
 npm run cohort:prune-winloss            # report win-loss coverage across the cohort
 npm run sf:purge -- --noncohort         # shrink the CRM org to the cohort (dry-run by default)
@@ -74,6 +75,7 @@ npm run sf:purge -- --noncohort         # shrink the CRM org to the cohort (dry-
 Two mix rules are worth checking after any bulk generation, because config is not self-evidently correct and the mix it produces is the check:
 
 - **Win-loss scarcity.** Roughly one closed deal in three carries a survey or interview (`world.yaml` `winloss.mode_mix`, `none` ≈ 0.67). If most of your cohort's closed deals have one, fix the config before generating prose. A world where every close gets a debrief reads as generated, and absence stops meaning anything.
+- **Shaping the monthly trend.** A dashboard that plots the cohort's competitive win rate month by month swings wildly on a handful of deals. `--shape-trend` adds decided deals from the ledger so each of the trailing `--months` (default 12) lands near a straight line from `--from` to `--to`, which default to your trends' win-rate target at each end. It steers membership only, never an outcome, and only adds members. The added deals enroll as `seed`, so run `/backfill-opps` for them afterwards.
 - **Slack is weekly-members-only.** Seed-sourced cohort members never get Slack artifacts ([why](connectors/slack.md#the-weekly-members-only-rule)).
 
 ## Changing the story
