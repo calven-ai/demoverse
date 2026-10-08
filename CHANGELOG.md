@@ -26,6 +26,13 @@ All notable changes to this project are documented here. The format follows
 - `apply -- --ingest --reconcile` exits non-zero when any connector reports an
   error, so unattended runs fail visibly.
 
+### Fixed
+- Rep Slack handles fold accents ("José Núñez" is `jose.nunez`, was
+  `jos.n.ez`). Handles stored the old way still resolve; run
+  `npm run repair:slack-identities -- --confirm` to rewrite them, and rename
+  any accented handle under `rep_personas` in `config/slack-personas.yaml` so
+  its avatar keeps binding.
+
 ## [0.1.0] - 2026-08-14
 
 First public release.

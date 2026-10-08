@@ -14,6 +14,7 @@ import type { Artifact, Opportunity } from "../ledger/schema.js";
 import type { GenerationRequest } from "./requests.js";
 import { varietyBlock, artifactShape, castSubset, bannedPhrasesRule } from "./variety.js";
 import { useCaseBrief } from "../use-cases.js";
+import { handleFor } from "./ingest.js";
 
 interface Ctx {
   config: Config;
@@ -463,7 +464,7 @@ function internalRoster(ctx: Ctx): string[] {
  */
 function personaRoster(ctx: Ctx, deal: Opportunity, artifact: Artifact): string {
   const rep = ctx.ledger.rep(deal.ownerRepId);
-  const repHandle = rep.name.toLowerCase().replace(/[^a-z]+/g, ".");
+  const repHandle = handleFor(rep.name);
   const repVoice = ctx.config.slackPersonas.rep_personas.find((p) => p.handle === repHandle)?.voice;
   const cast = castSubset(ctx.seed, artifact.id, ctx.config.slackPersonas.internal_personas, 2, 3);
   return [

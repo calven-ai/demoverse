@@ -100,7 +100,7 @@ Do steps 1 to 5 first; the app stays as the fallback poster and owns channel loo
    SLACK_USER_TOKENS={"taylor.ceo":"xoxp-...","priya.se":"xoxp-..."}
    ```
 
-   One variable per handle also works and wins over the map: `priya.se` → `SLACK_USER_TOKEN_PRIYA_SE`. For scheduled runs, add the same JSON as the `SLACK_USER_TOKENS` secret ([automation](../automation.md)).
+   One variable per handle also works and wins over the map: `priya.se` → `SLACK_USER_TOKEN_PRIYA_SE`. A deal-owning rep's handle is derived from the name with accents folded, so "José Núñez" is `jose.nunez`. For scheduled runs, add the same JSON as the `SLACK_USER_TOKENS` secret ([automation](../automation.md)).
 5. **Move what is already posted** (optional). Slack can't change who posted a message, so existing threads are deleted and re-posted, at today's timestamp:
 
    ```bash

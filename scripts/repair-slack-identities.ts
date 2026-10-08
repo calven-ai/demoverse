@@ -23,7 +23,7 @@
 
 import { loadWorld, saveWorld } from "../src/ledger/ledger.js";
 import { loadConfig } from "../src/config/load.js";
-import { personaResolver, normalizeHandle } from "../src/generation/ingest.js";
+import { personaResolver } from "../src/generation/ingest.js";
 import { SlackClient } from "../src/connectors/slack/client.js";
 import { hasEnv } from "../src/util/env.js";
 import { SLACK_KINDS } from "../src/connectors/kinds.js";
@@ -38,6 +38,7 @@ async function main(): Promise<void> {
 
   const stale: { artifactId: string; posted: boolean; changes: string[] }[] = [];
   const unresolved = new Set<string>();
+  let renamed = 0;
 
   for (const artifact of world.artifacts) {
     if (!SLACK_KINDS.includes(artifact.kind) || !artifact.messages?.length) continue;
@@ -48,10 +49,23 @@ async function main(): Promise<void> {
         unresolved.add(msg.personaHandle);
         continue; // not on the roster, so not repairable here; reported below
       }
-      if (msg.personaDisplay === persona.display && msg.avatar === persona.avatar) continue;
+      if (
+        msg.personaHandle === persona.handle &&
+        msg.personaDisplay === persona.display &&
+        msg.avatar === persona.avatar
+      )
+        continue;
+      if (msg.personaHandle !== persona.handle) {
+        // Handle-only rename: the posted copy still looks right, so it needs no re-post.
+        if (confirm) msg.personaHandle = persona.handle;
+        if (msg.personaDisplay === persona.display && msg.avatar === persona.avatar) {
+          renamed++;
+          continue;
+        }
+      }
       changes.push(`${msg.personaHandle} -> ${persona.display}${persona.avatar ? " +avatar" : ""}`);
       if (confirm) {
-        msg.personaHandle = normalizeHandle(msg.personaHandle);
+        msg.personaHandle = persona.handle;
         msg.personaDisplay = persona.display;
         msg.avatar = persona.avatar;
       }
@@ -72,6 +86,9 @@ async function main(): Promise<void> {
     console.log(`\n! handle(s) not on the roster, left as-is: ${[...unresolved].join(", ")}`);
   }
 
+  if (renamed > 0) {
+    console.log(`${confirm ? "renamed" : "would rename"} ${renamed} message handle(s) to the canonical form`);
+  }
   const postedCount = stale.filter((s) => s.posted).length;
   console.log(
     `\n${confirm ? "repaired" : "would repair"} ${stale.length} artifact(s); ${postedCount} already posted to Slack`,

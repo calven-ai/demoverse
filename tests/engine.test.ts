@@ -22,7 +22,7 @@ import { seedTrendsFromConfig, loadTrends } from "../src/trends.js";
 import { advanceWorld, backfillTouchpoints } from "../src/generation/advance.js";
 import { CohortIndex, COHORT_PATH, type Cohort } from "../src/cohort.js";
 import { buildRequest } from "../src/generation/prompts.js";
-import { ingestResults } from "../src/generation/ingest.js";
+import { ingestResults, handleFor, personaResolver } from "../src/generation/ingest.js";
 import { scoreIcp } from "../src/icp.js";
 import { lint } from "../src/lint.js";
 import { Rng } from "../src/util/rng.js";
@@ -898,4 +898,13 @@ test("Rng is seed-stable and weighted() respects weights", () => {
   let dominant = 0;
   for (let i = 0; i < 200; i++) if (rng.weighted({ a: 99, b: 1 }) === "a") dominant++;
   assert.ok(dominant > 180, `expected ~99% 'a', got ${dominant}/200`);
+});
+
+test("rep handles fold accents, and the pre-fold handle still resolves", () => {
+  assert.equal(handleFor("José Núñez"), "jose.nunez");
+  const w = oneDealWorld();
+  w.reps[0]!.name = "José Núñez";
+  const resolve = personaResolver(w, cfg);
+  assert.equal(resolve("jose.nunez")?.handle, "jose.nunez");
+  assert.equal(resolve("jos.n.ez")?.handle, "jose.nunez", "legacy handle maps to the folded one");
 });
