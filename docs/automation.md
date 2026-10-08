@@ -26,6 +26,7 @@ A run takes about 5 minutes. To run by hand instead, or to add knobs such as `--
 | `GOOGLE_SERVICE_ACCOUNT_JSON`                                     | for Drive        | the whole contents of `service-account.json` ([guide](connectors/google-drive.md)) |
 | `DRIVE_ROOT_FOLDER_ID`                                            | for Drive        | as in `.env`                                                                       |
 | `SLACK_BOT_TOKEN`                                                 | for Slack        | as in `.env` ([guide](connectors/slack.md))                                        |
+| `SLACK_USER_TOKENS`                                               | optional, Slack  | as in `.env`, only for [persona accounts](connectors/slack.md#option-b-persona-accounts) |
 
 A connector also has to be `enabled: true` in `config/connectors.yaml`. A connector with no secrets is skipped, as it is locally. HubSpot is not part of the weekly push. It is driven by `npm run hubspot:*` ([guide](connectors/hubspot.md)).
 

@@ -107,8 +107,9 @@ async function main(): Promise<void> {
     // Delete replies before the thread root: deleting a parent orphans its replies.
     for (const msg of [...artifact.messages!].reverse()) {
       if (!msg.ts) continue;
-      await client.deleteMessage(channelId, msg.ts);
+      await client.deleteMessage(channelId, msg.ts, msg.postedAsUser ? msg.personaHandle : undefined);
       delete msg.ts;
+      delete msg.postedAsUser;
       deleted++;
     }
     delete artifact.external.slackThreadTs;

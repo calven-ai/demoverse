@@ -1,7 +1,8 @@
 /**
  * Reconcile Slack artifacts (deal threads, win-loss post-mortems, competitive
  * questions) into the dedicated workspace. Each persona message is posted under
- * its own username; the root thread ts and per-message ts are recorded so
+ * its own username, or as the persona's own member when it has a user token
+ * (client.ts); the root thread ts and per-message ts are recorded so
  * re-runs update messages in place rather than duplicating threads.
  */
 
@@ -75,15 +76,17 @@ export async function reconcileSlack(
 
       for (const [i, msg] of artifact.messages!.entries()) {
         if (msg.ts) {
-          await client.update(channelId, msg.ts, msg.text);
+          await client.update(channelId, msg.ts, msg.text, msg.postedAsUser ? msg.personaHandle : undefined);
           stats.updated++;
         } else {
           const ts = await client.post(channelId, msg.text, {
             username: msg.personaDisplay,
             avatar: msg.avatar,
             threadTs: i === 0 ? undefined : threadTs,
+            handle: msg.personaHandle,
           });
           msg.ts = ts;
+          if (client.postsAsUser(msg.personaHandle)) msg.postedAsUser = true;
           if (i === 0) threadTs = ts; // first message roots the thread
           stats.created++;
         }

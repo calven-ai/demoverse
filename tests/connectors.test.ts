@@ -76,3 +76,27 @@ test("disabledStats carries the system name and skip note", () => {
   assert.equal(s.disabled, true);
   assert.match(s.note ?? "", /disabled/);
 });
+
+test("slack user-token env keys derive from persona handles", async () => {
+  const { userTokenEnvKey, SlackClient } = await import("../src/connectors/slack/client.js");
+  assert.equal(userTokenEnvKey("priya.se"), "SLACK_USER_TOKEN_PRIYA_SE");
+  assert.equal(userTokenEnvKey("taylor.ceo"), "SLACK_USER_TOKEN_TAYLOR_CEO");
+  const client = new SlackClient("xoxb-test", (h) => (h === "priya.se" ? "xoxp-test" : undefined));
+  assert.equal(client.postsAsUser("priya.se"), true);
+  assert.equal(client.postsAsUser("chris.sales"), false);
+  assert.equal(client.postsAsUser(undefined), false);
+});
+
+test("slack user tokens fall back to the SLACK_USER_TOKENS JSON map", async () => {
+  const { envUserToken } = await import("../src/connectors/slack/client.js");
+  process.env.SLACK_USER_TOKENS = JSON.stringify({ "priya.se": "xoxp-map" });
+  process.env.SLACK_USER_TOKEN_CHRIS_SALES = "xoxp-own";
+  try {
+    assert.equal(envUserToken("priya.se"), "xoxp-map");
+    assert.equal(envUserToken("chris.sales"), "xoxp-own");
+    assert.equal(envUserToken("omar.revops"), undefined);
+  } finally {
+    delete process.env.SLACK_USER_TOKENS;
+    delete process.env.SLACK_USER_TOKEN_CHRIS_SALES;
+  }
+});

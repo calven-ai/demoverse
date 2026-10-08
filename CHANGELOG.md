@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Slack persona accounts: a persona with a user token (`SLACK_USER_TOKENS`
+  JSON map, or `SLACK_USER_TOKEN_<HANDLE>`) posts as its own workspace member
+  instead of through the controller app, so Slack apps that ignore bot
+  messages can read the chatter. Mixes per persona; `npm run
+  slack:repost-as-users` moves already-posted threads. Both options are
+  compared in `docs/connectors/slack.md`.
 - Weekly GitHub Actions workflow (`.github/workflows/pipeline-update.yml`) that
   runs `/pipeline-update` headless every Sunday, pushes to the configured
   connectors and commits the result. It is now the default way a world

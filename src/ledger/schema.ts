@@ -190,6 +190,8 @@ export const SlackMessage = z.object({
   text: z.string(),
   /** Posted-message ts, set after reconcile. */
   ts: z.string().optional(),
+  /** Posted by the persona's own user token rather than the controller app. */
+  postedAsUser: z.boolean().optional(),
 });
 export type SlackMessage = z.infer<typeof SlackMessage>;
 

@@ -2,6 +2,20 @@
 
 Slack carries the world's internal chatter: deal threads, win-loss post-mortems, and competitive questions, posted by a roster of synthetic personas. This guide stands up a dedicated free workspace and the single "controller app" that posts as everyone. That app is the trick that makes an unlimited cast possible on a free plan.
 
+## Two ways to post
+
+| | **A. App only** (default) | **B. Persona accounts** |
+| --- | --- | --- |
+| Who posts | The controller app, under each persona's name and avatar | Each persona as a real member of the workspace |
+| Setup | One app, one token (steps 1 to 5) | A + one Slack member and one user token per persona ([steps](#option-b-persona-accounts)) |
+| Upkeep | Nothing per persona | A new persona needs a new member and token |
+| Looks like | Persona name + avatar with an "APP" badge | A normal message from a person |
+| Seen by a Slack app you are testing | **Only if it accepts messages from other apps** | Yes, like any user message |
+
+Pick **A** unless something has to *react* to the chatter. Messages posted by an app carry a `bot_id`, and many Slack apps (bots, assistants, ingestion integrations) drop every such message, @mentions included, mostly so they never loop by replying to themselves or to other bots. Slack delivers the message either way; whether it is ignored is the receiving app's choice, so check yours. If your app ignores bot messages, the persona chatter is invisible to it under A, and B is the fix.
+
+The two mix per persona: a persona with a user token posts as its member, every other persona keeps posting through the app. You can start with only the personas your app has to hear, for example the ones who ask in `#competitive`.
+
 > **Dedicated workspace only.** Create a brand-new free workspace for this. Never install the app into your company's real workspace, and don't invite real coworkers.
 
 ## 1. Create the workspace
@@ -71,7 +85,33 @@ The channel names here must match what you created in step 2. Then reconcile as 
 
 ## How personas work
 
-The free plan caps installed apps at 10 per workspace, so "one app per fake employee" can't scale. Instead, the single controller app holds `chat:write.customize` and posts **each message under a per-message display name and avatar**. The persona roster lives in `config/slack-personas.yaml` and reuses the same identities as the CRM: the rep who owns a deal is the same name discussing it in `#deals`. Display names carry the role in parentheses, as in "Jordan Reyes (Account Executive)". The one visible tradeoff is a small "APP" badge on every message, which is fine for data an analytics tool scans and acceptable for human demos.
+The free plan caps installed apps at 10 per workspace, so "one app per fake employee" can't scale. Instead, the single controller app holds `chat:write.customize` and posts **each message under a per-message display name and avatar**. The persona roster lives in `config/slack-personas.yaml` and reuses the same identities as the CRM: the rep who owns a deal is the same name discussing it in `#deals`. Display names carry the role in parentheses, as in "Jordan Reyes (Account Executive)". The one visible tradeoff is a small "APP" badge on every message, which is fine for data an analytics tool scans and acceptable for human demos. The less visible one: apps that ignore bot messages won't see these posts ([two ways to post](#two-ways-to-post)).
+
+## Option B: persona accounts
+
+Do steps 1 to 5 first; the app stays as the fallback poster and owns channel lookup.
+
+1. **Add user scopes.** On the app's **OAuth & Permissions** page, under **User Token Scopes**, add `chat:write` and `channels:write` (the second lets a persona join a channel on its first post).
+2. **Create one member per persona.** Invite a **full member** (not a guest) for each `handle` in `config/slack-personas.yaml` you want to move, plus each deal-owning rep whose deal threads should count. `+alias` addresses on one inbox keep it manageable (`you+priya@…`). In each profile set the full name and title to match the persona's `display` and role, and upload the avatar from its `avatar` URL. Add the member to `#deals`, `#win-loss` and `#competitive`.
+3. **Get each member's token.** Add the member under the app's **Collaborators**. Then, signed in to api.slack.com as that member (a private window helps), open the app → **Install to Workspace** → **Allow**, and copy the **User OAuth Token** (`xoxp-…`).
+4. **Hand the tokens to the engine** as one JSON map, keyed by persona handle, in `.env`:
+
+   ```bash
+   SLACK_USER_TOKENS={"taylor.ceo":"xoxp-...","priya.se":"xoxp-..."}
+   ```
+
+   One variable per handle also works and wins over the map: `priya.se` → `SLACK_USER_TOKEN_PRIYA_SE`. For scheduled runs, add the same JSON as the `SLACK_USER_TOKENS` secret ([automation](../automation.md)).
+5. **Move what is already posted** (optional). Slack can't change who posted a message, so existing threads are deleted and re-posted, at today's timestamp:
+
+   ```bash
+   npm run slack:repost-as-users                         # report: which threads, which personas still lack a token
+   npm run slack:repost-as-users -- --channel=#competitive --confirm   # delete + queue
+   npm run apply -- --reconcile                          # re-post as the members
+   ```
+
+A user-posted message shows the member's own profile, so the name and avatar come from Slack, not from `slack-personas.yaml`. The ledger records which messages were posted as users, so later edits and deletes go through the right token. A persona whose token is missing silently falls back to the app, so check the first run.
+
+## Content rules
 
 Two content rules the engine enforces at generation time:
 
@@ -91,5 +131,8 @@ Slack is the one destination with an extra gate beyond the cohort: only cohort m
 | `Slack channel #deals not found` | Create the channel; it must be public and not archived |
 | `channel_not_found` on join | The channel is private. Recreate it as public |
 | Every persona shows the same name | `chat:write.customize` is missing. Add it and reinstall |
+| The app you are testing ignores the persona posts | It drops messages posted by apps. Use [persona accounts](#option-b-persona-accounts) |
+| A persona still posts with the "APP" badge | No user token for that handle. `npm run slack:repost-as-users` lists them; the key is the exact `handle` |
+| `not_in_channel` for a persona | Add the member to the channel, or grant the `channels:write` user scope and reinstall as that member |
 
 Back to [getting started](../getting-started.md) · other connectors: [Salesforce](salesforce.md) · [Drive](google-drive.md) · [HubSpot](hubspot.md)

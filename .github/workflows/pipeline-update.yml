@@ -14,6 +14,8 @@ name: Weekly pipeline increment
 #   GOOGLE_SERVICE_ACCOUNT_JSON  the full contents of service-account.json
 #   DRIVE_ROOT_FOLDER_ID
 #   SLACK_BOT_TOKEN
+#   SLACK_USER_TOKENS            optional JSON {"handle":"xoxp-..."}; listed personas
+#                                post as their own Slack member, the rest via the bot
 #
 # A failed push is retried with "Run workflow" and `reconcile_only` checked,
 # which pushes without advancing another week.
@@ -136,6 +138,7 @@ jobs:
           SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
           DRIVE_ROOT_FOLDER_ID: ${{ secrets.DRIVE_ROOT_FOLDER_ID }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_USER_TOKENS: ${{ secrets.SLACK_USER_TOKENS }}
         run: |
           set -o pipefail
           if [ -f service-account.json ]; then export GOOGLE_APPLICATION_CREDENTIALS="$PWD/service-account.json"; fi
