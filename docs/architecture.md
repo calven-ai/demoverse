@@ -2,7 +2,7 @@
 
 Demoverse is built on one split, applied everywhere. A **deterministic TypeScript engine owns every fact**: accounts, contacts, deals, outcomes, dates, competitors, ids. The **coding agent owns only the prose**, written from prompts that carry the exact facts, so it can never invent one. This document covers the engine side of that line: the ledger, the clock, the generation protocol, the cohort, the steering model, and the verification layer.
 
-![The Demoverse loop: config and state feed the deterministic engine; the engine advances the pipeline and emits grounded generation requests; an agent fills the prose; the engine ingests, lints, and reconciles into the external systems, recording external ids back into the ledger.](assets/architecture-8bit.svg)
+![The Demoverse loop: company config and a target list seed the ledger; the weekly advance moves the pipeline and emits grounded prompts; an agent writes the prose; the engine ingests, lints, and reconciles it into the external systems, recording external ids back on the ledger.](assets/architecture-8bit.svg)
 
 ## The ledger is the source of truth
 
