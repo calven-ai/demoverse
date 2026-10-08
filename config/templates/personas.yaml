@@ -94,3 +94,5 @@ attendees_by_stage:
   Evaluation:  [Champion, User, Technical Buyer]
   Proposal:    [Champion, Economic Buyer, User]
   Negotiation: [Champion, Economic Buyer, Technical Buyer, Influencer, User]
+  Customer check-in: [Champion, User]
+  Customer review: [Champion, Economic Buyer, User]

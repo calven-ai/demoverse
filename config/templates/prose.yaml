@@ -127,6 +127,17 @@ stage_focus:
   Negotiation: |-
     A ~45–60 min late-stage call: objection handling, competitor head-to-head (raised by the buyer), the
     security review (IT joins for SSO/SAML, SOC 2, data handling), procurement/redlines, and final timeline.
+  Customer check-in: |-
+    A ~25–35 min post-sale check-in a few weeks after go-live, with the account's rep. The buyer is now a
+    customer: they talk about what is already working (concrete moments where the product helped: a deal,
+    a launch, a meeting where it paid off), what they get out of it versus before, who on their team has
+    adopted it, and one or two honest rough edges or asks. Mostly positive and specific, never a sales pitch.
+    No pricing. The competitor they evaluated comes up once, in passing, as the road not taken.
+  Customer review: |-
+    A ~30–45 min review call about three months after go-live, with the account's rep and the budget holder
+    joining. The customer walks through results so far: concrete wins, adoption across the team, time saved
+    versus the old approach, and what they want to roll out next. Clearly positive and specific, with one
+    small ask. Not a sales pitch, no pricing. The competitor they evaluated comes up once, in passing.
   default: |-
     A realistic sales call: the rep discovers needs, demos where relevant, and addresses the competitor(s) and any pricing/product reaction.
 

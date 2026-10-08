@@ -42,7 +42,7 @@ Three commands advance the world. `npm run pipeline` forces exactly one week. Pl
 | Per deal | 0–3 touch points, this stage only | every stage the deal actually reached |
 | When | the routine run, forever | once, to seed history |
 
-The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email; its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts. The backfill exists only to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, which reads as fake on sight.
+The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email; its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts. The backfill exists only to give historical deals their past. It also plants a won deal's post-sale check-in and review calls once their dates have passed, even on a deal that was backfilled before those calls existed. Confuse the two and you generate a full detail layer for a freshly-opened deal, which reads as fake on sight.
 
 The backfill loop, per opportunity (resume-safe, one deal at a time):
 

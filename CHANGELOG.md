@@ -18,11 +18,19 @@ All notable changes to this project are documented here. The format follows
   connectors and commits the result. It is now the default way a world
   advances; setup in `docs/automation.md`. A `reconcile_only` run retries a
   failed push without advancing.
+- Post-sale customer calls on won deals: a check-in 3 to 6 weeks after the
+  close and a review about 3 months after (`world.yaml`
+  `artifacts.customer_checkin` / `customer_review`, with attendees in
+  `personas.yaml` and briefs in `prose.yaml` `stage_focus`). They carry the
+  gains that pre-sale calls lack.
 
 ### Changed
 - `AGENTS.md` is the one instruction file: `CLAUDE.md` is gone, because Claude
   Code 2.1.277 and later read `AGENTS.md` directly. The skills table, the
   subagent rule and the bulk-backfill loop moved into its Part 3.
+- Post-sale calls are on by default (rates 0.9 and 0.8). Existing worlds start
+  earning them on the next run; set `rate: 0` to opt out. A missing
+  `stage_focus` entry for an enabled post-sale stage is now a config warning.
 - `apply -- --ingest --reconcile` exits non-zero when any connector reports an
   error, so unattended runs fail visibly.
 

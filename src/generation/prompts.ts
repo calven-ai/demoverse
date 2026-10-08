@@ -15,6 +15,7 @@ import type { GenerationRequest } from "./requests.js";
 import { varietyBlock, artifactShape, castSubset, bannedPhrasesRule } from "./variety.js";
 import { useCaseBrief } from "../use-cases.js";
 import { handleFor } from "./ingest.js";
+import { isPostSaleStage } from "./touchpoints.js";
 
 interface Ctx {
   config: Config;
@@ -203,7 +204,7 @@ function callTranscriptPrompt(ctx: Ctx, artifact: Artifact): string {
     ...contacts.map((c) => `  - ${c.name}, ${c.title} (${c.buyingRole})`),
   ].join("\n");
   return [
-    `Write a realistic ${stage} sales call transcript, dated ${artifact.date}.`,
+    `Write a realistic ${stage}${isPostSaleStage(ctx.config, stage) ? " customer" : " sales"} call transcript, dated ${artifact.date}.`,
     DETAIL_GUIDANCE[artifact.detailLevel],
     `Produce a FULL multi-turn conversation (many back-and-forth exchanges), not a summary or a handful of lines.`,
     "",

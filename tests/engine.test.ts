@@ -20,6 +20,7 @@ import { World, type Artifact } from "../src/ledger/schema.js";
 import { buildReps } from "../src/sales-team.js";
 import { seedTrendsFromConfig, loadTrends } from "../src/trends.js";
 import { advanceWorld, backfillTouchpoints } from "../src/generation/advance.js";
+import { checkinDate, postSaleCalls } from "../src/generation/touchpoints.js";
 import { CohortIndex, COHORT_PATH, type Cohort } from "../src/cohort.js";
 import { buildRequest } from "../src/generation/prompts.js";
 import { ingestResults, handleFor, personaResolver } from "../src/generation/ingest.js";
@@ -907,4 +908,47 @@ test("rep handles fold accents, and the pre-fold handle still resolves", () => {
   const resolve = personaResolver(w, cfg);
   assert.equal(resolve("jose.nunez")?.handle, "jose.nunez");
   assert.equal(resolve("jos.n.ez")?.handle, "jose.nunez", "legacy handle maps to the folded one");
+});
+
+test("post-sale call dates exist only for won deals, are stable, and stay inside after_days", () => {
+  const w = oneDealWorld();
+  const opp = w.opportunities[0]!;
+  const spec = cfg.world.artifacts.customer_checkin;
+  opp.status = "open";
+  assert.equal(checkinDate(cfg, w.seed, opp, spec), undefined, "open deals get no post-sale call");
+  opp.status = "won";
+  opp.closeDate = "2025-06-02";
+  // Scan seeds until the rate draw lands; the date must then be in range and repeatable.
+  let found = 0;
+  for (let i = 0; i < 20; i++) {
+    const d = checkinDate(cfg, `${w.seed}-${i}`, opp, spec);
+    if (!d) continue;
+    found++;
+    assert.equal(checkinDate(cfg, `${w.seed}-${i}`, opp, spec), d, "same seed, same date");
+    const days: number = (Date.parse(d) - Date.parse("2025-06-02")) / 86_400_000;
+    assert.ok(days >= spec.after_days[0] && days <= spec.after_days[1], `${days} days outside after_days`);
+  }
+  assert.ok(found > 0, "rate 0.9 should plant at least one check-in across 20 seeds");
+  assert.equal(postSaleCalls(cfg).length, 2, "the template enables both post-sale calls");
+});
+
+test("backfill plants each post-sale call once, even on an already-backfilled deal", () => {
+  const w = oneDealWorld();
+  const opp = w.opportunities[0]!;
+  opp.status = "won";
+  const horizon = "2026-12-31";
+  const postSale = (): Artifact[] =>
+    w.artifacts.filter(
+      (a) => a.kind === "call_transcript" && a.grounding.stage?.toString().startsWith("Customer"),
+    );
+  const expected = postSaleCalls(cfg).filter((s) => checkinDate(cfg, w.seed, opp, s)).length;
+
+  backfillTouchpoints(w, cfg, "opp-001", horizon, new CohortIndex(EMPTY_COHORT));
+  assert.equal(postSale().length, expected);
+  // Drop them and re-run: the deal is already backfilled, but post-sale calls still plant.
+  w.artifacts = w.artifacts.filter((a) => !postSale().includes(a));
+  backfillTouchpoints(w, cfg, "opp-001", horizon, new CohortIndex(EMPTY_COHORT));
+  assert.equal(postSale().length, expected);
+  const again = backfillTouchpoints(w, cfg, "opp-001", horizon, new CohortIndex(EMPTY_COHORT));
+  assert.equal(again.plannedArtifactIds.length, 0, "post-sale calls are idempotent");
 });
