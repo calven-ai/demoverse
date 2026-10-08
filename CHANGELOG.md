@@ -7,18 +7,47 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Slack persona accounts: a persona with a user token (`SLACK_USER_TOKENS`
+  JSON map, or `SLACK_USER_TOKEN_<HANDLE>`) posts as its own workspace member
+  instead of through the controller app, so Slack apps that ignore bot
+  messages can read the chatter. Mixes per persona; `npm run
+  slack:repost-as-users` moves already-posted threads. Both options are
+  compared in `docs/connectors/slack.md`.
 - Weekly GitHub Actions workflow (`.github/workflows/pipeline-update.yml`) that
   runs `/pipeline-update` headless every Sunday, pushes to the configured
   connectors and commits the result. It is now the default way a world
   advances; setup in `docs/automation.md`. A `reconcile_only` run retries a
   failed push without advancing.
+- Post-sale customer calls on won deals: a check-in 3 to 6 weeks after the
+  close and a review about 3 months after (`world.yaml`
+  `artifacts.customer_checkin` / `customer_review`, with attendees in
+  `personas.yaml` and briefs in `prose.yaml` `stage_focus`). They carry the
+  gains that pre-sale calls lack.
+- Customer-voice arcs in `state/trends.json` (`voice.arcs`, `voice.gainShare`):
+  dated themes that calls, surveys and interviews voice in proportion to their
+  weight at the artifact's date, so a theme rises and fades across the corpus.
+  Empty by default, which leaves prompts unchanged.
+- `cohort:select --shape-trend`: adds decided deals to the cohort so its
+  monthly competitive win rate follows a line between the trends' targets
+  (`--from`, `--to`, `--months`, `--max-add`, `--min-n`). Membership only,
+  never outcomes; additive; dry-run with `--dry-run`.
 
 ### Changed
 - `AGENTS.md` is the one instruction file: `CLAUDE.md` is gone, because Claude
   Code 2.1.277 and later read `AGENTS.md` directly. The skills table, the
   subagent rule and the bulk-backfill loop moved into its Part 3.
+- Post-sale calls are on by default (rates 0.9 and 0.8). Existing worlds start
+  earning them on the next run; set `rate: 0` to opt out. A missing
+  `stage_focus` entry for an enabled post-sale stage is now a config warning.
 - `apply -- --ingest --reconcile` exits non-zero when any connector reports an
   error, so unattended runs fail visibly.
+
+### Fixed
+- Rep Slack handles fold accents ("José Núñez" is `jose.nunez`, was
+  `jos.n.ez`). Handles stored the old way still resolve; run
+  `npm run repair:slack-identities -- --confirm` to rewrite them, and rename
+  any accented handle under `rep_personas` in `config/slack-personas.yaml` so
+  its avatar keeps binding.
 
 ## [0.1.0] - 2026-08-14
 

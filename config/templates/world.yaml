@@ -312,6 +312,18 @@ artifacts:
   # 1.0: a CRM where every close is neatly written up needs no win-loss
   # programme downstream. Incompleteness is what makes the surveys matter.
   ae_close_note_rate: 0.5
+  # Post-sale check-in call on won deals, 3 to 6 weeks after close. This is where
+  # customers say what is working: the gains that pre-sale calls lack. rate 0 = off.
+  customer_checkin:
+    rate: 0.9
+    after_days: [21, 42]
+    stage: Customer check-in
+  # A second post-sale call about 3 months after close, once the team has real
+  # usage to report. rate 0 = off.
+  customer_review:
+    rate: 0.8
+    after_days: [75, 110]
+    stage: Customer review
   internal_collateral:
     count: [4, 8]
     # TODO: adjust to the internal doc types your company would produce.

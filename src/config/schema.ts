@@ -240,6 +240,30 @@ export const WorldConfigSchema = z.object({
      * win-loss interviews necessary. 1.0 restores the old always-on behavior.
      */
     ae_close_note_rate: z.number().min(0).max(1).default(1),
+    /**
+     * A post-sale customer check-in call on won deals, `after_days` past the
+     * close. This is where buyers talk about what is working, so it carries the
+     * gains that pre-sale calls (pain-heavy by design) cannot. rate 0 = off.
+     */
+    customer_checkin: z
+      .object({
+        rate: z.number().min(0).max(1).default(0.9),
+        after_days: IntRange.default([21, 42]),
+        stage: z.string().default("Customer check-in"),
+      })
+      .prefault({}),
+    /**
+     * A later post-sale review call on won deals (e.g. a quarterly business
+     * review), `after_days` past the close. Same shape and purpose as
+     * customer_checkin: months of real usage to talk about. rate 0 = off.
+     */
+    customer_review: z
+      .object({
+        rate: z.number().min(0).max(1).default(0.8),
+        after_days: IntRange.default([75, 110]),
+        stage: z.string().default("Customer review"),
+      })
+      .prefault({}),
     internal_collateral: z.object({
       count: IntRange,
       types: z.array(z.string()).min(1),

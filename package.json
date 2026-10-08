@@ -40,6 +40,7 @@
     "assign-use-cases": "tsx scripts/assign-use-cases.ts",
     "backfill:created-at": "tsx scripts/backfill-created-at.ts",
     "repair:slack-identities": "tsx scripts/repair-slack-identities.ts",
+    "slack:repost-as-users": "tsx scripts/slack-repost-as-users.ts",
     "cohort": "tsx scripts/cohort-status.ts",
     "cohort:select": "tsx scripts/cohort-select.ts",
     "cohort:prune-slack": "tsx scripts/cohort-prune-slack.ts",

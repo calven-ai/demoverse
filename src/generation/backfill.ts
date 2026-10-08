@@ -12,7 +12,15 @@ import type { World } from "../ledger/schema.js";
 import { openStages, stageRank } from "../pipeline/stages.js";
 import { dealShape, stageForElapsed } from "../pipeline/shape.js";
 import { closeTarget } from "./advance.js";
-import { planArtifact, artifactDetail, planDealTouchpoints, type PlanFn } from "./touchpoints.js";
+import {
+  planArtifact,
+  artifactDetail,
+  planDealTouchpoints,
+  checkinDate,
+  postSaleCalls,
+  planCheckin,
+  type PlanFn,
+} from "./touchpoints.js";
 
 /**
  * Rebuild `stageHistory` for deals created before the field existed.
@@ -122,9 +130,16 @@ export function backfillTouchpoints(
   // time, means no prose is ever generated for a destination it cannot reach.
   const cohort = cohortIndex ?? new CohortIndex();
   for (const opp of targets) {
-    if (world.artifacts.some((a) => a.dealId === opp.id)) continue; // already backfilled
-    const rng = new Rng(`${world.seed}|backfill|${opp.id}`);
-    planDealTouchpoints(world, cfg, ledger, opp, horizonDate, planned, rng, cohort.allowsSlack(opp.id));
+    if (!world.artifacts.some((a) => a.dealId === opp.id)) {
+      const rng = new Rng(`${world.seed}|backfill|${opp.id}`);
+      planDealTouchpoints(world, cfg, ledger, opp, horizonDate, planned, rng, cohort.allowsSlack(opp.id));
+    }
+    // Post-sale calls postdate the cycle, so they are planted even on an
+    // already-backfilled deal; planCheckin is idempotent.
+    for (const spec of postSaleCalls(cfg)) {
+      const d = checkinDate(cfg, world.seed, opp, spec);
+      if (d && !isBefore(horizonDate, d)) planCheckin(world, cfg, ledger, opp, d, planned, spec.stage);
+    }
   }
   return { plannedArtifactIds };
 }

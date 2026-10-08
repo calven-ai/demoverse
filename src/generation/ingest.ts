@@ -67,8 +67,8 @@ export interface IngestReport {
 export function personaResolver(
   world: World,
   cfg: Config,
-): (handle: string) => { display: string; avatar?: string } | undefined {
-  const map = new Map<string, { display: string; avatar?: string }>();
+): (handle: string) => { handle: string; display: string; avatar?: string } | undefined {
+  const map = new Map<string, { handle: string; display: string; avatar?: string }>();
   const withRole = (name: string, role?: string): string => (role ? `${name} (${role})` : name);
   // The customer's sales org: deal-owning ICs are Account Executives; managers
   // show their management title. (Their CRM `title` may say something else, e.g.
@@ -76,25 +76,43 @@ export function personaResolver(
   const repRole = (r: World["reps"][number]): string =>
     r.role === "manager" ? (r.title ?? "Sales Manager") : "Account Executive";
   for (const r of world.reps) {
-    map.set(handleFor(r.name), { display: withRole(r.name, repRole(r)) });
+    map.set(handleFor(r.name), { handle: handleFor(r.name), display: withRole(r.name, repRole(r)) });
   }
   // rep_personas pin the avatar; role still comes from the matching rep.
   for (const p of cfg.slackPersonas.rep_personas) {
     const rep = world.reps.find((r) => handleFor(r.name) === normalizeHandle(p.handle));
     map.set(normalizeHandle(p.handle), {
+      handle: normalizeHandle(p.handle),
       display: withRole(p.display, rep ? repRole(rep) : "Account Executive"),
       avatar: p.avatar,
     });
   }
   // Standing internal personas carry an explicit role.
   for (const p of cfg.slackPersonas.internal_personas) {
-    map.set(normalizeHandle(p.handle), { display: withRole(p.display, p.role), avatar: p.avatar });
+    map.set(normalizeHandle(p.handle), {
+      handle: normalizeHandle(p.handle),
+      display: withRole(p.display, p.role),
+      avatar: p.avatar,
+    });
+  }
+  // Handles stored before accents were folded ("Núñez" -> n.ez) still resolve, to
+  // the current entry; repair-slack-identities rewrites them to the canonical one.
+  for (const r of world.reps) {
+    const legacy = r.name.toLowerCase().replace(/[^a-z]+/g, ".");
+    const current = map.get(handleFor(r.name));
+    if (legacy !== handleFor(r.name) && current && !map.has(legacy)) map.set(legacy, current);
   }
   return (handle: string) => map.get(normalizeHandle(handle));
 }
 
-function handleFor(name: string): string {
-  return name.toLowerCase().replace(/[^a-z]+/g, ".");
+/** A rep's Slack handle: accents folded, then every non-letter run -> ".".
+ * "José Núñez" -> jose.nunez. */
+export function handleFor(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z]+/g, ".");
 }
 
 /**
@@ -198,7 +216,7 @@ export function ingestResults(
       const messages: SlackMessage[] = parsed.data.messages.map((m) => {
         const persona = resolve(m.personaHandle)!;
         return {
-          personaHandle: normalizeHandle(m.personaHandle),
+          personaHandle: persona.handle,
           personaDisplay: persona.display,
           avatar: persona.avatar,
           text: m.text,

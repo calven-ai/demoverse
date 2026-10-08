@@ -291,3 +291,65 @@ export function planDealTouchpoints(
     }
   }
 }
+
+/** One post-sale call spec (artifacts.customer_checkin / customer_review). */
+export type PostSaleCall = Config["world"]["artifacts"]["customer_checkin"];
+
+/** The post-sale call specs that are switched on, earliest first. */
+export function postSaleCalls(cfg: Config): PostSaleCall[] {
+  const a = cfg.world.artifacts;
+  return [a.customer_checkin, a.customer_review].filter((s) => s.rate > 0);
+}
+
+/** Whether a call stage is a post-sale one (a customer call, not a sales call). */
+export function isPostSaleStage(cfg: Config, stage: string): boolean {
+  const a = cfg.world.artifacts;
+  return stage === a.customer_checkin.stage || stage === a.customer_review.stage;
+}
+
+/**
+ * The date of a post-sale call for a won deal, or undefined when this deal gets
+ * none (the spec's rate). Stable per deal, so the live engine and the historical
+ * planner agree on it. Defaults to the check-in.
+ */
+export function checkinDate(
+  cfg: Config,
+  seed: string,
+  opp: Opportunity,
+  spec: PostSaleCall = cfg.world.artifacts.customer_checkin,
+): ISODate | undefined {
+  if (opp.status !== "won" || !opp.closeDate || spec.rate <= 0) return undefined;
+  const key =
+    spec.stage === cfg.world.artifacts.customer_checkin.stage ? "checkin" : `postsale:${spec.stage}`;
+  const rng = new Rng(`${seed}|${key}|${opp.id}`);
+  if (!rng.chance(spec.rate)) return undefined;
+  return addDays(opp.closeDate, rng.int(spec.after_days[0], spec.after_days[1]));
+}
+
+/**
+ * Plant a post-sale call for a won deal: a transcript dated `date` at `stage`.
+ * Idempotent: a deal that already has one at that stage is skipped.
+ */
+export function planCheckin(
+  world: World,
+  cfg: Config,
+  ledger: Ledger,
+  opp: Opportunity,
+  date: ISODate,
+  planned: PlanFn,
+  stage: string = cfg.world.artifacts.customer_checkin.stage,
+): boolean {
+  const exists = world.artifacts.some(
+    (a) => a.dealId === opp.id && a.kind === "call_transcript" && a.grounding.stage === stage,
+  );
+  if (exists) return false;
+  planned({
+    id: nextId(world.artifacts, "art"),
+    kind: "call_transcript",
+    dealId: opp.id,
+    title: `${ledger.account(opp.accountId).name} — ${stage} call`, // prose-lint: allow-emdash (external record name)
+    date,
+    grounding: { ...dealFacts(ledger, opp), stage },
+  });
+  return true;
+}

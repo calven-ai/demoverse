@@ -42,7 +42,7 @@ Three commands advance the world. `npm run pipeline` forces exactly one week. Pl
 | Per deal | 0–3 touch points, this stage only | every stage the deal actually reached |
 | When | the routine run, forever | once, to seed history |
 
-The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email; its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts. The backfill exists only to give historical deals their past. Confuse the two and you generate a full detail layer for a freshly-opened deal, which reads as fake on sight.
+The living increment is the core motion, and what keeps the world believable. A deal opened this week has one discovery call and maybe an intro email; its Evaluation call happens in a *later* run, once it reaches Evaluation. Not every deal walks that path: a short cycle skips stages, a stalled one sits in the same stage for weeks earning nothing, and a fast-track deal closes with barely two artifacts. The backfill exists only to give historical deals their past. It also plants a won deal's post-sale check-in and review calls once their dates have passed, even on a deal that was backfilled before those calls existed. Confuse the two and you generate a full detail layer for a freshly-opened deal, which reads as fake on sight.
 
 The backfill loop, per opportunity (resume-safe, one deal at a time):
 
@@ -66,6 +66,7 @@ Only deals in `state/cohort.json` ever reach external systems: a curated ~50-dea
 npm run cohort                          # status table + regenerate the summary
 npm run cohort -- --pending             # members still needing generation
 npm run cohort:select                   # (re)pick membership, deterministic
+npm run cohort:select -- --shape-trend --dry-run   # add deals so the monthly win rate climbs
 npm run cohort:prune-slack              # drop unfilled Slack artifacts from seed members
 npm run cohort:prune-winloss            # report win-loss coverage across the cohort
 npm run sf:purge -- --noncohort         # shrink the CRM org to the cohort (dry-run by default)
@@ -74,6 +75,7 @@ npm run sf:purge -- --noncohort         # shrink the CRM org to the cohort (dry-
 Two mix rules are worth checking after any bulk generation, because config is not self-evidently correct and the mix it produces is the check:
 
 - **Win-loss scarcity.** Roughly one closed deal in three carries a survey or interview (`world.yaml` `winloss.mode_mix`, `none` ≈ 0.67). If most of your cohort's closed deals have one, fix the config before generating prose. A world where every close gets a debrief reads as generated, and absence stops meaning anything.
+- **Shaping the monthly trend.** A dashboard that plots the cohort's competitive win rate month by month swings wildly on a handful of deals. `--shape-trend` adds decided deals from the ledger so each of the trailing `--months` (default 12) lands near a straight line from `--from` to `--to`, which default to your trends' win-rate target at each end. It steers membership only, never an outcome, and only adds members. The added deals enroll as `seed`, so run `/backfill-opps` for them afterwards.
 - **Slack is weekly-members-only.** Seed-sourced cohort members never get Slack artifacts ([why](connectors/slack.md#the-weekly-members-only-rule)).
 
 ## Changing the story
@@ -93,7 +95,21 @@ Some direction changes durably: "from now on, win rate climbs". That's a **Tier-
    "winRate": { "baseline": 0.48, "trendPerQuarter": 0.04 }
    ```
 
-The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward: data already written stays, only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
+The common mappings: deal velocity → `volume.newOppsPerWeek`; a competitor getting tougher → `competitors.<name>.driftPerQuarter`; win-rate trajectory → `winRate.baseline` / `winRate.trendPerQuarter`; what buyers talk about over time → `voice.arcs` and `voice.gainShare`. Amending later moves the old entry to `## Superseded` and adjusts the trajectory from that date forward: data already written stays, only the path ahead changes. The engine echoes back how it resolved any directive or nudge before applying it, so read the echo.
+
+A voice arc is a theme with a dated weight curve. A call, survey or interview dated where the weight is high is likely to have the buyer say it, in their own words and quotably, so a theme dashboard sees it rise and fade. `gainShare` steers the balance of gains (what works, what they expect) against pains over time. Post-sale calls voice `gain` and `job` arcs; pre-sale calls voice `pain`, `buying_trigger` and `job`.
+
+```jsonc
+"voice": {
+  "arcs": [
+    { "label": "AI search answers", "category": "pain",
+      "says": "Buyers ask an AI assistant before they ever talk to us.",
+      "points": [["2025-01-01", 0.1], ["2025-09-01", 0.8]] }
+  ],
+  "gainShare": [["2025-01-01", 0.3], ["2025-09-01", 0.5]],
+  "maxArcsPerArtifact": 3
+}
+```
 
 ## Lint triage
 

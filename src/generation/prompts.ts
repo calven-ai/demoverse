@@ -14,12 +14,17 @@ import type { Artifact, Opportunity } from "../ledger/schema.js";
 import type { GenerationRequest } from "./requests.js";
 import { varietyBlock, artifactShape, castSubset, bannedPhrasesRule } from "./variety.js";
 import { useCaseBrief } from "../use-cases.js";
+import { handleFor } from "./ingest.js";
+import { isPostSaleStage } from "./touchpoints.js";
+import { voiceFor, type Trends, type VoiceArc } from "../trends.js";
 
 interface Ctx {
   config: Config;
   ledger: Ledger;
   /** world.seed. Drives the deterministic variety axes (variety.ts). */
   seed: string;
+  /** state/trends.json: the customer-voice arcs (absent means no voice block). */
+  trends?: Trends;
 }
 
 const DETAIL_GUIDANCE: Record<"low" | "medium" | "high", string> = {
@@ -88,6 +93,42 @@ function commonRules(ctx: Ctx): string {
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+const VOICE_CATEGORY_LABEL: Record<VoiceArc["category"], string> = {
+  pain: "pain",
+  job: "job to be done",
+  buying_trigger: "buying trigger",
+  gain: "gain / what works",
+};
+
+/**
+ * The dated customer-voice block: which trending themes this buyer voices, and
+ * the gain-vs-pain balance for the period. A theme only clusters downstream if
+ * it is said plainly, so the block asks for explicit, quotable buyer lines.
+ * Returns [] when there is nothing to say, else the block plus a blank line.
+ */
+function voiceSection(ctx: Ctx, artifact: Artifact, categories: VoiceArc["category"][]): string[] {
+  if (!ctx.trends) return [];
+  const { arcs, gainShare } = voiceFor(ctx.trends, artifact.date, `${ctx.seed}|${artifact.id}`, categories);
+  const lines: string[] = [];
+  if (arcs.length) {
+    lines.push(
+      "CUSTOMER VOICE (what buyers are talking about around this date; weave EACH of these in naturally):",
+      ...arcs.map((a) => `  - (${VOICE_CATEGORY_LABEL[a.category]}) ${a.label}: e.g. "${a.says.trim()}"`),
+      "  The buyer states each one explicitly, in their own first-person words (paraphrase the example, never copy it),",
+      "  at least once in a line that would stand on its own as a quote. Keep the deal's primary use case dominant.",
+    );
+  }
+  if (gainShare !== undefined) {
+    const pct = Math.round(gainShare * 100);
+    lines.push(
+      `TONE BALANCE: about ${pct}% of the buyer's statements about their situation and ${companyShort(ctx)} are GAINS`,
+      `(what is working, what they like, the outcome they expect or got) and the rest pains. Make at least 3 gains`,
+      `explicit and quotable (on a pre-sale call: what they like in what they've seen, the outcome they expect).`,
+    );
+  }
+  return lines.length ? [lines.join("\n"), ""] : [];
 }
 
 /** The per-deal variety block + this artifact's structural shape, ready to insert. */
@@ -202,7 +243,7 @@ function callTranscriptPrompt(ctx: Ctx, artifact: Artifact): string {
     ...contacts.map((c) => `  - ${c.name}, ${c.title} (${c.buyingRole})`),
   ].join("\n");
   return [
-    `Write a realistic ${stage} sales call transcript, dated ${artifact.date}.`,
+    `Write a realistic ${stage}${isPostSaleStage(ctx.config, stage) ? " customer" : " sales"} call transcript, dated ${artifact.date}.`,
     DETAIL_GUIDANCE[artifact.detailLevel],
     `Produce a FULL multi-turn conversation (many back-and-forth exchanges), not a summary or a handful of lines.`,
     "",
@@ -216,6 +257,13 @@ function callTranscriptPrompt(ctx: Ctx, artifact: Artifact): string {
     "",
     varietySection(ctx, artifact),
     "",
+    // Pre-sale calls voice what hurts and what they need; a "what works now"
+    // gain only fits once the buyer is a customer.
+    ...voiceSection(
+      ctx,
+      artifact,
+      isPostSaleStage(ctx.config, stage) ? ["gain", "job"] : ["pain", "buying_trigger", "job"],
+    ),
     productBlock(ctx),
     "",
     `Format as markdown: a short header (date, attendees, stage), then a speaker-labeled transcript.`,
@@ -312,6 +360,7 @@ function surveyPrompt(ctx: Ctx, artifact: Artifact): string {
     varietySection(ctx, artifact),
     `The free-text answers must reflect this deal's VARIETY backstory and objections. Do not write a generic evaluation story.`,
     "",
+    ...voiceSection(ctx, artifact, ["gain", "pain"]),
     `Questionnaire: ${survey.meta.title}`,
     renderSurvey(survey, company, modules),
     "",
@@ -343,6 +392,7 @@ function interviewPrompt(ctx: Ctx, artifact: Artifact): string {
     "",
     varietySection(ctx, artifact),
     "",
+    ...voiceSection(ctx, artifact, ["gain", "pain"]),
     `This is the "${survey.meta.title}" conversation. Cover these topics (the interviewer probes naturally, not as a rigid list):`,
     topics,
     "",
@@ -463,7 +513,7 @@ function internalRoster(ctx: Ctx): string[] {
  */
 function personaRoster(ctx: Ctx, deal: Opportunity, artifact: Artifact): string {
   const rep = ctx.ledger.rep(deal.ownerRepId);
-  const repHandle = rep.name.toLowerCase().replace(/[^a-z]+/g, ".");
+  const repHandle = handleFor(rep.name);
   const repVoice = ctx.config.slackPersonas.rep_personas.find((p) => p.handle === repHandle)?.voice;
   const cast = castSubset(ctx.seed, artifact.id, ctx.config.slackPersonas.internal_personas, 2, 3);
   return [

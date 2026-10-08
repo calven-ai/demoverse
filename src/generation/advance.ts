@@ -57,6 +57,9 @@ import {
   normalizeModeMix,
   shouldEmitPerStage,
   planCloseArtifacts,
+  checkinDate,
+  postSaleCalls,
+  planCheckin,
 } from "./touchpoints.js";
 export { backfillStageHistory, backfillTouchpoints } from "./backfill.js";
 
@@ -430,6 +433,18 @@ export function advanceWorld(
               grounding: { ...dealFacts(ledger, opp), stage: entered },
             });
           }
+        }
+      }
+    }
+
+    // --- 2b. Post-sale calls on won deals whose date falls in this period ----
+    if (cfg.world.generate.transcripts) {
+      for (const opp of world.opportunities) {
+        if (opp.status !== "won" || !proseFor(opp.id)) continue;
+        for (const spec of postSaleCalls(cfg)) {
+          const d = checkinDate(cfg, world.seed, opp, spec);
+          if (!d || isBefore(d, period.start) || isBefore(period.end, d)) continue;
+          planCheckin(world, cfg, ledger, opp, d, planned, spec.stage);
         }
       }
     }

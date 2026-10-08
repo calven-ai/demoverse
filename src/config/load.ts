@@ -200,7 +200,12 @@ function validateCrossRefs(cfg: Config): void {
   // Per-stage call attendees must reference real persona roles and real stages.
   {
     const personaRoles = new Set(cfg.personas.personas.map((p) => p.role));
-    const stages = new Set(cfg.world.pipeline.stages);
+    // Post-sale calls are call stages without being a pipeline stage.
+    const stages = new Set([
+      ...cfg.world.pipeline.stages,
+      cfg.world.artifacts.customer_checkin.stage,
+      cfg.world.artifacts.customer_review.stage,
+    ]);
     for (const [stage, roles] of Object.entries(cfg.personas.attendees_by_stage)) {
       if (!stages.has(stage)) {
         warnings.push(
@@ -212,6 +217,15 @@ function validateCrossRefs(cfg: Config): void {
           warnings.push(`personas.yaml attendees_by_stage.${stage} role "${role}" has no matching persona.`);
         }
       }
+    }
+  }
+
+  // An enabled post-sale call without its own stage_focus would be briefed as a sales call.
+  for (const spec of [cfg.world.artifacts.customer_checkin, cfg.world.artifacts.customer_review]) {
+    if (spec.rate > 0 && !cfg.prose.stage_focus[spec.stage]) {
+      warnings.push(
+        `prose.yaml stage_focus has no "${spec.stage}" entry; those post-sale calls fall back to the sales-call focus.`,
+      );
     }
   }
 
