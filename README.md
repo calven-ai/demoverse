@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://youtu.be/2hih3Pc0Ipk"><img src="docs/assets/video-poster.png" alt="Watch the 10-minute Demoverse walkthrough on YouTube" width="820"></a><br>
-  <sub><a href="https://youtu.be/2hih3Pc0Ipk">▶ Watch the 10-minute walkthrough</a></sub>
+  <a href="https://youtu.be/hJngH753boI"><img src="docs/assets/video-poster.png" alt="Watch the 10-minute Demoverse walkthrough on YouTube" width="820"></a><br>
+  <sub><a href="https://youtu.be/hJngH753boI">▶ Watch the 10-minute walkthrough</a></sub>
 </p>
 
 <p align="center">
