@@ -5,7 +5,7 @@
 <h1 align="center">Demoverse</h1>
 
 <p align="center">
-  <b>Grow a fake company's entire sales history across CRM, calls, email and Slack.<br> Then keep it moving, week after week.</b>
+  <b>Demoverse is an open-source synthetic B2B sales data generator that grows a fictional company's sales history in Salesforce, HubSpot, Google Drive and Slack (deals, call transcripts, emails, Slack threads, win-loss interviews) and moves it forward one week at a time, written by your Claude Code agent.</b>
 </p>
 
 <p align="center">
@@ -38,6 +38,14 @@ is pushed into [Salesforce](docs/connectors/salesforce.md),
 [Slack](docs/connectors/slack.md) (or
 [your own connector](docs/connectors/build-your-own.md)), where your product
 ingests it like production data.
+
+Built by [Calven](https://calven.ai) to demo our own product on a believable
+company; a private deployment of this engine powers Calven's live demo.
+
+<p align="center">
+  <a href="https://youtu.be/hJngH753boI"><img src="docs/assets/video-poster.png" alt="Demoverse walkthrough on YouTube: a fictional company's opportunities in a real Salesforce org" width="720"></a><br>
+  <sub><a href="https://youtu.be/hJngH753boI">▶ Watch the 10-minute walkthrough</a>: the config, the weekly loop, then the data in Salesforce, Google Drive and Slack.</sub>
+</p>
 
 ### Works with
 
@@ -198,5 +206,4 @@ standards live in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## License
 
-[MIT](LICENSE). Built by the team at [Calven](https://calven.ai), where a
-private deployment of this engine powers the live product demo.
+[MIT](LICENSE).

@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-26
+
 ### Added
 - Slack persona accounts: a persona with a user token (`SLACK_USER_TOKENS`
   JSON map, or `SLACK_USER_TOKEN_<HANDLE>`) posts as its own workspace member
@@ -33,6 +35,8 @@ All notable changes to this project are documented here. The format follows
   never outcomes; additive; dry-run with `--dry-run`.
 
 ### Changed
+- README opens with a one-sentence definition; the 10-minute video
+  walkthrough follows the intro.
 - The weekly workflow (`.github/workflows/pipeline-update.yml`) runs on Node
   24 instead of Node 20, which reached end of life on 2026-04-30 and gets no
   security fixes. Node 24 is already in the CI matrix; `engines` is
@@ -106,5 +110,6 @@ First public release.
 - `.github/CODEOWNERS` used a bare org login, which GitHub matches to no
   reviewer, so review requests were never assigned.
 
-[Unreleased]: https://github.com/calven-ai/demoverse/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/calven-ai/demoverse/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/calven-ai/demoverse/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/calven-ai/demoverse/releases/tag/v0.1.0
