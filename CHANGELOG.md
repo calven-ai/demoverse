@@ -35,8 +35,8 @@ All notable changes to this project are documented here. The format follows
   never outcomes; additive; dry-run with `--dry-run`.
 
 ### Changed
-- README opens with a one-sentence definition and the 10-minute video
-  walkthrough.
+- README opens with a one-sentence definition; the 10-minute video
+  walkthrough follows the intro.
 - The weekly workflow (`.github/workflows/pipeline-update.yml`) runs on Node
   24 instead of Node 20, which reached end of life on 2026-04-30 and gets no
   security fixes. Node 24 is already in the CI matrix; `engines` is

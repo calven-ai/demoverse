@@ -1,12 +1,11 @@
+<p align="center">
+  <img src="docs/assets/hero.svg" alt="Demoverse, a living synthetic sales world" width="820">
+</p>
+
 <h1 align="center">Demoverse</h1>
 
 <p align="center">
   <b>Demoverse is an open-source synthetic B2B sales data generator that grows a fictional company's sales history in Salesforce, HubSpot, Google Drive and Slack (deals, call transcripts, emails, Slack threads, win-loss interviews) and moves it forward one week at a time, written by your Claude Code agent.</b>
-</p>
-
-<p align="center">
-  <a href="https://youtu.be/hJngH753boI"><img src="docs/assets/video-poster.png" alt="Watch the 10-minute Demoverse walkthrough on YouTube" width="820"></a><br>
-  <sub><a href="https://youtu.be/hJngH753boI">▶ Watch the 10-minute walkthrough</a></sub>
 </p>
 
 <p align="center">
@@ -42,6 +41,11 @@ ingests it like production data.
 
 Built by [Calven](https://calven.ai) to demo our own product on a believable
 company; a private deployment of this engine powers Calven's live demo.
+
+<p align="center">
+  <a href="https://youtu.be/hJngH753boI"><img src="docs/assets/video-poster.png" alt="Demoverse walkthrough on YouTube: a fictional company's opportunities in a real Salesforce org" width="720"></a><br>
+  <sub><a href="https://youtu.be/hJngH753boI">▶ Watch the 10-minute walkthrough</a>: the config, the weekly loop, then the data in Salesforce, Google Drive and Slack.</sub>
+</p>
 
 ### Works with
 
