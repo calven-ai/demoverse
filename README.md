@@ -204,6 +204,15 @@ Issues and PRs welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Security
 reports go through [SECURITY.md](SECURITY.md), never a public issue. Community
 standards live in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
+## More from Calven
+
+- [calven-mcp](https://github.com/calven-ai/calven-mcp): your approved GTM context in Claude, ChatGPT, Codex, Cursor and Copilot, through a remote MCP server.
+- [marketing-as-code](https://github.com/calven-ai/marketing-as-code): a template repo that keeps strategy, messaging and briefs as plain text for agents to read and write.
+- [calven-migrate-from-klue](https://github.com/calven-ai/calven-migrate-from-klue): export your Klue cards and battlecards to Markdown and JSON on your machine.
+- [calven-migrate-from-crayon](https://github.com/calven-ai/calven-migrate-from-crayon): export your Crayon battlecards and win/loss stories to Markdown and JSON on your machine.
+
+All projects: [github.com/calven-ai](https://github.com/calven-ai)
+
 ## License
 
 [MIT](LICENSE).
