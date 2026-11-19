@@ -64,7 +64,7 @@
     "test": "node --test --import tsx tests/*.test.ts"
   },
   "dependencies": {
-    "@slack/web-api": "^8.2.0",
+    "@slack/web-api": "^8.3.0",
     "googleapis": "^188.0.0",
     "yaml": "^2.9.1",
     "zod": "^4.6.7"
